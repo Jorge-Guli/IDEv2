@@ -98,6 +98,7 @@ class SimCfg:
     poblacion_inicial: int = 200
     registrar_cada: int = 50
     imagen_cada: int = 0  # 0: solo imagen final
+    dispositivo: str = "auto"  # "auto" (GPU si hay), "cpu" o "gpu"
 
 
 @dataclass

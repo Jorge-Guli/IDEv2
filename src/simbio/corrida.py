@@ -35,7 +35,8 @@ def correr(cfg: Config, salida: Path | None = None, genomas=None, cepas=None,
         persistencia.guardar_historial(sim.historial, salida / "metricas.csv")
         persistencia.guardar_poblacion(sim, salida / "poblacion.npz")
         persistencia.guardar_linaje(sim, salida / "linaje.npz")
-        resumen = {"pasos": sim.t, "poblacion_final": sim.pob.n, "segundos": round(duracion, 2),
+        resumen = {"pasos": sim.t, "poblacion_final": sim.pob.n, "dispositivo": sim.dispositivo,
+                   "segundos": round(duracion, 2),
                    "pasos_por_segundo": round(sim.t / max(duracion, 1e-9), 2)}
         (salida / "resumen.json").write_text(json.dumps(resumen, indent=2), encoding="utf-8")
         if imagenes:

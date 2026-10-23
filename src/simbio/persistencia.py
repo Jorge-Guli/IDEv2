@@ -9,6 +9,7 @@ import numpy as np
 
 from . import genoma as gen
 from .config import Config
+from .dispositivo import a_cpu
 
 
 def guardar_config(cfg: Config, ruta: Path) -> None:
@@ -32,8 +33,9 @@ def leer_historial(ruta: Path) -> list[dict[str, float]]:
 
 def guardar_poblacion(sim, ruta: Path) -> None:
     p = sim.pob
-    extra = {k: p[k] for k in ("generacion", "cepa", "E", "id", "estres")}
-    np.savez_compressed(ruta, **p.genomas(), **extra)
+    datos = {k: a_cpu(v) for k, v in p.genomas().items()}
+    datos.update({k: a_cpu(p[k]) for k in ("generacion", "cepa", "E", "id", "estres")})
+    np.savez_compressed(ruta, **datos)
 
 
 def cargar_genomas(ruta: Path) -> dict[str, np.ndarray]:

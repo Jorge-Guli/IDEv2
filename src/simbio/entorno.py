@@ -20,16 +20,19 @@ def generar_parches(alto: int, ancho: int, escala: float, contraste: float,
 
 
 class Entorno:
-    def __init__(self, cfg: MundoCfg, rng: np.random.Generator):
+    def __init__(self, cfg: MundoCfg, rng: np.random.Generator, xp=np):
         self.cfg = cfg
         self.alto, self.ancho = cfg.alto, cfg.ancho
         self.rng = rng
+        self.xp = xp
         self.K_base = self._nuevo_mapa()
         self.R = self.K_base * cfg.recurso_inicial
 
     def _nuevo_mapa(self) -> np.ndarray:
+        # el mapa se genera en CPU (mismo resultado en cualquier dispositivo) y se copia
         c = self.cfg
-        return c.capacidad_max * generar_parches(c.alto, c.ancho, c.escala_parche, c.contraste, self.rng)
+        return self.xp.asarray(c.capacidad_max * generar_parches(c.alto, c.ancho, c.escala_parche, c.contraste,
+                                                                 self.rng))
 
     def capacidad(self, t: int) -> np.ndarray:
         c = self.cfg
@@ -43,5 +46,5 @@ class Entorno:
             self.K_base = self._nuevo_mapa()
         K = self.capacidad(t)
         self.R += self.cfg.regeneracion * (K - self.R)
-        np.minimum(self.R, K, out=self.R)
-        np.maximum(self.R, 0.0, out=self.R)
+        self.xp.minimum(self.R, K, out=self.R)
+        self.xp.maximum(self.R, 0.0, out=self.R)

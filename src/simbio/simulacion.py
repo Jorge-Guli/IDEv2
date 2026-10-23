@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import numpy as np
 
+from . import dispositivo as dev
 from . import genoma as gen
 from .config import Config
 from .entorno import Entorno
@@ -19,187 +20,203 @@ class Simulacion:
     def __init__(self, cfg: Config, genomas: dict[str, np.ndarray] | None = None,
                  cepas: np.ndarray | None = None):
         self.cfg = cfg
+        self.xp, self.dispositivo = dev.elegir(cfg.sim.dispositivo)
+        xp = self.xp
+        self.DY, self.DX, self.OPUESTA = xp.asarray(DY), xp.asarray(DX), xp.asarray(OPUESTA)
         semilla_entorno, semilla_sim = np.random.SeedSequence(cfg.sim.semilla).spawn(2)
         self.rng = np.random.default_rng(semilla_sim)
-        self.entorno = Entorno(cfg.mundo, np.random.default_rng(semilla_entorno))
-        self.pob = Poblacion(cfg.herencia.genes_max)
+        self.entorno = Entorno(cfg.mundo, np.random.default_rng(semilla_entorno), xp)
+        self.pob = Poblacion(cfg.herencia.genes_max, xp)
         self.t = 0
         self.sig_id = 0
         self.historial: list[dict[str, float]] = []
         self.linaje: list[np.ndarray] = []  # filas (id, padre, nacimiento, generacion, cepa)
         f, a = cfg.fisica, cfg.asociacion
-        self.costo_accion = np.zeros(gen.NUM_PRIM)
-        self.costo_accion[[gen.AVANZAR, gen.GIRAR_IZQ, gen.GIRAR_DER, gen.VOLTERETA, gen.COMER,
-                           gen.UNIRSE, gen.SOLTARSE, gen.COMPARTIR, gen.CONJUGAR]] = [
+        costo = np.zeros(gen.NUM_PRIM)
+        costo[[gen.AVANZAR, gen.GIRAR_IZQ, gen.GIRAR_DER, gen.VOLTERETA, gen.COMER,
+               gen.UNIRSE, gen.SOLTARSE, gen.COMPARTIR, gen.CONJUGAR]] = [
             f.costo_avanzar, f.costo_girar, f.costo_girar, f.costo_voltereta, f.costo_comer,
             a.costo_unirse, a.costo_soltarse, a.costo_compartir, a.costo_conjugar]
+        self.costo_accion = xp.asarray(costo)
+        self.sin_refuerzo = xp.asarray(gen.PRIM_SIN_REFUERZO)
         self.permitidas = gen.primitivas_permitidas(a.activa, a.conjugacion)
-        self.bloqueadas = ~np.isin(np.arange(gen.NUM_PRIM), self.permitidas)
+        self.bloqueadas = xp.asarray(~np.isin(np.arange(gen.NUM_PRIM), self.permitidas))
         self._reiniciar_contadores()
         self.sembrar(genomas, cepas)
 
     # ------------------------------------------------------------------ siembra
     def sembrar(self, genomas: dict[str, np.ndarray] | None, cepas: np.ndarray | None) -> None:
+        xp = self.xp
         if genomas is None:
             genomas = gen.repetir(gen.luca(self.cfg.herencia), self.cfg.sim.poblacion_inicial)
             genomas["etiqueta"] = self.rng.random((len(genomas["mu"]), 2))
+        genomas = gen.a_dispositivo(genomas, xp)
         n = len(genomas["mu"])
-        if cepas is None:
-            cepas = np.zeros(n, dtype=np.int16)
+        cepas = xp.zeros(n, dtype=xp.int16) if cepas is None else xp.asarray(cepas)
         H, W = self.entorno.alto, self.entorno.ancho
-        celdas = self.rng.choice(H * W, n, replace=False)
-        E = np.full(n, self.cfg.fisica.energia_inicial)
+        celdas = xp.asarray(self.rng.choice(H * W, n, replace=False))
+        E = xp.full(n, self.cfg.fisica.energia_inicial)
         nuevos = self._nuevos(genomas, celdas // W, celdas % W, E,
-                              padre=np.full(n, -1), generacion=np.zeros(n, dtype=np.int32),
-                              cepa=cepas, estres=np.zeros(n))
+                              padre=xp.full(n, -1), generacion=xp.zeros(n, dtype=xp.int32),
+                              cepa=cepas, estres=xp.zeros(n))
         self.pob.agregar(nuevos)
 
     def _nuevos(self, genomas, y, x, E, padre, generacion, cepa, estres) -> dict[str, np.ndarray]:
+        xp = self.xp
         n = len(E)
         d = self.pob.vacia(n)
         for k in gen.CAMPOS:
             d[k] = genomas[k]
-        d["y"], d["x"] = y.astype(np.int32), x.astype(np.int32)
-        d["dir"] = self.rng.integers(0, 8, n).astype(np.int8)
+        d["y"], d["x"] = y.astype(xp.int32), x.astype(xp.int32)
+        d["dir"] = xp.asarray(self.rng.integers(0, 8, n).astype(np.int8))
         d["E"], d["E_prev"] = E.copy(), E.copy()
         d["estres"] = estres.copy()
-        d["id"] = np.arange(self.sig_id, self.sig_id + n)
+        d["id"] = xp.arange(self.sig_id, self.sig_id + n)
         self.sig_id += n
         d["padre"] = padre
         d["generacion"] = generacion
-        d["nacimiento"] = np.full(n, self.t, dtype=np.int32)
-        d["cepa"] = cepa.astype(np.int16)
-        self.linaje.append(np.stack([d["id"], padre, d["nacimiento"], generacion, d["cepa"]], axis=1))
+        d["nacimiento"] = xp.full(n, self.t, dtype=xp.int32)
+        d["cepa"] = cepa.astype(xp.int16)
+        self.linaje.append(dev.a_cpu(xp.stack([d["id"], padre, d["nacimiento"], generacion, d["cepa"]], axis=1)))
         return d
 
     # ------------------------------------------------------------------ helpers
     def ocupacion(self, vivos: np.ndarray | None = None) -> np.ndarray:
-        occ = np.full((self.entorno.alto, self.entorno.ancho), -1, dtype=np.int32)
-        idx = np.arange(self.pob.n, dtype=np.int32) if vivos is None else np.flatnonzero(vivos).astype(np.int32)
+        xp = self.xp
+        occ = xp.full((self.entorno.alto, self.entorno.ancho), -1, dtype=xp.int32)
+        idx = xp.arange(self.pob.n, dtype=xp.int32) if vivos is None else xp.flatnonzero(vivos).astype(xp.int32)
         occ[self.pob["y"][idx], self.pob["x"][idx]] = idx
         return occ
 
     def _resolver(self, candidatos: np.ndarray, celdas: np.ndarray) -> np.ndarray:
         """Entre candidatos que apuntan a la misma celda gana uno al azar. Devuelve las posiciones ganadoras."""
-        orden = self.rng.permutation(len(candidatos))
-        _, primero = np.unique(celdas[orden], return_index=True)
+        xp = self.xp
+        orden = xp.asarray(self.rng.permutation(len(candidatos)))
+        _, primero = xp.unique(celdas[orden], return_index=True)
         return orden[primero]
 
     def _reiniciar_contadores(self) -> None:
+        xp = self.xp
         self.cont = {"nacimientos": 0, "muertes": 0, "comido": 0.0, "org_pasos": 0,
                      "compartido": 0.0, "recibido": 0.0, "conjugaciones": 0, "enlaces_creados": 0,
-                     "acciones": np.zeros(gen.NUM_PRIM, dtype=np.int64)}
+                     "acciones": xp.zeros(gen.NUM_PRIM, dtype=xp.int64)}
 
     def vecinos_enlazados(self, occ: np.ndarray) -> np.ndarray:
         """Índice del organismo en cada dirección enlazada (n, 8), o −1."""
+        xp = self.xp
         p = self.pob
         H, W = self.entorno.alto, self.entorno.ancho
-        ny = (p["y"][:, None] + DY[None, :]) % H
-        nx = (p["x"][:, None] + DX[None, :]) % W
-        return np.where(p["socio"] >= 0, occ[ny, nx], -1)
+        ny = (p["y"][:, None] + self.DY[None, :]) % H
+        nx = (p["x"][:, None] + self.DX[None, :]) % W
+        return xp.where(p["socio"] >= 0, occ[ny, nx], -1)
 
     def validar_enlaces(self, occ: np.ndarray) -> np.ndarray:
         """Rompe los enlaces cuyo socio ya no está en la misma posición relativa. Devuelve los vecinos enlazados."""
+        xp = self.xp
         p = self.pob
         j = self.vecinos_enlazados(occ)
         ok = j >= 0
         ok[ok] = p["id"][j[ok]] == p["socio"][ok]
         p["socio"][~ok] = -1
-        return np.where(ok, j, -1)
+        return xp.where(ok, j, -1)
 
     # ------------------------------------------------------------------ percepción y decisión
     def sensar(self, occ: np.ndarray, socios: np.ndarray) -> np.ndarray:
+        xp = self.xp
         p, ent = self.pob, self.entorno
         H, W = ent.alto, ent.ancho
         Emax = self.cfg.fisica.energia_max
-        y, x, d = p["y"], p["x"], p["dir"].astype(np.int64)
+        y, x, d = p["y"], p["x"], p["dir"].astype(xp.int64)
         R = ent.R / max(self.cfg.mundo.capacidad_max, 1e-12)
-        s = np.zeros((p.n, gen.NUM_SENS))
+        s = xp.zeros((p.n, gen.NUM_SENS))
         s[:, gen.S_CONST] = 1.0
         s[:, gen.S_AQUI] = R[y, x]
-        ya, xa = (y + DY[d]) % H, (x + DX[d]) % W
+        ya, xa = (y + self.DY[d]) % H, (x + self.DX[d]) % W
         s[:, gen.S_FRENTE] = R[ya, xa]
         di, dd = (d - 1) % 8, (d + 1) % 8
-        s[:, gen.S_FRENTE_IZQ] = R[(y + DY[di]) % H, (x + DX[di]) % W]
-        s[:, gen.S_FRENTE_DER] = R[(y + DY[dd]) % H, (x + DX[dd]) % W]
+        s[:, gen.S_FRENTE_IZQ] = R[(y + self.DY[di]) % H, (x + self.DX[di]) % W]
+        s[:, gen.S_FRENTE_DER] = R[(y + self.DY[dd]) % H, (x + self.DX[dd]) % W]
         s[:, gen.S_ENERGIA] = p["E"] / Emax
-        ocupada = (occ >= 0).astype(np.int8)
-        vecinos = sum(np.roll(np.roll(ocupada, dy, 0), dx, 1) for dy, dx in zip(DY, DX))
+        ocupada = (occ >= 0).astype(xp.int8)
+        vecinos = sum(xp.roll(xp.roll(ocupada, dy, 0), dx, 1) for dy, dx in zip(self.DY, self.DX))
         s[:, gen.S_VECINOS] = vecinos[y, x] / 8.0
         frente = occ[ya, xa]
         s[:, gen.S_BLOQUEADO] = frente >= 0
-        s[:, gen.S_DELTA_E] = np.clip(p["delta_e"] / self.cfg.aprendizaje.escala_recompensa, -1, 1)
-        s[:, gen.S_RUIDO] = self.rng.uniform(-1.0, 1.0, p.n)
+        s[:, gen.S_DELTA_E] = xp.clip(p["delta_e"] / self.cfg.aprendizaje.escala_recompensa, -1, 1)
+        s[:, gen.S_RUIDO] = xp.asarray(self.rng.uniform(-1.0, 1.0, p.n))
         # sensores sociales
         enlazado = socios >= 0
         n_enl = enlazado.sum(axis=1)
         s[:, gen.S_ENLACES] = n_enl / 8.0
-        e_socios = np.where(enlazado, p["E"][np.maximum(socios, 0)], 0.0).sum(axis=1)
-        s[:, gen.S_ENERGIA_SOCIOS] = np.where(n_enl > 0, e_socios / np.maximum(n_enl, 1), 0.0) / Emax
-        s[:, gen.S_SOCIO_FRENTE] = p["socio"][np.arange(p.n), d] >= 0
+        e_socios = xp.where(enlazado, p["E"][xp.maximum(socios, 0)], 0.0).sum(axis=1)
+        s[:, gen.S_ENERGIA_SOCIOS] = xp.where(n_enl > 0, e_socios / xp.maximum(n_enl, 1), 0.0) / Emax
+        s[:, gen.S_SOCIO_FRENTE] = p["socio"][xp.arange(p.n), d] >= 0
         hay = frente >= 0
-        dist = np.linalg.norm(p["etiqueta"] - p["etiqueta"][np.maximum(frente, 0)], axis=1)
+        dist = xp.linalg.norm(p["etiqueta"] - p["etiqueta"][xp.maximum(frente, 0)], axis=1)
         hay &= self.cfg.asociacion.activa  # sin asociación, los cuatro sensores sociales valen 0
-        s[:, gen.S_SIMILITUD_FRENTE] = np.where(hay, 1.0 - dist / np.sqrt(2.0), 0.0)
+        s[:, gen.S_SIMILITUD_FRENTE] = xp.where(hay, 1.0 - dist / xp.sqrt(2.0), 0.0)
         return s
 
     def decidir(self, s: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
         """Devuelve la primitiva elegida por cada organismo y la activación de cada gen."""
+        xp = self.xp
         p = self.pob
         w = p["w"] + p["P"]
-        z = np.einsum("ngs,ns->ng", w, s) + p["b"] + p["p"]
-        a = np.tanh(z) * p["activo"]
-        expresa = (p["prim"][:, :, None] == np.arange(gen.NUM_PRIM)) & p["activo"][:, :, None]
-        impulso = np.einsum("ng,nge->ne", a, expresa)
+        z = xp.einsum("ngs,ns->ng", w, s) + p["b"] + p["p"]
+        a = xp.tanh(z) * p["activo"]
+        expresa = (p["prim"][:, :, None] == xp.arange(gen.NUM_PRIM)) & p["activo"][:, :, None]
+        impulso = xp.einsum("ng,nge->ne", a, expresa)
         disponible = expresa.any(axis=1) & ~self.bloqueadas
-        impulso = np.where(disponible, impulso, -np.inf)
-        act = np.argmax(impulso, axis=1)
-        maximo = impulso[np.arange(p.n), act]
-        act = np.where(maximo > 0.0, act, gen.DESCANSAR).astype(np.int8)
+        impulso = xp.where(disponible, impulso, -xp.inf)
+        act = xp.argmax(impulso, axis=1)
+        maximo = impulso[xp.arange(p.n), act]
+        act = xp.where(maximo > 0.0, act, gen.DESCANSAR).astype(xp.int8)
         return act, a
 
     # ------------------------------------------------------------------ aprendizaje
     def aprender(self) -> None:
+        xp = self.xp
         p, c = self.pob, self.cfg.aprendizaje
         tuvo = p["ult_act"] >= 0
         # la energía recibida de otros no es resultado de la acción propia: no se refuerza por ella
         dE = p["E"] - p["E_prev"] - p["recibido_paso"]
-        p["recibido_paso"] = np.zeros(p.n)
+        p["recibido_paso"] = xp.zeros(p.n)
         # acciones sin retorno energético propio (reproducirse, ceder energía o genes) no se evalúan
-        valido = tuvo & ~np.isin(p["ult_act"], gen.PRIM_SIN_REFUERZO)
-        p["delta_e"] = np.where(valido, dE, 0.0)
+        valido = tuvo & ~xp.isin(p["ult_act"], self.sin_refuerzo)
+        p["delta_e"] = xp.where(valido, dE, 0.0)
         if c.activo:
-            r = np.clip((dE - p["linea_base"]) / c.escala_recompensa, -1.0, 1.0) * valido
+            r = xp.clip((dE - p["linea_base"]) / c.escala_recompensa, -1.0, 1.0) * valido
             mascara = (p["prim"] == p["ult_act"][:, None]) & p["activo"]
             grad = (1.0 - p["ult_a"] ** 2) * mascara * (p["eta"] * r)[:, None]
             # el decaimiento no puede sacar valores del rango: solo se recortan los genes actualizados
             p["P"] *= 1.0 - c.decaimiento
             p["p"] *= 1.0 - c.decaimiento
-            fi, gi = np.nonzero(grad)
+            fi, gi = xp.nonzero(grad)
             if fi.size:
-                p["P"][fi, gi] = np.clip(p["P"][fi, gi] + grad[fi, gi, None] * p["ult_s"][fi], -c.limite, c.limite)
-                p["p"][fi, gi] = np.clip(p["p"][fi, gi] + grad[fi, gi], -c.limite, c.limite)
-        p["linea_base"] = np.where(valido, (1 - c.memoria_linea_base) * p["linea_base"]
+                p["P"][fi, gi] = xp.clip(p["P"][fi, gi] + grad[fi, gi, None] * p["ult_s"][fi], -c.limite, c.limite)
+                p["p"][fi, gi] = xp.clip(p["p"][fi, gi] + grad[fi, gi], -c.limite, c.limite)
+        p["linea_base"] = xp.where(valido, (1 - c.memoria_linea_base) * p["linea_base"]
                                    + c.memoria_linea_base * dE, p["linea_base"])
 
     # ------------------------------------------------------------------ asociación
     def _compartir(self, act: np.ndarray, socios: np.ndarray) -> None:
+        xp = self.xp
         p, a = self.pob, self.cfg.asociacion
         if self.cfg.asociacion.inerte:  # control: la acción cuesta pero no tiene efecto
             return
         n_enl = (socios >= 0).sum(axis=1)
-        donantes = np.flatnonzero((act == gen.COMPARTIR) & (n_enl > 0))
+        donantes = xp.flatnonzero((act == gen.COMPARTIR) & (n_enl > 0))
         if donantes.size == 0:
             return
         cedido = a.fraccion_compartir * p["E"][donantes]
         p["E"][donantes] -= cedido
         p["dado"][donantes] += cedido
-        filas, dirs = np.nonzero(socios[donantes] >= 0)
+        filas, dirs = xp.nonzero(socios[donantes] >= 0)
         receptores = socios[donantes][filas, dirs]
         cuota = cedido[filas] / n_enl[donantes][filas] * a.eficiencia_compartir
         antes = p["E"].copy()
-        np.add.at(p["E"], receptores, cuota)
-        np.minimum(p["E"], self.cfg.fisica.energia_max, out=p["E"])
+        dev.sumar_en(p["E"], receptores, cuota)
+        xp.minimum(p["E"], self.cfg.fisica.energia_max, out=p["E"])
         recibido = p["E"] - antes
         p["recibido"] += recibido
         p["recibido_paso"] += recibido
@@ -207,44 +224,48 @@ class Simulacion:
         self.cont["recibido"] += float(recibido.sum())
 
     def _soltarse(self, act: np.ndarray, socios: np.ndarray) -> None:
+        xp = self.xp
         p = self.pob
         if self.cfg.asociacion.inerte:  # control: la acción cuesta pero no tiene efecto
             return
-        filas = np.flatnonzero(act == gen.SOLTARSE)
+        filas = xp.flatnonzero(act == gen.SOLTARSE)
         if filas.size == 0:
             return
-        f, k = np.nonzero(socios[filas] >= 0)
-        p["socio"][socios[filas][f, k], OPUESTA[k]] = -1
+        f, k = xp.nonzero(socios[filas] >= 0)
+        p["socio"][socios[filas][f, k], self.OPUESTA[k]] = -1
         p["socio"][filas] = -1
 
     def _unirse(self, act: np.ndarray, occ: np.ndarray) -> None:
+        xp = self.xp
         p = self.pob
         if self.cfg.asociacion.inerte:  # control: la acción cuesta pero no tiene efecto
             return
         H, W = self.entorno.alto, self.entorno.ancho
-        u = np.flatnonzero(act == gen.UNIRSE)
+        u = xp.flatnonzero(act == gen.UNIRSE)
         if u.size == 0:
             return
-        d = p["dir"][u].astype(np.int64)
-        j = occ[(p["y"][u] + DY[d]) % H, (p["x"][u] + DX[d]) % W]
+        d = p["dir"][u].astype(xp.int64)
+        j = occ[(p["y"][u] + self.DY[d]) % H, (p["x"][u] + self.DX[d]) % W]
         ok = (j >= 0) & (p["socio"][u, d] < 0)
         u, d, j = u[ok], d[ok], j[ok]
         p["socio"][u, d] = p["id"][j]
-        p["socio"][j, OPUESTA[d]] = p["id"][u]
+        p["socio"][j, self.OPUESTA[d]] = p["id"][u]
         self.cont["enlaces_creados"] += int(u.size)
 
     def _conjugar(self, act: np.ndarray, socios: np.ndarray) -> None:
+        xp = self.xp
         p = self.pob
         if self.cfg.asociacion.inerte:  # control: la acción cuesta pero no tiene efecto
             return
-        donantes = np.flatnonzero((act == gen.CONJUGAR) & (socios >= 0).any(axis=1))
-        for i in donantes:  # evento poco frecuente: bucle explícito
-            receptor = self.rng.choice(socios[i][socios[i] >= 0])
-            genes = np.flatnonzero(p["activo"][i])
-            libres = np.flatnonzero(~p["activo"][receptor])
+        donantes = dev.a_cpu(xp.flatnonzero((act == gen.CONJUGAR) & (socios >= 0).any(axis=1)))
+        for i in donantes:  # evento poco frecuente: bucle explícito en CPU
+            fila = dev.a_cpu(socios[i])
+            receptor = int(self.rng.choice(fila[fila >= 0]))
+            genes = np.flatnonzero(dev.a_cpu(p["activo"][i]))
+            libres = np.flatnonzero(~dev.a_cpu(p["activo"][receptor]))
             if genes.size == 0 or libres.size == 0:
                 continue
-            g, k = self.rng.choice(genes), libres[0]
+            g, k = int(self.rng.choice(genes)), int(libres[0])
             p["activo"][receptor, k] = True
             p["prim"][receptor, k] = p["prim"][i, g]
             p["w"][receptor, k] = p["w"][i, g]
@@ -263,26 +284,27 @@ class Simulacion:
         todos sus enlazados efectivamente avanzan en su misma dirección: el grupo se mueve junto o no se
         mueve; quien queda frenado por la adhesión no paga el costo de avanzar.
         """
+        xp = self.xp
         p = self.pob
         H, W = self.entorno.alto, self.entorno.ancho
-        i = np.flatnonzero(act == gen.AVANZAR)
+        i = xp.flatnonzero(act == gen.AVANZAR)
         if i.size == 0:
             return
-        d = p["dir"].astype(np.int64)
-        ty, tx = (p["y"][i] + DY[d[i]]) % H, (p["x"][i] + DX[d[i]]) % W
+        d = p["dir"].astype(xp.int64)
+        ty, tx = (p["y"][i] + self.DY[d[i]]) % H, (p["x"][i] + self.DX[d[i]]) % W
         ocupante = occ[ty, tx]
-        o = np.maximum(ocupante, 0)
+        o = xp.maximum(ocupante, 0)
         mueve = act == gen.AVANZAR
         candidato = (ocupante < 0) | (mueve[o] & (d[o] == d[i]))
         # adhesión (según la intención): enlazados que no avanzan en la misma dirección frenan al resto
         adhesion = self.cfg.asociacion.adhesion
         if adhesion:
             s_i = socios[i]
-            sm = np.maximum(s_i, 0)
+            sm = xp.maximum(s_i, 0)
             frenado = ((s_i >= 0) & ~(mueve[sm] & (d[sm] == d[i][:, None]))).any(axis=1)
             candidato &= ~frenado
         # conflictos por la misma celda destino: gana uno al azar
-        avanza = np.zeros(p.n, dtype=bool)
+        avanza = xp.zeros(p.n, dtype=bool)
         g = self._resolver(i[candidato], (ty * W + tx)[candidato])
         avanza[i[candidato][g]] = True
         # punto fijo: se cancela quien entra a la celda de alguien que finalmente no se mueve,
@@ -291,7 +313,7 @@ class Simulacion:
             sigue = avanza[i] & ~((ocupante >= 0) & ~avanza[o])
             if adhesion:
                 sigue &= ~((s_i >= 0) & ~avanza[sm]).any(axis=1)
-            if np.array_equal(sigue, avanza[i]):
+            if xp.array_equal(sigue, avanza[i]):
                 break
             avanza[i] = sigue
         if adhesion:
@@ -301,6 +323,7 @@ class Simulacion:
 
     # ------------------------------------------------------------------ paso
     def paso(self) -> None:
+        xp = self.xp
         cfg, p, ent = self.cfg, self.pob, self.entorno
         f = cfg.fisica
         H, W = ent.alto, ent.ancho
@@ -322,29 +345,29 @@ class Simulacion:
             # quien queda sin energía tras pagar sus costos muere antes de actuar: no come, no se mueve,
             # no ocupa su celda ni sostiene enlaces; se retira al final del paso
             vivos = p["E"] > 0.0
-            self.cont["acciones"] += np.bincount(act[vivos], minlength=gen.NUM_PRIM)
+            self.cont["acciones"] += xp.bincount(act[vivos], minlength=gen.NUM_PRIM)
             self.cont["org_pasos"] += int(vivos.sum())
             if not vivos.all():
                 self.cont["muertes"] += int((~vivos).sum())
-                act = np.where(vivos, act, gen.DESCANSAR).astype(np.int8)
+                act = xp.where(vivos, act, gen.DESCANSAR).astype(xp.int8)
                 occ = self.ocupacion(vivos)
                 socios = self.validar_enlaces(occ)
 
             # giros
-            d = p["dir"].astype(np.int64)
-            d = np.where(act == gen.GIRAR_IZQ, (d - 1) % 8, d)
-            d = np.where(act == gen.GIRAR_DER, (d + 1) % 8, d)
+            d = p["dir"].astype(xp.int64)
+            d = xp.where(act == gen.GIRAR_IZQ, (d - 1) % 8, d)
+            d = xp.where(act == gen.GIRAR_DER, (d + 1) % 8, d)
             volt = act == gen.VOLTERETA
-            d[volt] = self.rng.integers(0, 8, volt.sum())
-            p["dir"] = d.astype(np.int8)
+            d[volt] = xp.asarray(self.rng.integers(0, 8, int(volt.sum())))
+            p["dir"] = d.astype(xp.int8)
 
             # compartir (antes de comer: así quien recibe ajusta lo que toma y el recurso queda en la celda)
             self._compartir(act, socios)
 
             # comer
-            i = np.flatnonzero(act == gen.COMER)
+            i = xp.flatnonzero(act == gen.COMER)
             yi, xi = p["y"][i], p["x"][i]
-            toma = np.minimum(np.minimum(ent.R[yi, xi], f.toma_max), np.maximum(f.energia_max - p["E"][i], 0.0))
+            toma = xp.minimum(xp.minimum(ent.R[yi, xi], f.toma_max), xp.maximum(f.energia_max - p["E"][i], 0.0))
             ent.R[yi, xi] -= toma
             p["E"][i] += toma
             self.cont["comido"] += float(toma.sum())
@@ -362,19 +385,19 @@ class Simulacion:
 
             # estrés: promedio móvil del hambre (energía bajo el umbral), antes de que dividirse la reparta
             h = cfg.herencia
-            hambre = np.clip((h.umbral_hambre - p["E"]) / h.umbral_hambre, 0.0, 1.0)
+            hambre = xp.clip((h.umbral_hambre - p["E"]) / h.umbral_hambre, 0.0, 1.0)
             p["estres"] = (1 - h.memoria_estres) * p["estres"] + h.memoria_estres * hambre
 
             # dividirse (suelto o unido)
             nuevos = None
             divide = (act == gen.DIVIDIRSE) | (act == gen.DIVIDIRSE_UNIDO)
-            i = np.flatnonzero(divide & (p["E"] >= f.energia_min_division))
+            i = xp.flatnonzero(divide & (p["E"] >= f.energia_min_division))
             if i.size:
-                ny = (p["y"][i, None] + DY[None, :]) % H
-                nx = (p["x"][i, None] + DX[None, :]) % W
+                ny = (p["y"][i, None] + self.DY[None, :]) % H
+                nx = (p["x"][i, None] + self.DX[None, :]) % W
                 libres = occ[ny, nx] < 0
-                elegida = np.argmax(np.where(libres, self.rng.random(libres.shape), -1.0), axis=1)
-                fila = np.flatnonzero(libres.any(axis=1))
+                elegida = xp.argmax(xp.where(libres, xp.asarray(self.rng.random(libres.shape)), -1.0), axis=1)
+                fila = xp.flatnonzero(libres.any(axis=1))
                 celdas = ny[fila, elegida[fila]] * W + nx[fila, elegida[fila]]
                 g = self._resolver(i[fila], celdas)
                 padres, celdas, dirs = i[fila][g], celdas[g], elegida[fila][g]
@@ -383,16 +406,16 @@ class Simulacion:
                     hijos = p.genomas(padres)
                     estres = p["estres"]
                     if h.estres_modo == "barajado":  # control: rompe el vínculo con la condición propia
-                        estres = estres[self.rng.permutation(p.n)]
+                        estres = estres[xp.asarray(self.rng.permutation(p.n))]
                     m = gen.tasa_efectiva(hijos["mu"], hijos["sens"], estres[padres], h)
                     gen.mutar(hijos, m, h, self.rng, self.permitidas)
                     nuevos = self._nuevos(hijos, celdas // W, celdas % W, p["E"][padres],
                                           padre=p["id"][padres], generacion=p["generacion"][padres] + 1,
-                                          cepa=p["cepa"][padres], estres=np.zeros(padres.size))
+                                          cepa=p["cepa"][padres], estres=xp.zeros(padres.size))
                     unido = (act[padres] == gen.DIVIDIRSE_UNIDO) & (not cfg.asociacion.inerte)
                     nuevos["dir"][unido] = p["dir"][padres[unido]]  # el clon pegado nace orientado como su progenitor
                     p["socio"][padres[unido], dirs[unido]] = nuevos["id"][unido]
-                    nuevos["socio"][np.flatnonzero(unido), OPUESTA[dirs[unido]]] = p["id"][padres[unido]]
+                    nuevos["socio"][xp.flatnonzero(unido), self.OPUESTA[dirs[unido]]] = p["id"][padres[unido]]
                     self.cont["enlaces_creados"] += int(unido.sum())
                     self.cont["nacimientos"] += padres.size
 
@@ -405,6 +428,7 @@ class Simulacion:
         self.t += 1
 
     def correr(self, pasos: int | None = None, al_paso=None) -> list[dict[str, float]]:
+        xp = self.xp
         for _ in range(self.cfg.sim.pasos if pasos is None else pasos):
             self.paso()
             if al_paso is not None:
@@ -414,23 +438,25 @@ class Simulacion:
     # ------------------------------------------------------------------ métricas
     def grupos(self) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
         """Etiqueta de grupo conexo de cada organismo y las aristas (i, j) de los enlaces válidos."""
+        xp = self.xp
         p = self.pob
         socios = self.validar_enlaces(self.ocupacion())
-        ii, kk = np.nonzero(socios >= 0)
+        ii, kk = xp.nonzero(socios >= 0)
         jj = socios[ii, kk]
-        lab = np.arange(p.n)
+        lab = xp.arange(p.n)
         while ii.size:
-            m = np.minimum(lab[ii], lab[jj])
+            m = xp.minimum(lab[ii], lab[jj])
             nuevo = lab.copy()
-            np.minimum.at(nuevo, ii, m)
-            np.minimum.at(nuevo, jj, m)
+            dev.minimo_en(nuevo, ii, m)
+            dev.minimo_en(nuevo, jj, m)
             nuevo = nuevo[nuevo]  # salto de punteros: acelera la convergencia
-            if np.array_equal(nuevo, lab):
+            if xp.array_equal(nuevo, lab):
                 break
             lab = nuevo
         return lab, ii, jj
 
     def medir(self) -> dict[str, float]:
+        xp = self.xp
         p, c = self.pob, self.cont
         n = p.n
         fila: dict[str, float] = {"t": self.t, "poblacion": n,
@@ -457,13 +483,13 @@ class Simulacion:
                 "generacion_max": int(p["generacion"].max()),
                 "frac_cepa1": float((p["cepa"] == 1).mean()),
             })
-            perfil = np.stack([((p["prim"] == k) & activo).sum(1) for k in range(gen.NUM_PRIM)], axis=1)
-            fila["perfiles_distintos"] = int(len(np.unique(perfil, axis=0)))
+            perfil = xp.stack([((p["prim"] == k) & activo).sum(1) for k in range(gen.NUM_PRIM)], axis=1)
+            fila["perfiles_distintos"] = int(len(np.unique(dev.a_cpu(perfil), axis=0)))
             for k, nombre in enumerate(gen.PRIMITIVAS):
                 fila[f"tiene_{nombre}"] = float((perfil[:, k] > 0).mean())
             # organización
             lab, ii, jj = self.grupos()
-            tam = np.bincount(lab, minlength=n)[lab]
+            tam = xp.bincount(lab, minlength=n)[lab]
             n_enl = (p["socio"] >= 0).sum(axis=1)
             enlazado = n_enl > 0
             fila["frac_enlazados"] = float(enlazado.mean())
@@ -472,11 +498,11 @@ class Simulacion:
             fila["tamano_grupo_max"] = int(tam.max())
             fila["grupos_de_3_o_mas"] = float((tam >= 3).mean())
             et = p["etiqueta"]
-            fila["dist_etiqueta_enlazados"] = float(np.linalg.norm(et[ii] - et[jj], axis=1).mean()) if ii.size \
+            fila["dist_etiqueta_enlazados"] = float(xp.linalg.norm(et[ii] - et[jj], axis=1).mean()) if ii.size \
                 else float("nan")
             azar = np.random.default_rng(self.t)  # generador propio: medir no altera la simulación
-            a1, a2 = azar.integers(0, n, (2, min(n, 500)))
-            fila["dist_etiqueta_azar"] = float(np.linalg.norm(et[a1] - et[a2], axis=1).mean())
+            a1, a2 = xp.asarray(azar.integers(0, n, (2, min(n, 500))))
+            fila["dist_etiqueta_azar"] = float(xp.linalg.norm(et[a1] - et[a2], axis=1).mean())
             aprovecha = enlazado & (p["recibido"] > 2.0 * p["dado"] + 5.0)
             fila["frac_aprovechados"] = float(aprovecha.sum() / max(enlazado.sum(), 1))
         for k, nombre in enumerate(gen.PRIMITIVAS):

@@ -11,16 +11,20 @@ import matplotlib.pyplot as plt  # noqa: E402
 import numpy as np  # noqa: E402
 
 from . import genoma as gen  # noqa: E402
+from .dispositivo import a_cpu  # noqa: E402
 
 
 def imagen_mundo(sim, ruta: Path, titulo: str = "") -> None:
-    p = sim.pob
+    campos = ("x", "y", "socio", "cepa", "activo")
+    p = {k: a_cpu(sim.pob[k]) for k in campos}
+    n = sim.pob.n
     fig, ax = plt.subplots(figsize=(7, 7))
-    ax.imshow(sim.entorno.R, cmap="Greens", vmin=0, vmax=sim.cfg.mundo.capacidad_max, interpolation="nearest")
-    if p.n and (p["socio"] >= 0).any():
+    ax.imshow(a_cpu(sim.entorno.R), cmap="Greens", vmin=0, vmax=sim.cfg.mundo.capacidad_max,
+              interpolation="nearest")
+    if n and (p["socio"] >= 0).any():
         from matplotlib.collections import LineCollection
 
-        socios = sim.validar_enlaces(sim.ocupacion())
+        socios = a_cpu(sim.validar_enlaces(sim.ocupacion()))
         i, k = np.nonzero(socios >= 0)
         j = socios[i, k]
         sel = i < j  # cada enlace una vez
@@ -29,14 +33,14 @@ def imagen_mundo(sim, ruta: Path, titulo: str = "") -> None:
         corto = (np.abs(p["x"][i] - p["x"][j]) <= 1) & (np.abs(p["y"][i] - p["y"][j]) <= 1)
         seg = np.stack([np.stack([p["x"][i], p["y"][i]], 1), np.stack([p["x"][j], p["y"][j]], 1)], 1)[corto]
         ax.add_collection(LineCollection(seg, colors="black", linewidths=0.6, alpha=0.8))
-    if p.n:
+    if n:
         if (p["cepa"] > 0).any():
             color = np.where(p["cepa"] == 1, "tab:red", "tab:blue")
             ax.scatter(p["x"], p["y"], s=4, c=color, linewidths=0)
         else:
             ax.scatter(p["x"], p["y"], s=4, c=p["activo"].sum(1), cmap="plasma", linewidths=0,
                        vmin=0, vmax=sim.cfg.herencia.genes_max)
-    ax.set_title(titulo or f"t = {sim.t}  ·  población = {p.n}")
+    ax.set_title(titulo or f"t = {sim.t}  ·  población = {n}")
     ax.set_xticks([])
     ax.set_yticks([])
     fig.tight_layout()

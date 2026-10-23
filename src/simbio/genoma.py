@@ -15,6 +15,7 @@ from __future__ import annotations
 import numpy as np
 
 from .config import HerenciaCfg
+from .dispositivo import a_cpu, modulo
 
 # Primitivas: la "física" fija de las acciones posibles.
 (DESCANSAR, AVANZAR, GIRAR_IZQ, GIRAR_DER, VOLTERETA, COMER, DIVIDIRSE,
@@ -46,16 +47,16 @@ def primitivas_permitidas(asociacion: bool, conjugacion: bool) -> np.ndarray:
     return todas if conjugacion else todas[todas != CONJUGAR]
 
 
-def vacio(n: int, genes_max: int) -> dict[str, np.ndarray]:
+def vacio(n: int, genes_max: int, xp=np) -> dict[str, np.ndarray]:
     return {
-        "activo": np.zeros((n, genes_max), dtype=bool),
-        "prim": np.zeros((n, genes_max), dtype=np.int8),
-        "w": np.zeros((n, genes_max, NUM_SENS)),
-        "b": np.zeros((n, genes_max)),
-        "mu": np.zeros(n),
-        "sens": np.zeros(n),
-        "eta": np.zeros(n),
-        "etiqueta": np.zeros((n, 2)),
+        "activo": xp.zeros((n, genes_max), dtype=bool),
+        "prim": xp.zeros((n, genes_max), dtype=np.int8),
+        "w": xp.zeros((n, genes_max, NUM_SENS)),
+        "b": xp.zeros((n, genes_max)),
+        "mu": xp.zeros(n),
+        "sens": xp.zeros(n),
+        "eta": xp.zeros(n),
+        "etiqueta": xp.zeros((n, 2)),
     }
 
 
@@ -85,17 +86,22 @@ def repetir(g: dict[str, np.ndarray], n: int) -> dict[str, np.ndarray]:
     return {k: np.repeat(v, n, axis=0) for k, v in g.items()}
 
 
+def a_dispositivo(g: dict[str, np.ndarray], xp) -> dict[str, np.ndarray]:
+    return {k: xp.asarray(v) for k, v in g.items()}
+
+
 def tomar(g: dict[str, np.ndarray], idx: np.ndarray) -> dict[str, np.ndarray]:
     return {k: v[idx].copy() for k, v in g.items()}
 
 
 def tasa_efectiva(mu: np.ndarray, sens: np.ndarray, estres: np.ndarray, cfg: HerenciaCfg) -> np.ndarray:
     """Tasa de mutación de la descendencia: μ·(1 + sensibilidad·estrés), con tope tasa_max."""
+    xp = modulo(mu)
     if not cfg.mutacion:
-        return np.zeros_like(mu)
+        return xp.zeros_like(mu)
     if not cfg.estres:
-        return np.minimum(mu, cfg.tasa_max)
-    return np.minimum(mu * (1.0 + sens * estres), cfg.tasa_max)
+        return xp.minimum(mu, cfg.tasa_max)
+    return xp.minimum(mu * (1.0 + sens * estres), cfg.tasa_max)
 
 
 def mutar(g: dict[str, np.ndarray], m: np.ndarray, cfg: HerenciaCfg,
@@ -109,58 +115,68 @@ def mutar(g: dict[str, np.ndarray], m: np.ndarray, cfg: HerenciaCfg,
         return g
     if permitidas is None:
         permitidas = np.arange(NUM_PRIM)
+    # el azar sale siempre del generador en CPU y se copia al dispositivo (misma secuencia en CPU y GPU)
+    xp = modulo(g["w"])
+    A = xp.asarray
     mm = m[:, None]
     activo = g["activo"]
 
     # mutación puntual de pesos y sesgos
-    mask_w = (rng.random(g["w"].shape) < m[:, None, None]) & activo[:, :, None]
-    g["w"] += mask_w * rng.normal(0.0, cfg.sigma_peso, g["w"].shape)
-    mask_b = (rng.random((n, G)) < mm) & activo
-    g["b"] += mask_b * rng.normal(0.0, cfg.sigma_peso, (n, G))
+    mask_w = (A(rng.random(g["w"].shape)) < m[:, None, None]) & activo[:, :, None]
+    g["w"] += mask_w * A(rng.normal(0.0, cfg.sigma_peso, g["w"].shape))
+    mask_b = (A(rng.random((n, G))) < mm) & activo
+    g["b"] += mask_b * A(rng.normal(0.0, cfg.sigma_peso, (n, G)))
 
     # cambio de primitiva
-    mask_p = (rng.random((n, G)) < cfg.k_primitiva * mm) & activo
-    g["prim"][mask_p] = rng.choice(permitidas, mask_p.sum())
+    mask_p = (A(rng.random((n, G))) < cfg.k_primitiva * mm) & activo
+    g["prim"][mask_p] = A(rng.choice(permitidas, int(mask_p.sum())).astype(np.int8))
 
     # eliminación
-    mask_del = (rng.random((n, G)) < cfg.k_eliminacion * mm) & activo
+    mask_del = (A(rng.random((n, G))) < cfg.k_eliminacion * mm) & activo
     activo[mask_del] = False
 
-    # duplicación hacia una ranura libre (eventos raros: bucle explícito)
-    mask_dup = (rng.random((n, G)) < cfg.k_duplicacion * mm) & activo
-    for i, j in zip(*np.nonzero(mask_dup)):
-        libres = np.flatnonzero(~activo[i])
-        if libres.size == 0:
-            continue
-        k = libres[0]
-        activo[i, k] = True
-        g["prim"][i, k] = g["prim"][i, j]
-        g["w"][i, k] = g["w"][i, j]
-        g["b"][i, k] = g["b"][i, j]
+    # duplicación hacia una ranura libre (eventos raros: bucle explícito en CPU)
+    mask_dup = (A(rng.random((n, G))) < cfg.k_duplicacion * mm) & activo
+    pares = a_cpu(xp.stack(xp.nonzero(mask_dup), axis=1))
+    if len(pares):
+        activo_h = a_cpu(activo).copy()
+        for i, j in pares:
+            libres = np.flatnonzero(~activo_h[i])
+            if libres.size == 0:
+                continue
+            k = int(libres[0])
+            activo_h[i, k] = True
+            activo[i, k] = True
+            g["prim"][i, k] = g["prim"][i, j]
+            g["w"][i, k] = g["w"][i, j]
+            g["b"][i, k] = g["b"][i, j]
 
     # gen nuevo aleatorio
-    nuevos = np.flatnonzero(rng.random(n) < cfg.k_gen_nuevo * G * m)
-    for i in nuevos:
-        libres = np.flatnonzero(~activo[i])
-        if libres.size == 0:
-            continue
-        k = libres[0]
-        activo[i, k] = True
-        g["prim"][i, k] = rng.choice(permitidas)
-        g["w"][i, k] = rng.normal(0.0, 1.0, NUM_SENS)
-        g["b"][i, k] = rng.normal(0.0, 1.0)
+    nuevos = np.flatnonzero(rng.random(n) < a_cpu(cfg.k_gen_nuevo * G * m))
+    if nuevos.size:
+        activo_h = a_cpu(activo).copy()
+        for i in nuevos:
+            libres = np.flatnonzero(~activo_h[i])
+            if libres.size == 0:
+                continue
+            k = int(libres[0])
+            activo_h[i, k] = True
+            activo[i, k] = True
+            g["prim"][i, k] = int(rng.choice(permitidas))
+            g["w"][i, k] = A(rng.normal(0.0, 1.0, NUM_SENS))
+            g["b"][i, k] = float(rng.normal(0.0, 1.0))
 
     # rasgos heredables
     rasgos = [("mu", cfg.mu_min, cfg.mu_max), ("eta", 0.0, cfg.eta_max)]
     if cfg.estres:
         rasgos.append(("sens", 0.0, cfg.sensibilidad_max))
     for nombre, lo, hi in rasgos:
-        mask = rng.random(n) < np.minimum(1.0, cfg.k_rasgo * m)
-        factor = np.exp(rng.normal(0.0, cfg.sigma_log_rasgo, n))
-        g[nombre] = np.where(mask, np.clip(g[nombre] * factor, lo, hi), g[nombre])
+        mask = A(rng.random(n)) < xp.minimum(1.0, cfg.k_rasgo * m)
+        factor = A(np.exp(rng.normal(0.0, cfg.sigma_log_rasgo, n)))
+        g[nombre] = xp.where(mask, xp.clip(g[nombre] * factor, lo, hi), g[nombre])
 
     # etiqueta
-    mask = rng.random(n) < np.minimum(1.0, cfg.k_rasgo * m)
-    ruido = rng.normal(0.0, cfg.sigma_etiqueta, (n, 2))
-    g["etiqueta"] = np.where(mask[:, None], np.clip(g["etiqueta"] + ruido, 0.0, 1.0), g["etiqueta"])
+    mask = A(rng.random(n)) < xp.minimum(1.0, cfg.k_rasgo * m)
+    ruido = A(rng.normal(0.0, cfg.sigma_etiqueta, (n, 2)))
+    g["etiqueta"] = xp.where(mask[:, None], xp.clip(g["etiqueta"] + ruido, 0.0, 1.0), g["etiqueta"])
     return g

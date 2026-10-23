@@ -29,20 +29,21 @@ ESTADO = {
 
 
 class Poblacion:
-    def __init__(self, genes_max: int):
+    def __init__(self, genes_max: int, xp=np):
         self.genes_max = genes_max
+        self.xp = xp  # numpy o cupy (ver dispositivo.py)
         self.d: dict[str, np.ndarray] = self.vacia(0)
 
     def vacia(self, n: int) -> dict[str, np.ndarray]:
-        G = self.genes_max
-        d = {k: np.zeros((n, *forma), dtype=dt) for k, (dt, forma) in ESTADO.items()}
-        d.update(gen.vacio(n, G))
-        d["P"] = np.zeros((n, G, gen.NUM_SENS))  # ajustes plásticos de pesos
-        d["p"] = np.zeros((n, G))  # ajustes plásticos de sesgos
-        d["ult_s"] = np.zeros((n, gen.NUM_SENS))
-        d["ult_a"] = np.zeros((n, G))
+        G, xp = self.genes_max, self.xp
+        d = {k: xp.zeros((n, *forma), dtype=dt) for k, (dt, forma) in ESTADO.items()}
+        d.update(gen.vacio(n, G, xp))
+        d["P"] = xp.zeros((n, G, gen.NUM_SENS))  # ajustes plásticos de pesos
+        d["p"] = xp.zeros((n, G))  # ajustes plásticos de sesgos
+        d["ult_s"] = xp.zeros((n, gen.NUM_SENS))
+        d["ult_a"] = xp.zeros((n, G))
         d["ult_act"][:] = -1
-        d["socio"] = np.full((n, 8), -1, dtype=np.int64)  # id del enlazado en cada dirección
+        d["socio"] = xp.full((n, 8), -1, dtype=np.int64)  # id del enlazado en cada dirección
         return d
 
     @property
@@ -57,12 +58,12 @@ class Poblacion:
 
     def genomas(self, idx: np.ndarray | None = None) -> dict[str, np.ndarray]:
         if idx is None:
-            idx = np.arange(self.n)
+            idx = self.xp.arange(self.n)
         return {k: self.d[k][idx].copy() for k in gen.CAMPOS}
 
     def agregar(self, nuevos: dict[str, np.ndarray]) -> None:
         for k in self.d:
-            self.d[k] = np.concatenate([self.d[k], nuevos[k]], axis=0)
+            self.d[k] = self.xp.concatenate([self.d[k], nuevos[k]], axis=0)
 
     def filtrar(self, mascara: np.ndarray) -> None:
         for k in self.d:
@@ -75,7 +76,8 @@ class Poblacion:
         últimas filas y se recorta; solo si hay más nacimientos que muertes se concatena el excedente.
         El orden de las filas cambia, pero de forma determinista.
         """
-        huecos = np.flatnonzero(~mascara)
+        xp = self.xp
+        huecos = xp.flatnonzero(~mascara)
         nn = 0 if nuevos is None else len(nuevos["E"])
         k = min(len(huecos), nn)
         if k:
@@ -83,13 +85,15 @@ class Poblacion:
                 self.d[c][huecos[:k]] = nuevos[c][:k]
         if nn > k:
             for c in self.d:
-                self.d[c] = np.concatenate([self.d[c], nuevos[c][k:]], axis=0)
+                self.d[c] = xp.concatenate([self.d[c], nuevos[c][k:]], axis=0)
         elif len(huecos) > k:
             restantes = huecos[k:]
             n_final = self.n - len(restantes)
             # filas vivas del final que pasan a ocupar los huecos por debajo de n_final
             destino = restantes[restantes < n_final]
-            cola = np.setdiff1d(np.arange(n_final, self.n), restantes, assume_unique=True)
+            sobra = xp.zeros(self.n - n_final, dtype=bool)
+            sobra[restantes[restantes >= n_final] - n_final] = True
+            cola = xp.flatnonzero(~sobra) + n_final
             for c in self.d:
                 if destino.size:
                     self.d[c][destino] = self.d[c][cola]

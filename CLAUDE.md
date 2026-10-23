@@ -16,7 +16,8 @@ Documentación, specs, comentarios y nombres del dominio en **español**. Los en
 - Nada de LLMs ni modelos preentrenados dentro de los organismos.
 - Percepción solo local.
 - Toda afirmación se compara con un control y varias semillas.
-- Determinismo: misma configuración y misma semilla dan el mismo resultado. Toda la aleatoriedad pasa por los generadores de la simulación.
+- Determinismo: misma configuración y misma semilla dan el mismo resultado. Toda la aleatoriedad pasa por los generadores de la simulación, que viven en CPU.
+- Portabilidad: el código no puede depender de un hardware particular. Se usa `xp` (NumPy o CuPy, según `simbio/dispositivo.py`) para operar sobre arreglos, nunca `np.` directamente en la simulación, y todo azar se genera con el `rng` de CPU y se copia con `xp.asarray`. Ver `docs/dispositivos.md`.
 
 ## Comandos
 - Tests: `python -m pytest -q`
@@ -24,3 +25,4 @@ Documentación, specs, comentarios y nombres del dominio en **español**. Los en
 - Competencia: `python -m simbio competir luca runs/x/poblacion.npz experiments/configs/base.toml --pasos 3000`
 - Evaluación de la fase 1: `python experiments/fase1/evaluar.py --salida runs/fase1`
 - Validar specs: `openspec validate --all --strict`
+- Dispositivo: `python -m simbio dispositivo`

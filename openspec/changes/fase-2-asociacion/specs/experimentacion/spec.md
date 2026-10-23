@@ -19,6 +19,21 @@ Todos los parámetros del mundo, la física, la herencia, el aprendizaje y la as
 
 ## ADDED Requirements
 
+### Requirement: Dispositivo de cálculo automático
+El simulador SHALL usar una GPU NVIDIA si está disponible y CPU en caso contrario, sin cambios en la configuración del experimento; MUST permitir forzar el dispositivo y registrar el usado. La aleatoriedad MUST generarse en CPU para que ambos dispositivos consuman la misma secuencia.
+
+#### Scenario: Equipo sin GPU
+- **WHEN** se ejecuta una corrida en un equipo sin GPU utilizable con dispositivo automático
+- **THEN** la corrida se ejecuta en CPU y su resumen indica "cpu"
+
+#### Scenario: GPU pedida sin GPU
+- **WHEN** se fuerza el dispositivo GPU en un equipo sin GPU utilizable
+- **THEN** la ejecución termina con un mensaje que explica cómo habilitarla
+
+#### Scenario: Determinismo por dispositivo
+- **WHEN** se ejecuta dos veces la misma configuración y semilla en el mismo tipo de dispositivo
+- **THEN** los resultados son idénticos
+
 ### Requirement: Criterios de éxito de la fase 2
 La fase 2 SHALL considerarse validada solo si: (C1) con asociación, la población persiste 30 000 pasos en al menos 4 de 5 semillas, en entorno constante y variable; (C2) se cumplen los invariantes de enlaces durante una corrida de verificación; (C3) se cumple la reproducibilidad; (C4) el simulador supera 40 pasos/s con ~1500 organismos. Que la asociación evolucione o no es una pregunta exploratoria, no un criterio.
 

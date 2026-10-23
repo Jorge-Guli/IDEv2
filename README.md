@@ -34,3 +34,5 @@ python experiments/fase1/estres_extendido.py --salida runs/e1 --semillas 20 --pa
 ```
 
 Cualquier parámetro se puede cambiar con `--set seccion.clave=valor` (ver `src/simbio/config.py`).
+
+**CPU o GPU:** se detecta automáticamente. Con una GPU NVIDIA y CuPy instalado se usa la GPU; si no, la CPU. Ver [`docs/dispositivos.md`](docs/dispositivos.md) y `python -m simbio dispositivo`.

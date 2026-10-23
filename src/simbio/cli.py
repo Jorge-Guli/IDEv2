@@ -2,6 +2,7 @@
 
     python -m simbio correr [CONFIG] --salida runs/x --semilla 1 --pasos 20000 --set mundo.alto=256
     python -m simbio competir A.npz B.npz [CONFIG] --pasos 3000 --salida runs/comp
+    python -m simbio dispositivo [--rapido]
 """
 
 from __future__ import annotations
@@ -25,6 +26,8 @@ def _cfg(args) -> config.Config:
 def main(argv: list[str] | None = None) -> None:
     ap = argparse.ArgumentParser(prog="simbio")
     sub = ap.add_subparsers(dest="cmd", required=True)
+    sp = sub.add_parser("dispositivo", help="detecta CPU/GPU, mide rendimiento y compara")
+    sp.add_argument("--rapido", action="store_true")
     for nombre in ("correr", "competir"):
         sp = sub.add_parser(nombre)
         if nombre == "competir":
@@ -36,6 +39,11 @@ def main(argv: list[str] | None = None) -> None:
         sp.add_argument("--pasos", type=int, default=None)
         sp.add_argument("--set", action="append", default=[], metavar="seccion.clave=valor")
     args = ap.parse_args(argv)
+    if args.cmd == "dispositivo":
+        from . import verificar
+
+        verificar.main(args.rapido)
+        return
     cfg = _cfg(args)
 
     if args.cmd == "correr":
