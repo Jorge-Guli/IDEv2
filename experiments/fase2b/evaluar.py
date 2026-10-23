@@ -128,9 +128,11 @@ def main():
     ap.add_argument("--procesos", type=int, default=4)
     ap.add_argument("--pasos", type=int, default=30000)
     ap.add_argument("--semillas", type=int, default=5)
+    ap.add_argument("--semilla-inicial", type=int, default=1,
+                    help="primera semilla (para repartir semillas entre equipos sin repetir)")
     args = ap.parse_args()
     args.salida.mkdir(parents=True, exist_ok=True)
-    semillas = list(range(1, args.semillas + 1))
+    semillas = list(range(args.semilla_inicial, args.semilla_inicial + args.semillas))
     t0 = time.time()
     with Pool(args.procesos) as pool:
         resultados = pool.map(_correr, [(str(args.salida), n, s, args.pasos) for n in CONDICIONES for s in semillas])
