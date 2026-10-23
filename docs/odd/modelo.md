@@ -15,7 +15,7 @@ Investigar bajo qué condiciones organismos artificiales simples, que se adaptan
 - **Escala temporal**: pasos discretos; un paso es una decisión por organismo.
 
 ### 1.3 Visión general del proceso y orden
-En cada paso: (1) el entorno regenera recursos (con estación y cambios abruptos); (2) cada organismo actualiza su aprendizaje con el ΔE de su acción anterior; (3) sensa; (4) decide; (5) paga los costos basal, de genoma y de acción; (6) gira; (7) come; (8) avanza; (9) se divide; (10) mueren los que no tienen energía; (11) se actualiza el estrés. Todos los organismos actúan de forma sincrónica; los conflictos por una misma celda se resuelven en orden aleatorio.
+En cada paso: (1) el entorno regenera recursos (con estación y cambios abruptos); (2) cada organismo actualiza su aprendizaje con el ΔE de su acción anterior; (3) sensa; (4) decide; (5) paga los costos basal, de genoma y de acción; quien queda sin energía tras los costos muere antes de actuar; (6) gira; (7) come; (8) avanza; (9) se actualiza el estrés; (10) se divide. Todos los organismos actúan de forma sincrónica; los conflictos por una misma celda se resuelven en orden aleatorio.
 
 ## 2. Conceptos de diseño
 
@@ -23,7 +23,7 @@ En cada paso: (1) el entorno regenera recursos (con estación y cambios abruptos
 - **Emergencia.** Las conductas de forrajeo, el tamaño del genoma, el uso de cada primitiva y los valores de los rasgos `μ`, `σ` y `η` emergen de la selección. Lo impuesto es la física (primitivas y costos) y el genoma inicial (LUCA).
 - **Adaptación.** Cada organismo elige en cada paso la primitiva con mayor impulso positivo: el impulso es la suma de las activaciones `tanh` de los genes que la expresan. Una primitiva sin genes no está disponible.
 - **Objetivos.** No hay una función objetivo explícita: lo único que persiste es lo que sobrevive y se reproduce. El aprendizaje usa como recompensa el ΔE relativo a la línea base del propio organismo.
-- **Aprendizaje.** Regla de refuerzo local: los genes que impulsaron la acción ejecutada ajustan su respuesta en la dirección del gradiente de su activación, en proporción a `η · recompensa`. Los ajustes decaen y están acotados. La división no se evalúa por energía.
+- **Aprendizaje.** Regla de refuerzo local: los genes que impulsaron la acción ejecutada ajustan su respuesta en la dirección del gradiente de su activación, en proporción a `η · recompensa`. Los ajustes decaen y están acotados. La división queda fuera de la recompensa, de la línea base y del sensor de ΔE.
 - **Predicción.** Ninguna explícita.
 - **Percepción.** Local: recurso en la celda propia, al frente, al frente-izquierda y al frente-derecha; energía propia; ocupación de los 8 vecinos; frente bloqueado; último ΔE; ruido; constante.
 - **Interacción.** Indirecta: competencia por recursos y por espacio. No hay interacción directa en la fase 1.
@@ -53,7 +53,7 @@ Sin datos externos. Variabilidad ambiental: estacionalidad `K·(1 + A·sin(2πt/
 - **Regeneración**: `R ← min(R + 0.02·(K − R), K)`.
 - **Metabolismo**: costo por paso de `0.3 + 0.01·genes_activos`, más la acción: avanzar 0.4, girar 0.05, voltereta 0.1, comer 0.05, descansar 0.
 - **Comer**: toma `min(R, 4, E_max − E)`.
-- **División**: requiere `E ≥ 20` y una celda vecina libre; cuesta 2; el resto se reparte por mitades. El hijo hereda el genoma mutado, el estrés del progenitor y ajustes plásticos en cero.
-- **Mutación** con tasa `m = μ·(1 + σ·estrés)`: puntual por peso (prob. `m`, N(0, 0.3)); cambio de primitiva `0.3m`; duplicación `0.5m`; eliminación `0.5m` por gen; gen nuevo `0.2·G·m` por genoma; rasgos log-normales con prob. 0.2.
-- **Estrés**: `estrés ← 0.95·estrés + 0.05·(1 − E/E_max)`.
+- **División**: requiere `E ≥ 20` y una celda vecina libre; cuesta 2; el resto se reparte por mitades. El hijo hereda el genoma mutado y nace con estrés y ajustes plásticos en cero. Un intento fallido no cuesta nada.
+- **Mutación** con tasa `m = min(μ·(1 + σ·estrés), 0.2)`: puntual por peso (prob. `m`, N(0, 0.3)); cambio de primitiva `0.3m`; duplicación `0.5m`; eliminación `0.5m` por gen; gen nuevo `0.2·G·m` por genoma; rasgos log-normales con prob. `min(1, 10m)`. Control: modo "barajado" (estrés de otro organismo al azar).
+- **Estrés**: `estrés ← 0.95·estrés + 0.05·hambre`, con `hambre = clip((25 − E)/25, 0, 1)`, calculado antes de la división.
 - **Aprendizaje**: `r = clip((ΔE − base)/5, −1, 1)`; `ΔP_g = η·r·(1 − a_g²)·s` para los genes de la primitiva ejecutada; decaimiento 1 %/paso; ajustes acotados a ±2; `base ← 0.9·base + 0.1·ΔE`.

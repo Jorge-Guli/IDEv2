@@ -7,11 +7,15 @@ Define qué es un organismo: su metabolismo, su percepción local y cómo sus ac
 ## ADDED Requirements
 
 ### Requirement: Metabolismo
-Cada organismo SHALL tener una reserva de energía acotada; en cada paso MUST pagar un costo basal más un costo proporcional a la cantidad de genes activos, y MUST morir cuando su energía llega a cero o menos.
+Cada organismo SHALL tener una reserva de energía acotada; en cada paso MUST pagar un costo basal, uno proporcional a sus genes activos y el de su acción, y MUST morir sin actuar si su energía queda en cero o menos.
 
 #### Scenario: Muerte por inanición
 - **WHEN** un organismo no obtiene energía durante suficientes pasos
 - **THEN** su energía llega a cero y es retirado del mundo
+
+#### Scenario: Sin energía no se actúa
+- **WHEN** los costos del paso dejan a un organismo sin energía
+- **THEN** muere en ese paso sin comer, moverse ni dividirse
 
 #### Scenario: Genoma grande cuesta más
 - **WHEN** dos organismos idénticos difieren solo en la cantidad de genes activos

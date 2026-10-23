@@ -39,14 +39,17 @@ Energía máxima 100; costo basal 0.3/paso; costo por gen activo 0.01/paso; avan
 Todo es vectorizado; el orden aleatorio sale del generador con semilla, por lo que la corrida es determinista.
 
 ### D5. Herencia y mutagénesis por estrés
-Estrés: `estrés ← 0.95·estrés + 0.05·(1 − E/E_max)`. Tasa efectiva del hijo: `m = μ·(1 + σ·estrés)`, con `μ` (tasa base) y `σ` (sensibilidad) heredables. Con tasa `m`, por gen activo: mutación puntual de cada peso con probabilidad `m` (ruido N(0, 0.3)); cambio de primitiva con `0.3·m`; duplicación hacia una ranura libre con `0.5·m`; eliminación con `0.5·m`. Por genoma: gen nuevo aleatorio con probabilidad `G·m·0.2`. Rasgos (`μ`, `σ`, `η`) mutan con probabilidad 0.2 por un factor log-normal (σ_log = 0.2) y se acotan.
-LUCA: genes "comer si hay recurso aquí", "avanzar si hay recurso al frente", "voltereta si no hay recurso", "dividirse si energía alta", más un sesgo de avanzar; `μ = 0.02`, `σ = 2`, `η = 0.05`.
+Estrés: `estrés ← 0.95·estrés + 0.05·hambre`, con `hambre = clip((25 − E)/25, 0, 1)`, calculado antes de dividirse para que la reproducción no cuente como hambre (una versión previa usaba `1 − E/E_max` y quedaba dominada por la división, según la revisión independiente). El hijo nace con estrés 0. Tasa efectiva del hijo: `m = min(μ·(1 + σ·estrés), 0.2)`, con `μ` (tasa base) y `σ` (sensibilidad) heredables. Con tasa `m`, por gen activo: mutación puntual de cada peso con probabilidad `m` (ruido N(0, 0.3)); cambio de primitiva con `0.3·m`; duplicación hacia una ranura libre con `0.5·m`; eliminación con `0.5·m`. Por genoma: gen nuevo aleatorio con probabilidad `G·m·0.2`. Rasgos (`μ`, `σ`, `η`) mutan con probabilidad `min(1, 10·m)` por un factor log-normal (σ_log = 0.2) y se acotan. Control experimental: modo "barajado", en el que cada hijo usa el estrés de otro organismo al azar.
+LUCA: genes "comer si hay recurso aquí y no estoy lleno", "avanzar si aquí no hay recurso (más si hay al frente)", "voltereta al azar o si estoy bloqueado", "dividirse si energía alta" (calibrado para ser viable con y sin aprendizaje); `μ = 0.02`, `σ = 2`, `η = 0.05`.
 
 ### D6. Aprendizaje
-Recompensa `r = clip((ΔE − línea_base)/5, −1, 1)`, `línea_base ← 0.9·línea_base + 0.1·ΔE`. Para los genes que expresan la primitiva ejecutada: `P_g += η·r·a_g·s`, `p_g += η·r·a_g`. Decaimiento 1 % por paso y recorte a ±2. Así el aprendizaje modula la respuesta de genes existentes; no puede crear acciones que el genoma no tiene (coherente con la biología: la plasticidad opera sobre lo que el genotipo permite).
+Recompensa `r = clip((ΔE − línea_base)/5, −1, 1)`, `línea_base ← 0.9·línea_base + 0.1·ΔE`. Para los genes que expresan la primitiva ejecutada: `P_g += η·r·(1 − a_g²)·s`, `p_g += η·r·(1 − a_g²)` (gradiente del impulso respecto de la entrada del gen: una acción recompensada aumenta su impulso en ese contexto). Los pasos de división se excluyen de la recompensa, de la línea base y del sensor de ΔE. Decaimiento 1 % por paso y recorte a ±2. Así el aprendizaje modula la respuesta de genes existentes; no puede crear acciones que el genoma no tiene (coherente con la biología: la plasticidad opera sobre lo que el genotipo permite).
 
 ### D7. Estructura del código
 `src/simbio/`: `config.py` (dataclasses + TOML), `entorno.py`, `genoma.py`, `poblacion.py` (estructura de arreglos), `simulacion.py` (paso), `metricas.py`, `persistencia.py`, `visual.py`, `cli.py`. `experiments/configs/*.toml`, `experiments/fase1/*.py`. Configuración en TOML porque `tomllib` está en la biblioteca estándar.
+
+### D8. Muerte antes de actuar e intentos de división
+Quien queda sin energía tras pagar los costos muere antes de comer, moverse o dividirse. Un intento de división fallido (poca energía o sin espacio) no cuesta nada ni se evalúa en el aprendizaje: equivale a descansar. Se acepta por simplicidad; la selección igual penaliza a los genes que pierden turnos.
 
 ## Risks / Trade-offs
 
