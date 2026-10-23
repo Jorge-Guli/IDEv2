@@ -57,7 +57,9 @@ def graficos(historial: list[dict[str, float]], ruta: Path, titulo: str = "") ->
         return np.array([h.get(clave, np.nan) for h in historial], dtype=float)
 
     asociacion = any("frac_enlazados" in h for h in historial)
-    fig, axs = plt.subplots(4 if asociacion else 3, 2, figsize=(12, 13 if asociacion else 10), sharex=True)
+    bien_publico = any("complejo_total" in h for h in historial)
+    filas = 3 + asociacion + bien_publico
+    fig, axs = plt.subplots(filas, 2, figsize=(12, 3.3 * filas), sharex=True)
     axs[0, 0].plot(t, serie("poblacion"))
     axs[0, 0].set_title("Población")
     axs[0, 1].plot(t, serie("energia_media"), label="energía media")
@@ -90,6 +92,18 @@ def graficos(historial: list[dict[str, float]], ruta: Path, titulo: str = "") ->
         axs[3, 1].plot(t, 10 * serie("compartido_por_org_paso"), label="compartido ×10")
         axs[3, 1].legend(fontsize=7)
         axs[3, 1].set_title("Grupos e intercambio")
+    if bien_publico:
+        f = 3 + asociacion
+        axs[f, 0].plot(t, serie("tiene_secretar"), label="con gen de secretar")
+        axs[f, 0].plot(t, serie("frac_enlazados_secretores"), label="enlazados entre secretores")
+        axs[f, 0].plot(t, serie("frac_enlazados_no_secretores"), label="enlazados entre no secretores")
+        axs[f, 0].legend(fontsize=7)
+        axs[f, 0].set_title("Bien público: secretores")
+        axs[f, 1].plot(t, serie("complejo_total") / 1000, label="recurso complejo / 1000")
+        axs[f, 1].plot(t, serie("libre_total") / 100, label="alimento libre / 100")
+        axs[f, 1].plot(t, 10 * serie("comido_libre_por_org_paso"), label="libre comido por org ×10")
+        axs[f, 1].legend(fontsize=7)
+        axs[f, 1].set_title("Bien público: campos")
     for ax in axs[-1]:
         ax.set_xlabel("paso")
     if titulo:
