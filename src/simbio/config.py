@@ -117,6 +117,14 @@ class BienPublicoCfg:
 
 
 @dataclass
+class DepredacionCfg:
+    activa: bool = False
+    modo: str = "tamano"  # "tamano": refugio por tamaño de grupo; "uniforme": todo ataque es mortal (control)
+    prob_ataque: float = 0.002  # por organismo y paso
+    refugio: int = 4  # grupos de este tamaño o mayores no pueden ser comidos
+
+
+@dataclass
 class SimCfg:
     semilla: int = 0
     pasos: int = 5000
@@ -135,6 +143,7 @@ class Config:
     aprendizaje: AprendizajeCfg = field(default_factory=AprendizajeCfg)
     asociacion: AsociacionCfg = field(default_factory=AsociacionCfg)
     bien_publico: BienPublicoCfg = field(default_factory=BienPublicoCfg)
+    depredacion: DepredacionCfg = field(default_factory=DepredacionCfg)
     sim: SimCfg = field(default_factory=SimCfg)
 
     def to_dict(self) -> dict[str, Any]:

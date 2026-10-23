@@ -1,0 +1,18 @@
+# Fase 2c: depredación limitada por tamaño (Boraas et al. 1998). Física base con asociación y movimiento
+# de grupos por empuje colectivo; el depredador no puede comer organismos de grupos de 4 o más.
+[mundo]
+alto = 128
+ancho = 128
+
+[asociacion]
+movimiento = "empuje"
+
+[depredacion]
+activa = true
+modo = "tamano"
+prob_ataque = 0.002
+refugio = 4
+
+[sim]
+poblacion_inicial = 200
+registrar_cada = 100

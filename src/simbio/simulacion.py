@@ -16,6 +16,21 @@ DX = np.array([0, 1, 1, 1, 0, -1, -1, -1])
 OPUESTA = (np.arange(8) + 4) % 8
 
 
+def componentes(socios: np.ndarray) -> np.ndarray:
+    """Etiqueta de componente conexa de cada organismo (en CPU) a partir de la matriz de vecinos enlazados."""
+    ii, kk = np.nonzero(socios >= 0)
+    jj = socios[ii, kk]
+    lab = np.arange(len(socios))
+    while True:  # propagación de etiquetas mínimas con salto de punteros
+        nuevo = lab.copy()
+        np.minimum.at(nuevo, ii, lab[jj])
+        np.minimum.at(nuevo, jj, lab[ii])
+        nuevo = nuevo[nuevo]
+        if np.array_equal(nuevo, lab):
+            return lab
+        lab = nuevo
+
+
 class Simulacion:
     def __init__(self, cfg: Config, genomas: dict[str, np.ndarray] | None = None,
                  cepas: np.ndarray | None = None):
@@ -104,7 +119,7 @@ class Simulacion:
         xp = self.xp
         self.cont = {"nacimientos": 0, "muertes": 0, "comido": 0.0, "org_pasos": 0,
                      "compartido": 0.0, "recibido": 0.0, "comido_libre": 0.0,
-                     "comido_libre_sec": 0.0, "comido_libre_nosec": 0.0, "conjugaciones": 0, "enlaces_creados": 0,
+                     "comido_libre_sec": 0.0, "comido_libre_nosec": 0.0, "depredados": 0, "conjugaciones": 0, "enlaces_creados": 0,
                      "acciones": xp.zeros(gen.NUM_PRIM, dtype=xp.int64)}
 
     def vecinos_enlazados(self, occ: np.ndarray) -> np.ndarray:
@@ -334,6 +349,20 @@ class Simulacion:
         m = avanza[i]
         p["y"][i[m]], p["x"][i[m]] = ty[m], tx[m]
 
+    def _depredar(self, socios) -> None:
+        """Ataques del depredador: mortales salvo para quien está en un grupo de tamaño de refugio o mayor
+        (modo "tamano"). Los atacados quedan sin energía y mueren antes de actuar en este paso."""
+        p, d = self.pob, self.cfg.depredacion
+        atacado = self.rng.random(p.n) < d.prob_ataque
+        if not atacado.any():
+            return
+        if d.modo == "tamano":
+            lab = componentes(dev.a_cpu(socios))
+            tam = np.bincount(lab, minlength=p.n)[lab]
+            atacado &= tam < d.refugio
+        p["E"][self.xp.asarray(np.flatnonzero(atacado))] = -1.0
+        self.cont["depredados"] += int(atacado.sum())
+
     def _mover_grupos(self, act, occ, socios):
         """Empuje colectivo: cada grupo conexo se desplaza una celda en la dirección (de las 8) más alineada
         con la suma de las orientaciones de sus miembros que eligieron avanzar, si esa suma alcanza
@@ -343,16 +372,7 @@ class Simulacion:
         H, W = self.entorno.alto, self.entorno.ancho
         soc = dev.a_cpu(socios)
         enlazado = (soc >= 0).any(axis=1)
-        ii, kk = np.nonzero(soc >= 0)
-        jj = soc[ii, kk]
-        lab = np.arange(p.n)
-        while True:  # componentes conexas por propagación de etiquetas mínimas
-            nuevo = lab.copy()
-            np.minimum.at(nuevo, ii, lab[jj])
-            nuevo = nuevo[nuevo]
-            if np.array_equal(nuevo, lab):
-                break
-            lab = nuevo
+        lab = componentes(soc)
         y, x = dev.a_cpu(p["y"]).copy(), dev.a_cpu(p["x"]).copy()
         d, a = dev.a_cpu(p["dir"]).astype(np.int64), dev.a_cpu(act)
         ocup = dev.a_cpu(occ).copy()
@@ -400,6 +420,10 @@ class Simulacion:
             # costos: basal + genoma + acción + enlaces
             p["E"] -= (f.costo_basal + f.costo_por_gen * p["activo"].sum(axis=1) + self.costo_accion[act]
                        + cfg.asociacion.costo_enlace * (socios >= 0).sum(axis=1))
+
+            # depredación (tras los costos, para no alterar lo que perciben los vecinos en este paso)
+            if cfg.depredacion.activa:
+                self._depredar(socios)
 
             # quien queda sin energía tras pagar sus costos muere antes de actuar: no come, no se mueve,
             # no ocupa su celda ni sostiene enlaces; se retira al final del paso
@@ -587,6 +611,9 @@ class Simulacion:
             fila["tamano_grupo_medio"] = float(tam.mean())
             fila["tamano_grupo_max"] = int(tam.max())
             fila["grupos_de_3_o_mas"] = float((tam >= 3).mean())
+            if self.cfg.depredacion.activa:
+                fila["frac_en_refugio"] = float((tam >= self.cfg.depredacion.refugio).mean())
+                fila["depredados"] = c["depredados"]
             et = p["etiqueta"]
             fila["dist_etiqueta_enlazados"] = float(xp.linalg.norm(et[ii] - et[jj], axis=1).mean()) if ii.size \
                 else float("nan")
