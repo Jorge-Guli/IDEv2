@@ -22,3 +22,14 @@ Las medidas son del último cuarto de cada corrida; "en k de 5" se cuenta por se
 - **H3 se cumple** → la agrupación entre parientes vuelve rentable un bien público: primera condición identificada en la que la asociación paga. Siguiente paso: fase 3 (colectivo como individuo) en este mundo, y medir si los grupos se reproducen como unidad.
 - **H3 no se cumple, pero H2 sí** → la agrupación clonal no alcanza con esta difusión. Probar un beneficio más local (difusión menor) y la variante "compartir + división unida".
 - **Ni H2 ni H3** → el dilema no es tal en la dinámica completa (por ejemplo, porque los secretores se agrupan solos por la estructura espacial). Recalibrar o pasar a la condición de depredación.
+
+## Addendum (2026-10-23, antes de la repetición)
+
+**Qué pasó con H3 en la primera evaluación.** Las colonias sembradas se extinguieron en las 15 semillas (5 aquí y 10 en el equipo local). El diagnóstico posterior mostró que la causa principal fue el **genoma secretor diseñado a mano**: secretaba en el 20–27 % de los pasos y la población sembrada colapsaba (de 200 a ~20) **con o sin colonias**. El control inerte también colapsaba y solo sobrevivía en algunas semillas por suerte. H3 quedó confundida y **no se considera puesta a prueba**. H1, H2 y H4 no dependen de ese genoma (H2 sí lo usa, pero su resultado, la pérdida de la secreción, se mantiene con más razón: un secretor malo se pierde antes).
+
+**Corrección.** Un nuevo genoma secretor (secreta en el 1–3 % de los pasos, solo con recurso complejo, sin comida a mano y bien alimentado), con verificación automática de viabilidad: no puede quedar por debajo del 70 % de la población de LUCA en el mismo mundo (`verificar_viabilidad` en `evaluar.py`).
+
+**Repetición prerregistrada (10 semillas, 30 000 pasos):**
+- **H3** (sin cambios en su enunciado): `sembrado_colonial` supera a `sembrado_colonial_asoc_inerte` en `tiene_secretar` final en ≥ 8/10 semillas pareadas, con diferencia media ≥ 0,2.
+- **H3-empuje**: lo mismo para `sembrado_colonial_empuje` (colonias que se mueven por la suma de los empujes de sus miembros) contra el mismo control.
+- Se registra también la **supervivencia** de cada condición: si las colonias se extinguen en ≥ 5/10 semillas, la conclusión es que en este mundo pegarse tiene un costo letal que la cooperación no compensa.

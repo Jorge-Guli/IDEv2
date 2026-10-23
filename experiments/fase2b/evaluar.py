@@ -33,6 +33,8 @@ CONDICIONES = {
     "sembrado_colonial": ([], "secretor_colonial"),
     # control del anterior: la división unida es una división común (sin grupos clonales)
     "sembrado_colonial_asoc_inerte": (["asociacion.inerte=true"], "secretor_colonial"),
+    # repetición de H3 (ver addendum del prerregistro): colonias que se mueven por empuje colectivo
+    "sembrado_colonial_empuje": (['asociacion.movimiento="empuje"'], "secretor_colonial"),
 }
 
 
@@ -42,10 +44,14 @@ def genoma_inicial(tipo: str, cfg) -> dict | None:
     g = gen.luca(cfg.herencia)
     k = int(np.flatnonzero(~g["activo"][0])[0])
     g["activo"][0, k] = True
-    g["prim"][0, k] = gen.SECRETAR  # secretar si hay recurso complejo y no hay comida aquí
-    g["b"][0, k] = -0.5
-    g["w"][0, k, gen.S_COMPLEJO_AQUI] = 3.0
-    g["w"][0, k, gen.S_AQUI] = -3.0
+    # secretar solo si hay recurso complejo, no hay comida a mano y está bien alimentado. Una versión
+    # anterior (sesgo −0,5; pesos 3 y −3) secretaba en el 25 % de los pasos y llevaba a la población
+    # sembrada al colapso con o sin colonias; ver la bitácora de la fase 2b.
+    g["prim"][0, k] = gen.SECRETAR
+    g["b"][0, k] = -4.0
+    g["w"][0, k, gen.S_COMPLEJO_AQUI] = 4.0
+    g["w"][0, k, gen.S_AQUI] = -8.0
+    g["w"][0, k, gen.S_ENERGIA] = 3.0
     if tipo == "secretor_colonial":
         g["prim"][g["prim"] == gen.DIVIDIRSE] = gen.DIVIDIRSE_UNIDO
     n = cfg.sim.poblacion_inicial
@@ -60,6 +66,20 @@ METRICAS = ["poblacion", "tiene_secretar", "usa_secretar", "frac_no_secretores",
             "energia_secretores", "energia_no_secretores", "tiene_dividirse_unido", "tiene_compartir",
             "tiene_unirse", "usa_compartir", "frac_aprovechados", "dist_etiqueta_enlazados", "dist_etiqueta_azar",
             "complejo_total", "libre_total"]
+
+
+def verificar_viabilidad(semillas=(1, 2), pasos=1000) -> None:
+    """El genoma secretor sembrado no puede rendir mucho peor que LUCA (sin mutación ni asociación efectiva)."""
+    for semilla in semillas:
+        pob = {}
+        for tipo in ("luca", "secretor"):
+            cfg = config.cargar(CONFIG, ["asociacion.inerte=true", "herencia.mutacion=false",
+                                         "sim.registrar_cada=100000", f"sim.semilla={semilla}"])
+            sim = Simulacion(cfg, genoma_inicial(tipo, cfg))
+            sim.correr(pasos)
+            pob[tipo] = sim.pob.n
+        assert pob["secretor"] >= 0.7 * pob["luca"], f"genoma secretor no viable: {pob}"
+        print(f"viabilidad semilla {semilla}: {pob}", flush=True)
 
 
 def _correr(tarea):
@@ -128,21 +148,24 @@ def main():
     ap.add_argument("--procesos", type=int, default=4)
     ap.add_argument("--pasos", type=int, default=30000)
     ap.add_argument("--semillas", type=int, default=5)
+    ap.add_argument("--condiciones", nargs="*", default=None, help="subconjunto de condiciones a correr")
     ap.add_argument("--semilla-inicial", type=int, default=1,
                     help="primera semilla (para repartir semillas entre equipos sin repetir)")
     args = ap.parse_args()
     args.salida.mkdir(parents=True, exist_ok=True)
     semillas = list(range(args.semilla_inicial, args.semilla_inicial + args.semillas))
+    condiciones = args.condiciones or list(CONDICIONES)
+    verificar_viabilidad()
     t0 = time.time()
     with Pool(args.procesos) as pool:
-        resultados = pool.map(_correr, [(str(args.salida), n, s, args.pasos) for n in CONDICIONES for s in semillas])
+        resultados = pool.map(_correr, [(str(args.salida), n, s, args.pasos) for n in condiciones for s in semillas])
         huellas = pool.map(_huella, range(2))
         conservacion = pool.map(_conservacion, range(1))[0]
     rendimiento = _rendimiento()
     por = {}
     for r in resultados:
         por.setdefault(r["nombre"], []).append(r)
-    persisten = sum(r["pasos"] >= args.pasos and r["poblacion_final"] > 0 for r in por["publico"])
+    persisten = sum(r["pasos"] >= args.pasos and r["poblacion_final"] > 0 for r in por.get("publico", []))
     umbral = int(np.ceil(0.8 * len(semillas)))
     resumen = {n: {**{m: {"media": float(np.nanmean([r[m] for r in rs])),
                           "por_semilla": [round(r[m], 4) for r in rs]} for m in METRICAS},
@@ -152,7 +175,8 @@ def main():
     informe = {
         "parametros": {"pasos": args.pasos, "semillas": semillas, "minutos": round((time.time() - t0) / 60, 1)},
         "criterios": {
-            "C1_persistencia": {"aprobado": persisten >= umbral, "publico": f"{persisten}/{len(semillas)}"},
+            "C1_persistencia": {"aprobado": persisten >= umbral if "publico" in por else None,
+                                "publico": f"{persisten}/{len(semillas)}"},
             "C2_conservacion": {"aprobado": conservacion["error_relativo_maximo"] < 1e-9
                                 and conservacion["digerido_total"] > 0, **conservacion},
             "C3_reproducibilidad": {"aprobado": huellas[0] == huellas[1]},

@@ -81,6 +81,10 @@ class AsociacionCfg:
     activa: bool = True
     conjugacion: bool = True
     adhesion: bool = True  # el grupo enlazado se mueve junto o no se mueve
+    # "unanime": el grupo avanza solo si todos sus miembros avanzan en la misma dirección;
+    # "empuje": el grupo se desplaza en la dirección de la suma de los empujes de sus miembros
+    movimiento: str = "unanime"
+    fraccion_empuje: float = 0.5  # en "empuje": |suma de empujes| mínimo, como fracción del tamaño del grupo
     inerte: bool = False  # control: las primitivas de asociación cuestan pero no tienen efecto
     costo_enlace: float = 0.02  # por enlace y paso, para cada extremo
     costo_unirse: float = 0.1

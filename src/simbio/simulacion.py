@@ -295,6 +295,11 @@ class Simulacion:
         xp = self.xp
         p = self.pob
         H, W = self.entorno.alto, self.entorno.ancho
+        if self.cfg.asociacion.movimiento == "empuje" and bool((socios >= 0).any()):
+            # los grupos enlazados se mueven por empuje colectivo; los sueltos, con la regla común
+            enlazado = self._mover_grupos(act, occ, socios)
+            act = xp.where(enlazado, gen.DESCANSAR, act).astype(xp.int8)
+            occ = self.ocupacion()
         i = xp.flatnonzero(act == gen.AVANZAR)
         if i.size == 0:
             return
@@ -328,6 +333,52 @@ class Simulacion:
             p["E"][i[frenado]] += self.cfg.fisica.costo_avanzar
         m = avanza[i]
         p["y"][i[m]], p["x"][i[m]] = ty[m], tx[m]
+
+    def _mover_grupos(self, act, occ, socios):
+        """Empuje colectivo: cada grupo conexo se desplaza una celda en la dirección (de las 8) más alineada
+        con la suma de las orientaciones de sus miembros que eligieron avanzar, si esa suma alcanza
+        `fraccion_empuje` × tamaño y todas las celdas de destino están libres o son del propio grupo.
+        Los grupos se procesan en orden aleatorio. Devuelve la máscara de organismos enlazados."""
+        xp, p, cfg = self.xp, self.pob, self.cfg.asociacion
+        H, W = self.entorno.alto, self.entorno.ancho
+        soc = dev.a_cpu(socios)
+        enlazado = (soc >= 0).any(axis=1)
+        ii, kk = np.nonzero(soc >= 0)
+        jj = soc[ii, kk]
+        lab = np.arange(p.n)
+        while True:  # componentes conexas por propagación de etiquetas mínimas
+            nuevo = lab.copy()
+            np.minimum.at(nuevo, ii, lab[jj])
+            nuevo = nuevo[nuevo]
+            if np.array_equal(nuevo, lab):
+                break
+            lab = nuevo
+        y, x = dev.a_cpu(p["y"]).copy(), dev.a_cpu(p["x"]).copy()
+        d, a = dev.a_cpu(p["dir"]).astype(np.int64), dev.a_cpu(act)
+        ocup = dev.a_cpu(occ).copy()
+        miembros_de = {}
+        for idx in np.flatnonzero(enlazado):
+            miembros_de.setdefault(lab[idx], []).append(idx)
+        grupos = list(miembros_de.values())
+        norma = np.hypot(DX, DY)
+        for g in self.rng.permutation(len(grupos)):
+            m = np.array(grupos[g])
+            empujan = m[a[m] == gen.AVANZAR]
+            if empujan.size == 0:
+                continue
+            vx, vy = DX[d[empujan]].sum(), DY[d[empujan]].sum()
+            if np.hypot(vx, vy) < cfg.fraccion_empuje * m.size:
+                continue
+            k = int(np.argmax((DX * vx + DY * vy) / norma))
+            ny, nx = (y[m] + DY[k]) % H, (x[m] + DX[k]) % W
+            destino = ocup[ny, nx]
+            if not np.all((destino < 0) | (lab[np.maximum(destino, 0)] == lab[m[0]])):
+                continue
+            ocup[y[m], x[m]] = -1
+            ocup[ny, nx] = m
+            y[m], x[m] = ny, nx
+        p["y"], p["x"] = xp.asarray(y.astype(np.int32)), xp.asarray(x.astype(np.int32))
+        return xp.asarray(enlazado)
 
     # ------------------------------------------------------------------ paso
     def paso(self) -> None:

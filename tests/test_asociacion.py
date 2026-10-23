@@ -214,8 +214,13 @@ def test_grupo_en_cadena(cfg):
     assert np.isclose(m["frac_enlazados"], 0.75)
 
 
-def test_invariantes_con_asociacion_forzada(cfg):
+import pytest
+
+
+@pytest.mark.parametrize("movimiento", ["unanime", "empuje"])
+def test_invariantes_con_asociacion_forzada(cfg, movimiento):
     """Una población que se une, comparte, conjuga y se divide unida mantiene los enlaces consistentes."""
+    cfg.asociacion.movimiento = movimiento
     cfg.mundo.alto = cfg.mundo.ancho = 40
     cfg.sim.poblacion_inicial = 300
     sim = Simulacion(cfg)
@@ -338,3 +343,31 @@ def test_aprendizaje_ignora_lo_recibido(cfg):
         return sim.pob["p"][1, 0]
     # recibir un regalo no cambia lo que el receptor aprende de su propia acción
     assert np.isclose(ajuste(True), ajuste(False))
+
+
+def test_empuje_mueve_al_grupo(cfg):
+    """En modo empuje, un par en el que uno solo empuja hacia el este se desplaza entero."""
+    cfg.asociacion.movimiento = "empuje"
+    sim = sim_vacia(cfg)
+    _par_enlazado(sim, cfg, quieto(cfg), con(cfg, gen.AVANZAR))
+    sim.paso()
+    p = sim.pob
+    assert (p["x"][0], p["x"][1]) == (6, 7)
+    assert enlazados(sim, 0, 1)
+
+
+def test_empujes_opuestos_se_anulan(cfg):
+    cfg.asociacion.movimiento = "empuje"
+    sim = sim_vacia(cfg)
+    _par_enlazado(sim, cfg, con(cfg, gen.AVANZAR), con(cfg, gen.AVANZAR), dir_a=OESTE, dir_b=ESTE)
+    sim.paso()
+    assert (sim.pob["x"][0], sim.pob["x"][1]) == (5, 6)
+
+
+def test_empuje_bloqueado_por_un_tercero(cfg):
+    cfg.asociacion.movimiento = "empuje"
+    sim = sim_vacia(cfg)
+    _par_enlazado(sim, cfg, con(cfg, gen.AVANZAR), con(cfg, gen.AVANZAR))
+    colocar(sim, quieto(cfg), [5], [7], E=50)
+    sim.paso()
+    assert (sim.pob["x"][0], sim.pob["x"][1]) == (5, 6)
