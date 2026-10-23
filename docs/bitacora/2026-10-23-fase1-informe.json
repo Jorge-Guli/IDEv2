@@ -1,0 +1,116 @@
+{
+  "parametros": {
+    "pasos": 20000,
+    "semillas": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "pasos_competencia": 3000,
+    "minutos": 32.8
+  },
+  "criterios": {
+    "C1_persistencia": {
+      "aprobado": true,
+      "persistieron": "5/5"
+    },
+    "C2_adaptacion": {
+      "aprobado": true,
+      "fraccion_evolucionada": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        0.998
+      ]
+    },
+    "C3_reproducibilidad": {
+      "aprobado": true
+    },
+    "C4_rendimiento": {
+      "aprobado": true,
+      "pasos_por_segundo": 50.0,
+      "poblacion": 1815
+    }
+  },
+  "exploratorios": {
+    "condiciones": {
+      "base": {
+        "persistieron": "5/5",
+        "poblacion_final_media": 1110.4,
+        "comido_por_org_paso_final": 0.5058666358862783,
+        "genes_medios_final": 4.917461702862332,
+        "mu_final": 0.017384448848380012,
+        "sens_final": 2.1076579012279835,
+        "eta_final": 0.04198617255506683,
+        "generacion_max": 46.0
+      },
+      "variable_estres": {
+        "persistieron": "5/5",
+        "poblacion_final_media": 648.6,
+        "comido_por_org_paso_final": 0.5238568130012572,
+        "genes_medios_final": 4.417755115129497,
+        "mu_final": 0.014189976585750178,
+        "sens_final": 2.5942351983384735,
+        "eta_final": 0.04204483258241221,
+        "generacion_max": 50.6
+      },
+      "variable_sin_estres": {
+        "persistieron": "5/5",
+        "poblacion_final_media": 598.8,
+        "comido_por_org_paso_final": 0.5254287725959149,
+        "genes_medios_final": 4.593615569147514,
+        "mu_final": 0.016868969307480906,
+        "sens_final": 2.0,
+        "eta_final": 0.04909363479286141,
+        "generacion_max": 43.8
+      },
+      "variable_estres_barajado": {
+        "persistieron": "5/5",
+        "poblacion_final_media": 643.0,
+        "comido_por_org_paso_final": 0.5295957429346677,
+        "genes_medios_final": 4.874148949865921,
+        "mu_final": 0.015182656554895396,
+        "sens_final": 2.443071873805425,
+        "eta_final": 0.04342059108803882,
+        "generacion_max": 48.2
+      },
+      "base_sin_aprendizaje": {
+        "persistieron": "5/5",
+        "poblacion_final_media": 1056.8,
+        "comido_por_org_paso_final": 0.5238718344218113,
+        "genes_medios_final": 5.39522073077777,
+        "mu_final": 0.016540422279192505,
+        "sens_final": 2.087894647905502,
+        "eta_final": 0.049869579415003897,
+        "generacion_max": 49.2
+      },
+      "base_sin_mutacion": {
+        "persistieron": "5/5",
+        "poblacion_final_media": 1038.6,
+        "comido_por_org_paso_final": 0.5010799687731462,
+        "genes_medios_final": 4.0,
+        "mu_final": 0.02,
+        "sens_final": 2.0,
+        "eta_final": 0.049999999999999996,
+        "generacion_max": 52.6
+      }
+    },
+    "E1_estres_recuperacion": {
+      "variable_estres": {
+        "minimo_relativo_tras_cambio": 0.15209780104250398,
+        "comido_por_org_paso_tras_cambio": 0.5321320461359502
+      },
+      "variable_estres_barajado": {
+        "minimo_relativo_tras_cambio": 0.154166651503814,
+        "comido_por_org_paso_tras_cambio": 0.5355179049746883
+      },
+      "variable_sin_estres": {
+        "minimo_relativo_tras_cambio": 0.15995512783202237,
+        "comido_por_org_paso_tras_cambio": 0.5369828084382211
+      }
+    }
+  }
+}

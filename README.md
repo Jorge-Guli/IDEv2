@@ -10,7 +10,9 @@ Experimento de vida artificial. Organismos simples, que empiezan casi como una b
 
 ## Estado
 
-**Fase 1 — evolución básica.** Organismos con un genoma de genes-regla: cada gen conecta lo que el organismo percibe con una acción primitiva, de modo que las acciones disponibles salen del ADN. Tienen metabolismo, división, mutación (puntual, duplicación, eliminación, gen nuevo), mutagénesis por estrés y aprendizaje durante la vida.
+**Fase 1 — evolución básica: cerrada (2026-10-23).** Organismos con un genoma de genes-regla: cada gen conecta lo que el organismo percibe con una acción primitiva, de modo que las acciones disponibles salen del ADN. Tienen metabolismo, división, mutación (puntual, duplicación, eliminación, gen nuevo), mutagénesis por estrés y aprendizaje durante la vida. Se cumplieron los cuatro criterios de éxito, y la evolución "inventó" el giro, una conducta que LUCA no tenía ([bitácora](docs/bitacora/2026-10-23-fase1-evaluacion.md)).
+
+**Próximo: fase 2 — asociación.**
 
 ## Uso
 
@@ -26,6 +28,9 @@ python -m simbio competir luca runs/demo/poblacion.npz experiments/configs/base.
 
 # evaluación completa de la fase 1 (criterios de éxito + exploratorios)
 python experiments/fase1/evaluar.py --salida runs/fase1 --procesos 4
+
+# experimento largo de mutagénesis por estrés (para un equipo con más núcleos)
+python experiments/fase1/estres_extendido.py --salida runs/e1 --semillas 20 --pasos 100000 --procesos 8
 ```
 
 Cualquier parámetro se puede cambiar con `--set seccion.clave=valor` (ver `src/simbio/config.py`).

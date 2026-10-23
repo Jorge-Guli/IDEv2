@@ -1,6 +1,6 @@
 # Descripción del modelo (protocolo ODD)
 
-> Versión vigente: **fase 1** (evolución básica, sin asociación). Este documento sigue el protocolo ODD (*Overview, Design concepts, Details*; Grimm et al. 2006, 2020) y se actualiza al cerrar cada fase. Los valores por defecto están en `src/simbio/config.py`.
+> Versión vigente: **fase 1, cerrada el 2026-10-23** (evolución básica, sin asociación). Este documento sigue el protocolo ODD (*Overview, Design concepts, Details*; Grimm et al. 2006, 2020) y se actualiza al cerrar cada fase. Los valores por defecto están en `src/simbio/config.py`.
 
 ## 1. Visión general
 
