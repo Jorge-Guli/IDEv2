@@ -12,20 +12,34 @@ Preferencia: argumento `preferencia` ("auto", "cpu", "gpu"), o la variable de en
 from __future__ import annotations
 
 import os
+import warnings
 from types import ModuleType
 
 import numpy as np
 
 
+_MOTIVO_SIN_GPU = ""
+
+
 def _cupy_disponible() -> ModuleType | None:
+    """CuPy si hay una GPU que además puede compilar y ejecutar kernels; si no, None (y guarda el motivo)."""
+    global _MOTIVO_SIN_GPU
     try:
         import cupy as cp
-
+    except Exception as e:  # CuPy no instalado o mal instalado
+        _MOTIVO_SIN_GPU = f"CuPy no disponible ({type(e).__name__})"
+        return None
+    try:
         if cp.cuda.runtime.getDeviceCount() < 1:
+            _MOTIVO_SIN_GPU = "no hay GPU NVIDIA"
             return None
-        cp.zeros(1).sum().item()  # confirma que el dispositivo responde
+        # operaciones que obligan a compilar kernels elementales y de reducción (fallan sin cabeceras de CUDA)
+        x = cp.arange(16, dtype=cp.float64) * 0.5 + 1.0
+        if abs(float(cp.tanh(x).sum()) - float(np.tanh(np.arange(16) * 0.5 + 1.0).sum())) > 1e-9:
+            raise RuntimeError("resultado incorrecto en la prueba de GPU")
         return cp
-    except Exception:
+    except Exception as e:
+        _MOTIVO_SIN_GPU = f"la GPU no pudo ejecutar la prueba: {str(e).splitlines()[0][:200]}"
         return None
 
 
@@ -40,8 +54,9 @@ def elegir(preferencia: str = "auto") -> tuple[ModuleType, str]:
     if cp is not None:
         return cp, "gpu"
     if preferencia == "gpu":
-        raise RuntimeError("se pidió GPU pero no hay una GPU NVIDIA utilizable con CuPy instalado "
-                           "(ver docs/dispositivos.md)")
+        raise RuntimeError(f"se pidió GPU pero no está utilizable: {_MOTIVO_SIN_GPU} (ver docs/dispositivos.md)")
+    if _MOTIVO_SIN_GPU.startswith("la GPU"):  # hay GPU pero falla: avisar, sin interrumpir
+        warnings.warn(f"se usa CPU porque {_MOTIVO_SIN_GPU}. Ver docs/dispositivos.md", stacklevel=2)
     return np, "cpu"
 
 

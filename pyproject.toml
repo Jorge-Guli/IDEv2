@@ -12,8 +12,9 @@ dependencies = ["numpy>=1.26", "matplotlib>=3.8"]
 [project.optional-dependencies]
 dev = ["pytest>=8"]
 # GPU NVIDIA (opcional): elegir el paquete de CuPy que corresponda a la versión de CUDA del equipo
-gpu-cuda12 = ["cupy-cuda12x"]
-gpu-cuda13 = ["cupy-cuda13x"]
+# [ctk] instala por pip las cabeceras de CUDA que CuPy necesita para compilar (no hace falta el CUDA Toolkit)
+gpu-cuda12 = ["cupy-cuda12x[ctk]"]
+gpu-cuda13 = ["cupy-cuda13x[ctk]"]
 
 [project.scripts]
 simbio = "simbio.cli:main"

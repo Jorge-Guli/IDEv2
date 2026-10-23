@@ -29,6 +29,8 @@ Mover datos a la GPU tiene un costo fijo por paso, y con pocos organismos (~2000
 
 ## Instalar soporte de GPU (NVIDIA)
 
+> Si la detección encuentra la GPU pero no puede usarla (por ejemplo, faltan las cabeceras de CUDA), el modo automático **avisa y sigue en CPU**: nunca interrumpe una corrida.
+
 1. Mira tu versión de CUDA con `nvidia-smi` (arriba a la derecha, "CUDA Version").
 2. Instala CuPy para esa versión, dentro del entorno virtual del proyecto:
    ```bash
@@ -37,6 +39,8 @@ Mover datos a la GPU tiene un costo fijo por paso, y con pocos organismos (~2000
    pip install -e ".[gpu-cuda12]"   # CUDA 12.x
    ```
    Las GPU recientes (serie RTX 50) requieren CUDA 12.8 o superior. Si la instalación para CUDA 13 no está disponible para tu plataforma, prueba la de CUDA 12: el controlador de una versión 13 también ejecuta programas compilados para la 12.
-3. Verifica con `python -m simbio dispositivo`.
+   El extra incluye `[ctk]`, que instala por pip las cabeceras de CUDA que CuPy necesita para compilar. Sin ellas aparece *"Failed to find CUDA headers"*.
+3. **Instala un solo paquete de CuPy.** Si instalaste más de uno, desinstálalos todos primero (`pip uninstall cupy-cuda12x cupy-cuda13x`).
+4. Verifica con `python -m simbio dispositivo`.
 
 Sin GPU NVIDIA (AMD, Intel, Apple), el simulador funciona igual en CPU.
