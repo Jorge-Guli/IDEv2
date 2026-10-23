@@ -29,7 +29,9 @@ CONDICIONES = {
 def _correr(tarea):
     salida, condicion, semilla, pasos = tarea
     registrar = max(1, min(200, pasos // 100))
-    ajustes = CONDICIONES[condicion] + [f"mundo.cambio_en_paso={pasos // 2}", f"sim.registrar_cada={registrar}"]
+    # física de la fase 1: sin asociación ni bien público (agregados después)
+    ajustes = CONDICIONES[condicion] + [f"mundo.cambio_en_paso={pasos // 2}", f"sim.registrar_cada={registrar}",
+                                        "asociacion.activa=false", "bien_publico.activo=false"]
     cfg = config.cargar(RAIZ / "experiments" / "configs" / "variable.toml", ajustes)
     cfg.sim.semilla, cfg.sim.pasos = semilla, pasos
     sim = corrida.correr(cfg, Path(salida) / condicion / f"semilla_{semilla}", imagenes=False)
