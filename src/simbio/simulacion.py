@@ -125,10 +125,10 @@ class Simulacion:
         p, c = self.pob, self.cfg.aprendizaje
         tuvo = p["ult_act"] >= 0
         dE = p["E"] - p["E_prev"]
-        p["delta_e"] = np.where(tuvo, dE, 0.0)
+        # dividirse no se evalúa por energía: reproducirse es aptitud, no pérdida
+        valido = tuvo & (p["ult_act"] != gen.DIVIDIRSE)
+        p["delta_e"] = np.where(valido, dE, 0.0)
         if c.activo:
-            # dividirse no se evalúa por energía: reproducirse es aptitud, no pérdida
-            valido = tuvo & (p["ult_act"] != gen.DIVIDIRSE)
             r = np.clip((dE - p["linea_base"]) / c.escala_recompensa, -1.0, 1.0) * valido
             mascara = (p["prim"] == p["ult_act"][:, None]) & p["activo"]
             grad = (1.0 - p["ult_a"] ** 2) * mascara * (p["eta"] * r)[:, None]
@@ -139,7 +139,7 @@ class Simulacion:
             if fi.size:
                 p["P"][fi, gi] = np.clip(p["P"][fi, gi] + grad[fi, gi, None] * p["ult_s"][fi], -c.limite, c.limite)
                 p["p"][fi, gi] = np.clip(p["p"][fi, gi] + grad[fi, gi], -c.limite, c.limite)
-        p["linea_base"] = np.where(tuvo, (1 - c.memoria_linea_base) * p["linea_base"]
+        p["linea_base"] = np.where(valido, (1 - c.memoria_linea_base) * p["linea_base"]
                                    + c.memoria_linea_base * dE, p["linea_base"])
 
     # ------------------------------------------------------------------ paso
@@ -159,6 +159,16 @@ class Simulacion:
 
             # costos: basal + genoma + acción
             p["E"] -= f.costo_basal + f.costo_por_gen * p["activo"].sum(axis=1) + self.costo_accion[act]
+
+            # quien queda sin energía tras pagar sus costos muere antes de actuar
+            vivos = p["E"] > 0.0
+            if not vivos.all():
+                self.cont["muertes"] += int((~vivos).sum())
+                self.cont["acciones"] += np.bincount(act[~vivos], minlength=gen.NUM_PRIM)
+                self.cont["org_pasos"] += int((~vivos).sum())
+                p.filtrar(vivos)
+                act = act[vivos]
+                occ = self.ocupacion()
 
             # giros
             d = p["dir"].astype(np.int64)
@@ -184,6 +194,11 @@ class Simulacion:
             ganadores, celdas = self._resolver(i[libre], (ty * W + tx)[libre])
             p["y"][ganadores], p["x"][ganadores] = celdas // W, celdas % W
 
+            # estrés: promedio móvil del hambre (energía bajo el umbral), antes de que dividirse la reparta
+            h = cfg.herencia
+            hambre = np.clip((h.umbral_hambre - p["E"]) / h.umbral_hambre, 0.0, 1.0)
+            p["estres"] = (1 - h.memoria_estres) * p["estres"] + h.memoria_estres * hambre
+
             # dividirse
             nuevos = None
             occ = self.ocupacion()
@@ -192,7 +207,7 @@ class Simulacion:
                 ny = (p["y"][i, None] + DY[None, :]) % H
                 nx = (p["x"][i, None] + DX[None, :]) % W
                 libres = occ[ny, nx] < 0
-                elegida = np.argmax(self.rng.random(libres.shape) * libres, axis=1)
+                elegida = np.argmax(np.where(libres, self.rng.random(libres.shape), -1.0), axis=1)
                 tiene = libres.any(axis=1)
                 fila = np.flatnonzero(tiene)
                 celdas = ny[fila, elegida[fila]] * W + nx[fila, elegida[fila]]
@@ -200,21 +215,18 @@ class Simulacion:
                 if padres.size:
                     p["E"][padres] = (p["E"][padres] - f.costo_division) / 2.0
                     hijos = p.genomas(padres)
-                    m = gen.tasa_efectiva(hijos["mu"], hijos["sens"], p["estres"][padres], cfg.herencia)
+                    estres = p["estres"]
+                    if h.estres_modo == "barajado":  # control: rompe el vínculo con la condición propia
+                        estres = estres[self.rng.permutation(p.n)]
+                    m = gen.tasa_efectiva(hijos["mu"], hijos["sens"], estres[padres], h)
                     gen.mutar(hijos, m, cfg.herencia, self.rng)
                     nuevos = self._nuevos(hijos, celdas // W, celdas % W, p["E"][padres],
                                           padre=p["id"][padres], generacion=p["generacion"][padres] + 1,
-                                          cepa=p["cepa"][padres], estres=p["estres"][padres])
+                                          cepa=p["cepa"][padres], estres=np.zeros(padres.size))
                     self.cont["nacimientos"] += padres.size
 
-            # muerte (los recién nacidos siempre tienen energía positiva) y altas en una sola operación
-            vivos = p["E"] > 0.0
-            self.cont["muertes"] += int((~vivos).sum())
-            p.actualizar(vivos, nuevos)
-
-            # estrés: promedio móvil del déficit de energía
-            alfa = cfg.herencia.memoria_estres
-            p["estres"] = (1 - alfa) * p["estres"] + alfa * (1.0 - p["E"] / f.energia_max)
+            # altas (comer y dividirse no pueden dejar la energía en cero: no hay muertes nuevas aquí)
+            p.actualizar(p["E"] > 0.0, nuevos)
 
             self.cont["acciones"] += np.bincount(act, minlength=gen.NUM_PRIM)
             self.cont["org_pasos"] += len(act)

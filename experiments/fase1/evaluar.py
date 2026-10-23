@@ -37,9 +37,20 @@ def _correr(tarea: tuple[str, str, int, int, list[str]]) -> dict:
 def _competir(tarea: tuple[str, int, int]) -> float:
     ruta_pob, semilla, pasos = tarea
     cfg = config.cargar(CONFIGS / "base.toml", ["herencia.mutacion=false", "sim.registrar_cada=500"])
-    cfg.sim.semilla, cfg.sim.pasos = semilla, pasos
+    # semilla distinta de la de la evolución: mapa nuevo, sin "jugar de local"
+    cfg.sim.semilla, cfg.sim.pasos = semilla + 1_000_003, pasos
     evolucionada = persistencia.cargar_genomas(Path(ruta_pob))
     return corrida.competir(cfg, gen.luca(cfg.herencia), evolucionada)
+
+
+def _huella(_: int) -> str:
+    """Huella de una corrida de 1500 pasos: métricas + estado completo de la población."""
+    import hashlib
+    sim = Simulacion(config.cargar(CONFIGS / "base.toml", ["mundo.alto=64", "mundo.ancho=64"]))
+    h = hashlib.sha256(repr(sim.correr(1500)).encode())
+    for k in sorted(sim.pob.d):
+        h.update(np.ascontiguousarray(sim.pob.d[k]).tobytes())
+    return h.hexdigest()
 
 
 def _rendimiento() -> dict:
@@ -86,6 +97,9 @@ def main() -> None:
     variable = [f"mundo.cambio_en_paso={cambio}"]
     tareas += [("variable_estres", "variable.toml", s, P, variable) for s in semillas]
     tareas += [("variable_sin_estres", "variable.toml", s, P, variable + ["herencia.estres=false"]) for s in semillas]
+    # control del estrés: misma distribución de tasas, pero sin vínculo con el hambre propio
+    tareas += [("variable_estres_barajado", "variable.toml", s, P, variable + ['herencia.estres_modo="barajado"'])
+               for s in semillas]
     # E2: aprendizaje
     tareas += [("base_sin_aprendizaje", "base.toml", s, P, ["aprendizaje.activo=false"]) for s in semillas]
     # control: sin mutación (LUCA congelado)
@@ -100,6 +114,7 @@ def main() -> None:
         comp_tareas = [(str(Path(r["salida"]) / "poblacion.npz"), r["semilla"], args.pasos_competencia)
                        for r in por_nombre["base"] if r["poblacion_final"] > 0]
         competencias = pool.map(_competir, comp_tareas)
+        huellas = pool.map(_huella, range(2))  # dos procesos distintos
     rendimiento = _rendimiento()
 
     # ---------------- criterios
@@ -108,9 +123,7 @@ def main() -> None:
     c1 = persistentes >= int(np.ceil(0.8 * len(base)))
     ganadas = sum(f > 0.8 for f in competencias if not np.isnan(f))
     c2 = ganadas >= int(np.ceil(0.8 * len(base)))
-    a = Simulacion(config.cargar(CONFIGS / "base.toml", ["sim.pasos=300"])).correr(300)
-    b = Simulacion(config.cargar(CONFIGS / "base.toml", ["sim.pasos=300"])).correr(300)
-    c3 = a == b
+    c3 = huellas[0] == huellas[1]
     c4 = rendimiento["pasos_por_segundo"] >= 50
 
     def tabla(nombre: str) -> dict:
@@ -153,7 +166,8 @@ def main() -> None:
         },
         "exploratorios": {
             "condiciones": {n: tabla(n) for n in por_nombre},
-            "E1_estres_recuperacion": {n: recuperacion(n) for n in ("variable_estres", "variable_sin_estres")},
+            "E1_estres_recuperacion": {n: recuperacion(n) for n in ("variable_estres", "variable_estres_barajado",
+                                                                     "variable_sin_estres")},
         },
     }
     (SALIDA / "informe.json").write_text(json.dumps(informe, indent=2, ensure_ascii=False), encoding="utf-8")

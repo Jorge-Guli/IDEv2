@@ -49,9 +49,12 @@ class HerenciaCfg:
     k_duplicacion: float = 0.5
     k_eliminacion: float = 0.5
     k_gen_nuevo: float = 0.2
-    prob_mutar_rasgo: float = 0.2
+    k_rasgo: float = 10.0  # prob. de mutar cada rasgo = min(1, k_rasgo·m)
     sigma_log_rasgo: float = 0.2
+    tasa_max: float = 0.2  # tope de la tasa de mutación efectiva
     memoria_estres: float = 0.05  # peso del paso actual en el promedio móvil del estrés
+    umbral_hambre: float = 25.0  # energía por debajo de la cual el organismo acumula estrés
+    estres_modo: str = "propio"  # "propio" o "barajado" (control: estrés de otro organismo al azar)
     # rasgos de LUCA
     mu_inicial: float = 0.02
     sensibilidad_inicial: float = 2.0
@@ -99,6 +102,8 @@ class Config:
             for k, v in valores.items():
                 if isinstance(v, bool):
                     v = "true" if v else "false"
+                elif isinstance(v, str):
+                    v = f'"{v}"'
                 lineas.append(f"{k} = {v}")
             lineas.append("")
         return "\n".join(lineas)

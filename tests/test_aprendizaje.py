@@ -37,3 +37,13 @@ def test_aprendizaje_desactivado(cfg):
     sim = Simulacion(cfg)
     sim.correr(200)
     assert np.all(sim.pob["P"] == 0) and np.all(sim.pob["p"] == 0)
+
+
+def test_division_no_altera_la_linea_base(cfg):
+    sim = sim_vacia(cfg)
+    colocar(sim, genoma_con(cfg, [(gen.DIVIDIRSE, 5.0, {})]), [5], [5], E=60)
+    sim.entorno.R[:] = 0
+    sim.paso()  # se divide
+    sim.aprender()
+    assert sim.pob["linea_base"][0] == 0.0
+    assert sim.pob["delta_e"][0] == 0.0

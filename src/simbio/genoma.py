@@ -73,12 +73,12 @@ def tomar(g: dict[str, np.ndarray], idx: np.ndarray) -> dict[str, np.ndarray]:
 
 
 def tasa_efectiva(mu: np.ndarray, sens: np.ndarray, estres: np.ndarray, cfg: HerenciaCfg) -> np.ndarray:
-    """Tasa de mutación de la descendencia: μ·(1 + sensibilidad·estrés)."""
+    """Tasa de mutación de la descendencia: μ·(1 + sensibilidad·estrés), con tope tasa_max."""
     if not cfg.mutacion:
         return np.zeros_like(mu)
     if not cfg.estres:
-        return mu.copy()
-    return mu * (1.0 + sens * estres)
+        return np.minimum(mu, cfg.tasa_max)
+    return np.minimum(mu * (1.0 + sens * estres), cfg.tasa_max)
 
 
 def mutar(g: dict[str, np.ndarray], m: np.ndarray, cfg: HerenciaCfg,
@@ -133,7 +133,7 @@ def mutar(g: dict[str, np.ndarray], m: np.ndarray, cfg: HerenciaCfg,
     if cfg.estres:
         rasgos.append(("sens", 0.0, cfg.sensibilidad_max))
     for nombre, lo, hi in rasgos:
-        mask = rng.random(n) < cfg.prob_mutar_rasgo
+        mask = rng.random(n) < np.minimum(1.0, cfg.k_rasgo * m)
         factor = np.exp(rng.normal(0.0, cfg.sigma_log_rasgo, n))
         g[nombre] = np.where(mask, np.clip(g[nombre] * factor, lo, hi), g[nombre])
     return g

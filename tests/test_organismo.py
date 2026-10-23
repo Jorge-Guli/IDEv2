@@ -125,3 +125,29 @@ def test_luca_persiste_en_corrida_corta(cfg):
     sim = Simulacion(cfg)
     sim.correr(1500)
     assert sim.pob.n > cfg.sim.poblacion_inicial
+
+
+def test_sin_energia_tras_costos_muere_sin_comer(cfg):
+    sim = sim_vacia(cfg)
+    colocar(sim, genoma_con(cfg, [(gen.COMER, 5.0, {})]), [5], [5], E=0.2)  # menos que el costo basal
+    sim.entorno.R[5, 5] = sim.entorno.K_base[5, 5] = 4.0
+    sim.paso()
+    assert sim.pob.n == 0
+    assert sim.entorno.R[5, 5] == 4.0
+
+
+def test_dividirse_no_genera_estres(cfg):
+    sim = sim_vacia(cfg)
+    colocar(sim, genoma_con(cfg, [(gen.DIVIDIRSE, 5.0, {})]), [5], [5], E=90)
+    sim.entorno.R[:] = 0
+    sim.paso()
+    assert sim.pob.n == 2
+    assert np.all(sim.pob["estres"] == 0)  # 44 de energía cada uno: por encima del umbral de hambre
+
+
+def test_hambre_genera_estres(cfg):
+    sim = sim_vacia(cfg)
+    colocar(sim, genoma_con(cfg, [(gen.DESCANSAR, 5.0, {})]), [5], [5], E=5)
+    sim.entorno.R[:] = 0
+    sim.paso()
+    assert sim.pob["estres"][0] > 0

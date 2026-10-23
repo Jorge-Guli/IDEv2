@@ -56,3 +56,16 @@ def test_estres_desactivado():
     g = gen.repetir(gen.luca(cfg), 500)
     gen.mutar(g, np.full(500, 0.1), cfg, np.random.default_rng(0))
     assert np.all(g["sens"] == cfg.sensibilidad_inicial)
+
+
+def test_rasgos_no_mutan_con_tasa_cero():
+    cfg = HerenciaCfg()
+    g = gen.repetir(gen.luca(cfg), 200)
+    gen.mutar(g, np.zeros(200), cfg, np.random.default_rng(0))
+    assert np.all(g["mu"] == cfg.mu_inicial) and np.all(g["eta"] == cfg.eta_inicial)
+
+
+def test_tasa_efectiva_acotada():
+    cfg = HerenciaCfg()
+    m = gen.tasa_efectiva(np.array([0.1]), np.array([20.0]), np.array([1.0]), cfg)
+    assert m[0] == cfg.tasa_max

@@ -52,3 +52,10 @@ def test_competencia_contra_si_misma_es_pareja(cfg):
         cfg.sim.semilla = semilla
         fracciones.append(corrida.competir(cfg, luca, luca))
     assert 0.35 < np.mean(fracciones) < 0.65
+
+
+def test_estres_barajado_corre(cfg):
+    cfg.herencia.estres_modo = "barajado"
+    sim = Simulacion(cfg)
+    sim.correr(300)
+    assert sim.pob.n > 0
