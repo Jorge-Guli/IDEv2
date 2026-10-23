@@ -24,6 +24,7 @@ ESTADO = {
     "cepa": (np.int16, ()),
     "dado": (np.float64, ()),  # energía cedida en la vida
     "recibido": (np.float64, ()),  # energía recibida en la vida
+    "recibido_paso": (np.float64, ()),  # energía recibida desde la última decisión
 }
 
 

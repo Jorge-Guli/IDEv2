@@ -27,12 +27,15 @@ CONDICIONES = {
     "variable": ("variable.toml", []),
     "base_elastico": ("base.toml", ["asociacion.adhesion=false"]),
     "base_sin_beneficio": ("base.toml", ["asociacion.eficiencia_compartir=0.0"]),
-    "base_sin_asociacion": ("base.toml", ["asociacion.activa=false"]),
+    # control con el mismo espectro mutacional: las primitivas existen y cuestan, pero no hacen nada
+    "base_inerte": ("base.toml", ["asociacion.inerte=true"]),
+    # control positivo: compartir crea energía (eficiencia 2); si ni así aparece, el protocolo no la detectaría
+    "base_positivo": ("base.toml", ["asociacion.eficiencia_compartir=2.0"]),
 }
 METRICAS = ["poblacion", "frac_enlazados", "grupos_de_3_o_mas", "tamano_grupo_medio", "tamano_grupo_max",
             "compartido_por_org_paso", "frac_aprovechados", "tiene_unirse", "tiene_compartir",
             "tiene_dividirse_unido", "tiene_conjugar", "tiene_soltarse", "usa_unirse", "usa_compartir",
-            "usa_dividirse_unido", "usa_conjugar", "dist_etiqueta_enlazados", "dist_etiqueta_azar", "genes_medios"]
+            "usa_dividirse_unido", "usa_conjugar", "recibido_por_org_paso", "dist_etiqueta_enlazados", "dist_etiqueta_azar", "genes_medios"]
 
 
 def _correr(tarea):
@@ -52,8 +55,18 @@ def _correr(tarea):
     return res
 
 
+def _forzar_asociacion(sim):
+    p = sim.pob
+    for k, prim in enumerate([gen.UNIRSE, gen.COMPARTIR, gen.DIVIDIRSE_UNIDO, gen.CONJUGAR, gen.SOLTARSE]):
+        p["activo"][:, 4 + k] = True
+        p["prim"][:, 4 + k] = prim
+        p["w"][:, 4 + k, gen.S_RUIDO] = 2.0
+
+
 def _huella(_):
+    """Huella de una corrida con asociación forzada (ejercita compartir, conjugar y división unida)."""
     sim = Simulacion(config.cargar(CONFIGS / "base.toml", ["mundo.alto=64", "mundo.ancho=64"]))
+    _forzar_asociacion(sim)
     h = hashlib.sha256(repr(sim.correr(1500)).encode())
     for k in sorted(sim.pob.d):
         h.update(np.ascontiguousarray(sim.pob.d[k]).tobytes())
@@ -64,11 +77,7 @@ def _invariantes(_):
     """Corrida con asociación forzada: un organismo por celda, enlaces vecinos, simétricos y a vivos."""
     cfg = config.cargar(CONFIGS / "base.toml", ["mundo.alto=64", "mundo.ancho=64", "sim.poblacion_inicial=800"])
     sim = Simulacion(cfg)
-    p = sim.pob
-    for k, prim in enumerate([gen.UNIRSE, gen.COMPARTIR, gen.DIVIDIRSE_UNIDO, gen.CONJUGAR, gen.SOLTARSE]):
-        p["activo"][:, 4 + k] = True
-        p["prim"][:, 4 + k] = prim
-        p["w"][:, 4 + k, gen.S_RUIDO] = 2.0
+    _forzar_asociacion(sim)
     violaciones, enlaces = 0, 0
     for _ in range(2000):
         sim.paso()

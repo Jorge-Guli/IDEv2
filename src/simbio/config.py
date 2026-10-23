@@ -80,7 +80,8 @@ class AprendizajeCfg:
 class AsociacionCfg:
     activa: bool = True
     conjugacion: bool = True
-    adhesion: bool = True  # un enlace impide alejarse: solo se avanza si todos los enlazados avanzan igual
+    adhesion: bool = True  # el grupo enlazado se mueve junto o no se mueve
+    inerte: bool = False  # control: las primitivas de asociación cuestan pero no tienen efecto
     costo_enlace: float = 0.02  # por enlace y paso, para cada extremo
     costo_unirse: float = 0.1
     costo_soltarse: float = 0.05

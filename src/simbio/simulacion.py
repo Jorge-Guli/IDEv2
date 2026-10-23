@@ -87,7 +87,7 @@ class Simulacion:
 
     def _reiniciar_contadores(self) -> None:
         self.cont = {"nacimientos": 0, "muertes": 0, "comido": 0.0, "org_pasos": 0,
-                     "compartido": 0.0, "conjugaciones": 0, "enlaces_creados": 0,
+                     "compartido": 0.0, "recibido": 0.0, "conjugaciones": 0, "enlaces_creados": 0,
                      "acciones": np.zeros(gen.NUM_PRIM, dtype=np.int64)}
 
     def vecinos_enlazados(self, occ: np.ndarray) -> np.ndarray:
@@ -139,6 +139,7 @@ class Simulacion:
         s[:, gen.S_SOCIO_FRENTE] = p["socio"][np.arange(p.n), d] >= 0
         hay = frente >= 0
         dist = np.linalg.norm(p["etiqueta"] - p["etiqueta"][np.maximum(frente, 0)], axis=1)
+        hay &= self.cfg.asociacion.activa  # sin asociación, los cuatro sensores sociales valen 0
         s[:, gen.S_SIMILITUD_FRENTE] = np.where(hay, 1.0 - dist / np.sqrt(2.0), 0.0)
         return s
 
@@ -161,7 +162,9 @@ class Simulacion:
     def aprender(self) -> None:
         p, c = self.pob, self.cfg.aprendizaje
         tuvo = p["ult_act"] >= 0
-        dE = p["E"] - p["E_prev"]
+        # la energía recibida de otros no es resultado de la acción propia: no se refuerza por ella
+        dE = p["E"] - p["E_prev"] - p["recibido_paso"]
+        p["recibido_paso"] = np.zeros(p.n)
         # acciones sin retorno energético propio (reproducirse, ceder energía o genes) no se evalúan
         valido = tuvo & ~np.isin(p["ult_act"], gen.PRIM_SIN_REFUERZO)
         p["delta_e"] = np.where(valido, dE, 0.0)
@@ -182,6 +185,8 @@ class Simulacion:
     # ------------------------------------------------------------------ asociación
     def _compartir(self, act: np.ndarray, socios: np.ndarray) -> None:
         p, a = self.pob, self.cfg.asociacion
+        if self.cfg.asociacion.inerte:  # control: la acción cuesta pero no tiene efecto
+            return
         n_enl = (socios >= 0).sum(axis=1)
         donantes = np.flatnonzero((act == gen.COMPARTIR) & (n_enl > 0))
         if donantes.size == 0:
@@ -197,10 +202,14 @@ class Simulacion:
         np.minimum(p["E"], self.cfg.fisica.energia_max, out=p["E"])
         recibido = p["E"] - antes
         p["recibido"] += recibido
+        p["recibido_paso"] += recibido
         self.cont["compartido"] += float(cedido.sum())
+        self.cont["recibido"] += float(recibido.sum())
 
     def _soltarse(self, act: np.ndarray, socios: np.ndarray) -> None:
         p = self.pob
+        if self.cfg.asociacion.inerte:  # control: la acción cuesta pero no tiene efecto
+            return
         filas = np.flatnonzero(act == gen.SOLTARSE)
         if filas.size == 0:
             return
@@ -210,6 +219,8 @@ class Simulacion:
 
     def _unirse(self, act: np.ndarray, occ: np.ndarray) -> None:
         p = self.pob
+        if self.cfg.asociacion.inerte:  # control: la acción cuesta pero no tiene efecto
+            return
         H, W = self.entorno.alto, self.entorno.ancho
         u = np.flatnonzero(act == gen.UNIRSE)
         if u.size == 0:
@@ -224,6 +235,8 @@ class Simulacion:
 
     def _conjugar(self, act: np.ndarray, socios: np.ndarray) -> None:
         p = self.pob
+        if self.cfg.asociacion.inerte:  # control: la acción cuesta pero no tiene efecto
+            return
         donantes = np.flatnonzero((act == gen.CONJUGAR) & (socios >= 0).any(axis=1))
         for i in donantes:  # evento poco frecuente: bucle explícito
             receptor = self.rng.choice(socios[i][socios[i] >= 0])
@@ -238,7 +251,53 @@ class Simulacion:
             p["b"][receptor, k] = p["b"][i, g]
             p["P"][receptor, k] = 0.0
             p["p"][receptor, k] = 0.0
+            p["ult_a"][receptor, k] = 1.0  # el gen recién llegado no participó de la última acción
             self.cont["conjugaciones"] += 1
+
+    # ------------------------------------------------------------------ movimiento
+    def _avanzar(self, act: np.ndarray, occ: np.ndarray, socios: np.ndarray) -> None:
+        """Movimiento simultáneo.
+
+        Se puede entrar a una celda libre o a una que deja, en el mismo paso, alguien que avanza en la
+        misma dirección (así una fila puede desplazarse entera). Con adhesión, un enlazado solo avanza si
+        todos sus enlazados efectivamente avanzan en su misma dirección: el grupo se mueve junto o no se
+        mueve; quien queda frenado por la adhesión no paga el costo de avanzar.
+        """
+        p = self.pob
+        H, W = self.entorno.alto, self.entorno.ancho
+        i = np.flatnonzero(act == gen.AVANZAR)
+        if i.size == 0:
+            return
+        d = p["dir"].astype(np.int64)
+        ty, tx = (p["y"][i] + DY[d[i]]) % H, (p["x"][i] + DX[d[i]]) % W
+        ocupante = occ[ty, tx]
+        o = np.maximum(ocupante, 0)
+        mueve = act == gen.AVANZAR
+        candidato = (ocupante < 0) | (mueve[o] & (d[o] == d[i]))
+        # adhesión (según la intención): enlazados que no avanzan en la misma dirección frenan al resto
+        adhesion = self.cfg.asociacion.adhesion
+        if adhesion:
+            s_i = socios[i]
+            sm = np.maximum(s_i, 0)
+            frenado = ((s_i >= 0) & ~(mueve[sm] & (d[sm] == d[i][:, None]))).any(axis=1)
+            candidato &= ~frenado
+        # conflictos por la misma celda destino: gana uno al azar
+        avanza = np.zeros(p.n, dtype=bool)
+        g = self._resolver(i[candidato], (ty * W + tx)[candidato])
+        avanza[i[candidato][g]] = True
+        # punto fijo: se cancela quien entra a la celda de alguien que finalmente no se mueve,
+        # o (con adhesión) quien tiene un enlazado que finalmente no se mueve
+        while True:
+            sigue = avanza[i] & ~((ocupante >= 0) & ~avanza[o])
+            if adhesion:
+                sigue &= ~((s_i >= 0) & ~avanza[sm]).any(axis=1)
+            if np.array_equal(sigue, avanza[i]):
+                break
+            avanza[i] = sigue
+        if adhesion:
+            p["E"][i[frenado]] += self.cfg.fisica.costo_avanzar
+        m = avanza[i]
+        p["y"][i[m]], p["x"][i[m]] = ty[m], tx[m]
 
     # ------------------------------------------------------------------ paso
     def paso(self) -> None:
@@ -263,8 +322,8 @@ class Simulacion:
             # quien queda sin energía tras pagar sus costos muere antes de actuar: no come, no se mueve,
             # no ocupa su celda ni sostiene enlaces; se retira al final del paso
             vivos = p["E"] > 0.0
-            self.cont["acciones"] += np.bincount(act, minlength=gen.NUM_PRIM)
-            self.cont["org_pasos"] += len(act)
+            self.cont["acciones"] += np.bincount(act[vivos], minlength=gen.NUM_PRIM)
+            self.cont["org_pasos"] += int(vivos.sum())
             if not vivos.all():
                 self.cont["muertes"] += int((~vivos).sum())
                 act = np.where(vivos, act, gen.DESCANSAR).astype(np.int8)
@@ -279,6 +338,9 @@ class Simulacion:
             d[volt] = self.rng.integers(0, 8, volt.sum())
             p["dir"] = d.astype(np.int8)
 
+            # compartir (antes de comer: así quien recibe ajusta lo que toma y el recurso queda en la celda)
+            self._compartir(act, socios)
+
             # comer
             i = np.flatnonzero(act == gen.COMER)
             yi, xi = p["y"][i], p["x"][i]
@@ -287,23 +349,8 @@ class Simulacion:
             p["E"][i] += toma
             self.cont["comido"] += float(toma.sum())
 
-            # compartir (después de comer: se reparte lo recién obtenido)
-            self._compartir(act, socios)
-
-            # avanzar (solo hacia celdas libres al inicio del paso)
-            i = np.flatnonzero(act == gen.AVANZAR)
-            ty = (p["y"][i] + DY[p["dir"][i]]) % H
-            tx = (p["x"][i] + DX[p["dir"][i]]) % W
-            libre = occ[ty, tx] < 0
-            if cfg.asociacion.adhesion:
-                # adhesión: un organismo enlazado solo avanza si todos sus enlazados avanzan en su misma dirección
-                mueve = act == gen.AVANZAR
-                s_i = socios[i]
-                acompana = mueve[np.maximum(s_i, 0)] & (p["dir"][np.maximum(s_i, 0)] == p["dir"][i, None])
-                libre &= ~((s_i >= 0) & ~acompana).any(axis=1)
-            cand, celdas = i[libre], (ty * W + tx)[libre]
-            g = self._resolver(cand, celdas)
-            p["y"][cand[g]], p["x"][cand[g]] = celdas[g] // W, celdas[g] % W
+            # avanzar
+            self._avanzar(act, occ, socios)
 
             # enlaces: se rompen los estirados, luego soltarse, unirse y conjugar
             occ = self.ocupacion(vivos)
@@ -342,7 +389,8 @@ class Simulacion:
                     nuevos = self._nuevos(hijos, celdas // W, celdas % W, p["E"][padres],
                                           padre=p["id"][padres], generacion=p["generacion"][padres] + 1,
                                           cepa=p["cepa"][padres], estres=np.zeros(padres.size))
-                    unido = act[padres] == gen.DIVIDIRSE_UNIDO
+                    unido = (act[padres] == gen.DIVIDIRSE_UNIDO) & (not cfg.asociacion.inerte)
+                    nuevos["dir"][unido] = p["dir"][padres[unido]]  # el clon pegado nace orientado como su progenitor
                     p["socio"][padres[unido], dirs[unido]] = nuevos["id"][unido]
                     nuevos["socio"][np.flatnonzero(unido), OPUESTA[dirs[unido]]] = p["id"][padres[unido]]
                     self.cont["enlaces_creados"] += int(unido.sum())
@@ -391,6 +439,7 @@ class Simulacion:
         org_pasos = max(c["org_pasos"], 1)
         fila["comido_por_org_paso"] = c["comido"] / org_pasos
         fila["compartido_por_org_paso"] = c["compartido"] / org_pasos
+        fila["recibido_por_org_paso"] = c["recibido"] / org_pasos
         fila["conjugaciones"] = c["conjugaciones"]
         fila["enlaces_creados"] = c["enlaces_creados"]
         if n:

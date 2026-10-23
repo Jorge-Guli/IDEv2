@@ -260,3 +260,81 @@ def test_adhesion_permite_moverse_juntos(cfg):
     sim.paso()
     assert (p["x"][0], p["x"][1]) == (6, 6)
     assert enlazados(sim, 0, 1)
+
+
+def test_fila_enlazada_avanza_junta(cfg):
+    """Par alineado con el enlace: el de atrás entra a la celda que deja el de adelante."""
+    sim = sim_vacia(cfg)
+    _par_enlazado(sim, cfg, con(cfg, gen.AVANZAR), con(cfg, gen.AVANZAR))
+    sim.paso()
+    assert (sim.pob["x"][0], sim.pob["x"][1]) == (6, 7)
+    assert enlazados(sim, 0, 1)
+
+
+def test_grupo_frenado_por_un_tercero_no_se_separa(cfg):
+    sim = sim_vacia(cfg)
+    colocar(sim, con(cfg, gen.AVANZAR), [5], [5], E=50, dir_=ESTE)
+    colocar(sim, con(cfg, gen.AVANZAR), [6], [5], E=50, dir_=ESTE)
+    colocar(sim, quieto(cfg), [6], [6], E=50)  # bloquea al de abajo
+    p = sim.pob
+    p["socio"][0, 4], p["socio"][1, 0] = p["id"][1], p["id"][0]
+    sim.paso()
+    assert (p["x"][0], p["x"][1]) == (5, 5)
+    assert enlazados(sim, 0, 1)
+
+
+def test_frenado_por_adhesion_no_paga_avanzar(cfg):
+    sim = sim_vacia(cfg)
+    mundo_sin_recursos(sim)
+    _par_enlazado(sim, cfg, quieto(cfg), con(cfg, gen.AVANZAR))
+    sim.paso()
+    f, a = cfg.fisica, cfg.asociacion
+    assert np.isclose(sim.pob["E"][1], 50 - f.costo_basal - f.costo_por_gen - a.costo_enlace)
+
+
+def test_clon_unido_hereda_la_orientacion(cfg):
+    sim = sim_vacia(cfg)
+    mundo_sin_recursos(sim)
+    colocar(sim, con(cfg, gen.DIVIDIRSE_UNIDO), [5], [5], E=60, dir_=3)
+    sim.paso()
+    assert sim.pob.n == 2 and np.all(sim.pob["dir"] == 3)
+
+
+def test_compartir_antes_de_comer_no_desperdicia(cfg):
+    sim = sim_vacia(cfg)
+    mundo_sin_recursos(sim)
+    _par_enlazado(sim, cfg, con(cfg, gen.COMPARTIR), con(cfg, gen.COMER))
+    sim.pob["E"][1] = 95.0
+    sim.entorno.R[5, 6] = sim.entorno.K_base[5, 6] = 10.0
+    sim.paso()
+    # el receptor recibe primero y come solo lo que le falta: el resto del recurso queda en la celda
+    assert np.isclose(sim.pob["E"][1], 100.0)
+    assert sim.entorno.R[5, 6] > 6.0
+
+
+def test_control_inerte(cfg):
+    cfg.asociacion.inerte = True
+    sim = sim_vacia(cfg)
+    colocar(sim, con(cfg, gen.UNIRSE), [5], [5], E=50, dir_=ESTE)
+    colocar(sim, quieto(cfg), [5], [6], E=50)
+    colocar(sim, con(cfg, gen.DIVIDIRSE_UNIDO), [20], [20], E=60)
+    sim.paso()
+    assert np.all(sim.pob["socio"] < 0)
+    assert sim.pob.n == 4  # la división unida inerte es una división común
+    f, a = cfg.fisica, cfg.asociacion
+    assert np.isclose(sim.pob["E"][0], 50 - f.costo_basal - f.costo_por_gen - a.costo_unirse)
+
+
+def test_aprendizaje_ignora_lo_recibido(cfg):
+    def ajuste(donante_comparte):
+        sim = sim_vacia(cfg)
+        mundo_sin_recursos(sim)
+        receptor = genoma_con(cfg, [(gen.DESCANSAR, 0.5, {})])
+        receptor["eta"][0] = 0.5
+        donante = con(cfg, gen.COMPARTIR) if donante_comparte else quieto(cfg)
+        _par_enlazado(sim, cfg, donante, receptor)
+        sim.paso()
+        sim.aprender()
+        return sim.pob["p"][1, 0]
+    # recibir un regalo no cambia lo que el receptor aprende de su propia acción
+    assert np.isclose(ajuste(True), ajuste(False))
