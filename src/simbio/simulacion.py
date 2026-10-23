@@ -359,7 +359,12 @@ class Simulacion:
         if d.modo == "tamano":
             lab = componentes(dev.a_cpu(socios))
             tam = np.bincount(lab, minlength=p.n)[lab]
-            atacado &= tam < d.refugio
+            if d.gradual and d.refugio > 1:
+                # cuanto más grande el grupo, más difícil de tragar: muerte con prob. 1 − (tam − 1)/(refugio − 1)
+                mata = 1.0 - (tam - 1) / (d.refugio - 1)
+                atacado &= self.rng.random(p.n) < mata
+            else:
+                atacado &= tam < d.refugio
         p["E"][self.xp.asarray(np.flatnonzero(atacado))] = -1.0
         self.cont["depredados"] += int(atacado.sum())
 

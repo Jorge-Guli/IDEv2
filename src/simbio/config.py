@@ -122,6 +122,7 @@ class DepredacionCfg:
     modo: str = "tamano"  # "tamano": refugio por tamaño de grupo; "uniforme": todo ataque es mortal (control)
     prob_ataque: float = 0.002  # por organismo y paso
     refugio: int = 4  # grupos de este tamaño o mayores no pueden ser comidos
+    gradual: bool = True  # bajo el refugio, un ataque mata con prob. 1 − (tamaño − 1)/(refugio − 1)
 
 
 @dataclass

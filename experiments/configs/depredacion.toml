@@ -10,8 +10,8 @@ movimiento = "empuje"
 [depredacion]
 activa = true
 modo = "tamano"
-prob_ataque = 0.002
-refugio = 4
+prob_ataque = 0.015
+refugio = 2
 
 [sim]
 poblacion_inicial = 200

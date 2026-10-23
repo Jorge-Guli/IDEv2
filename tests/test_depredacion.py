@@ -59,7 +59,7 @@ def test_grupo_refugio_sobrevive(cfg):
 
 
 def test_grupo_chico_no_es_refugio(cfg):
-    sim = sim_vacia(_cfg(cfg, refugio=4))
+    sim = sim_vacia(_cfg(cfg, refugio=4, gradual=False))
     _fila(sim, cfg, [5, 6, 7])  # grupo de 3
     sim.paso()
     assert sim.pob.n == 0
@@ -79,3 +79,17 @@ def test_corrida_con_depredacion(cfg):
     sim.correr(300)
     h = sim.historial[-1]
     assert sim.pob.n > 0 and "frac_en_refugio" in h and h["depredados"] >= 0
+
+
+def test_refugio_gradual(cfg):
+    sim = sim_vacia(_cfg(cfg, refugio=4))
+    for y in range(0, 30, 2):  # 15 filas de 3 (en x 5, 6, 7) y sus enlaces
+        base = sim.pob.n
+        for x in (5, 6, 7):
+            colocar(sim, quieto(cfg), [y], [x], E=50)
+        p = sim.pob
+        for a in (0, 1):
+            p["socio"][base + a, ESTE], p["socio"][base + a + 1, OESTE] = p["id"][base + a + 1], p["id"][base + a]
+    sim.paso()
+    muertos = 45 - sim.pob.n
+    assert 5 <= muertos <= 25  # esperado: 15 (un tercio)

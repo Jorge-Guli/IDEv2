@@ -14,11 +14,15 @@ Con la depredación activa, en cada paso cada organismo vivo SHALL sufrir un ata
 - **THEN** ningún organismo muere por ataque
 
 ### Requirement: Refugio por tamaño
-Un ataque SHALL matar al organismo solo si su grupo conexo de enlaces tiene menos miembros que el tamaño de refugio configurado; quien muere por ataque MUST morir antes de actuar.
+Un ataque SHALL matar al organismo solo si su grupo conexo de enlaces tiene menos miembros que el tamaño de refugio; en modo gradual MUST matar con probabilidad 1 − (tamaño − 1)/(refugio − 1). Quien muere por ataque MUST morir antes de actuar.
 
 #### Scenario: Suelto atacado
 - **WHEN** un organismo sin enlaces sufre un ataque
 - **THEN** muere en ese paso
+
+#### Scenario: Refugio gradual
+- **WHEN** con refugio 4 y modo gradual, se ataca a muchos organismos de grupos de 3
+- **THEN** muere aproximadamente un tercio de ellos
 
 #### Scenario: En grupo refugio
 - **WHEN** un organismo de un grupo de tamaño mayor o igual al de refugio sufre un ataque
