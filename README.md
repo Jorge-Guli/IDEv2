@@ -3,7 +3,8 @@
 Experimento de vida artificial. Organismos simples, que empiezan casi como una bacteria, se adaptan para sobrevivir en un mundo de recursos limitados. La pregunta es si, evolución tras evolución, asociándose entre sí (fusionándose en organismos más complejos o coordinándose en sociedades), pueden construir niveles crecientes de organización hasta que emerja algo reconocible como inteligencia.
 
 - Hipótesis y objetivo: [`docs/00-hipotesis-fundacional.md`](docs/00-hipotesis-fundacional.md)
-- Metodología y hoja de ruta: [`docs/01-metodologia.md`](docs/01-metodologia.md)
+- Metodología: [`docs/01-metodologia.md`](docs/01-metodologia.md)
+- **Hoja de ruta viva** (fases en orden, estado y decisiones): [`docs/02-hoja-de-ruta.md`](docs/02-hoja-de-ruta.md)
 - Modelo vigente (protocolo ODD): [`docs/odd/modelo.md`](docs/odd/modelo.md)
 - Bitácora de experimentos: [`docs/bitacora/`](docs/bitacora/)
 - Especificaciones por fase (OpenSpec): [`openspec/`](openspec/)

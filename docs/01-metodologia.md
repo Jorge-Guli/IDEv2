@@ -37,6 +37,8 @@ Complementamos con el **protocolo ODD** (*Overview, Design concepts, Details*; G
 
 ## 3. Hoja de ruta
 
+> El camino detallado, con el estado actual, los criterios para cambiar de rumbo y el registro de decisiones, está en [`02-hoja-de-ruta.md`](02-hoja-de-ruta.md). Esta tabla es el resumen.
+
 | Fase | Ingrediente nuevo | Pregunta |
 |---|---|---|
 | 1 | Organismos tipo bacteria: genoma de genes-regla, metabolismo, división, mutación, mutagénesis por estrés, aprendizaje | ¿La población persiste y se adapta? ¿Ayudan el estrés y el aprendizaje? |
