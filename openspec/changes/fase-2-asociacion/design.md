@@ -7,7 +7,7 @@ Se extiende el simulador validado en la fase 1 (`openspec/specs/`, `docs/odd/mod
 ## Goals / Non-Goals
 
 **Goals:**
-- Que la asociación sea **posible, costosa y opcional**: ningún beneficio impuesto por regla. Los beneficios potenciales surgen solos de la física existente: el tope de energía hace que un organismo lleno desperdicie recurso que un enlazado podría usar, y la muerte en cero hace que repartir el riesgo sirva.
+- Que la asociación sea **posible, costosa y opcional**: ningún beneficio impuesto por regla. Los beneficios físicos que existen son llevar energía a un socio que no tiene recurso y repartir el riesgo de morir. Como señaló la revisión, el tope de energía no desperdicia recurso: lo que no se toma queda en la celda.
 - Que el camino clonal (hijo que queda pegado) y el camino "agregativo" (unirse a extraños) estén ambos disponibles.
 - Medir organización y conflicto (aprovechados).
 
@@ -23,6 +23,12 @@ Se extiende el simulador validado en la fase 1 (`openspec/specs/`, `docs/odd/mod
 - *Alternativa: lista de aristas.* Más flexible, pero obliga a reindexar en cada alta o baja.
 - *Alternativa: movimiento rígido del grupo.* Impondría coordinación; se prefiere que la coordinación evolucione.
 
+### D1b. Movimiento simultáneo y adhesión (corregido tras la revisión)
+- Se puede entrar a una celda libre o a una que deja, en el mismo paso, alguien que avanza en la misma dirección. Así una fila se desplaza entera; antes, el de atrás quedaba frenado y el enlace se rompía.
+- **Adhesión** (`asociacion.adhesion`, activada por defecto): un enlazado solo avanza si todos sus enlazados efectivamente avanzan en su misma dirección. Se resuelve por punto fijo: el grupo se mueve junto o no se mueve. Quien queda frenado por la adhesión no paga el costo de avanzar. La versión anterior le cobraba sin que se moviera y sin que pudiera percibirlo, lo que volvía letal cualquier enlace.
+- El hijo de una división unida nace con la orientación de su progenitor, para que el camino clonal no nazca descoordinado.
+- Sin adhesión (modo "elástico"), el enlace se rompe si los organismos dejan de estar en la misma posición relativa.
+
 ### D2. Orden del paso
 1. Regenerar recursos.
 2. Aprender.
@@ -32,9 +38,9 @@ Se extiende el simulador validado en la fase 1 (`openspec/specs/`, `docs/odd/mod
 6. Costos: basal, genoma, acción y `costo_enlace · enlaces`.
 7. Muerte antes de actuar.
 8. Girar.
-9. Comer.
-10. **Compartir**: después de comer, para que se reparta lo recién obtenido.
-11. Avanzar.
+9. **Compartir**: antes de comer, para que quien recibe ajuste lo que toma y el recurso sobrante quede en la celda. Una versión anterior compartía después de comer y destruía energía cuando el receptor ya estaba lleno.
+10. Comer.
+11. Avanzar (D1b).
 12. **Validar enlaces**: se rompen los estirados.
 13. **Soltarse**.
 14. **Unirse**: con el de enfrente según la posición y orientación nuevas.
@@ -65,7 +71,7 @@ Se agregan al final, de modo que los índices de la fase 1 no cambian:
 Dos números en [0, 1], heredables. Mutan con probabilidad `min(1, 10·m)`, con ruido N(0, 0.05) y recorte. Al sembrar, cada organismo recibe una etiqueta al azar.
 
 ### D6. Aprendizaje
-Se excluyen del refuerzo, de la línea base y del sensor de ΔE las acciones dividirse, dividirse unido, compartir y conjugar. La energía recibida de otros aparece en el ΔE de quien la recibe. Es ruido para su aprendizaje, pero es información real.
+Se excluyen del refuerzo, de la línea base y del sensor de ΔE las acciones dividirse, dividirse unido, compartir y conjugar. **La energía recibida de otros se descuenta del ΔE** con el que aprende el receptor: no es resultado de su acción, y sin descontarla se reforzaba lo que estuviera haciendo, típicamente avanzar frenado. El gen recibido por conjugación no participa del refuerzo del paso siguiente.
 
 ### D7. Métricas
 - Grupos: componentes conexas, por propagación de etiquetas mínimas sobre las aristas (`np.minimum.at` hasta converger), calculadas solo en los pasos de registro.
@@ -73,7 +79,12 @@ Se excluyen del refuerzo, de la línea base y del sensor de ΔE las acciones div
 - Parentesco: distancia media de etiqueta entre enlazados, contra la de pares al azar.
 
 ### D8. Desactivación
-`asociacion.activa = false` excluye las 5 primitivas de la mutación y de la decisión. `asociacion.conjugacion = false` excluye solo conjugar. Los sensores sociales siguen existiendo (valen 0), así que el modelo sin asociación es la fase 1 con 4 sensores siempre nulos.
+`asociacion.activa = false` excluye las 5 primitivas de la mutación y de la decisión. `asociacion.conjugacion = false` excluye solo conjugar. Los 4 sensores sociales siguen existiendo y valen 0, incluida la similitud de etiqueta.
+
+Controles experimentales:
+- **Inerte** (`asociacion.inerte = true`): las primitivas existen, aparecen por mutación y cuestan, pero no tienen efecto (la división unida es una división común). Conserva el espectro mutacional de la condición con asociación, cosa que no hace `activa = false`.
+- **Sin beneficio**: eficiencia de compartir 0.
+- **Positivo**: eficiencia de compartir 2. Si la asociación no aparece ni siquiera así, el protocolo no tendría poder para detectarla.
 
 ## Risks / Trade-offs
 
