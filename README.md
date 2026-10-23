@@ -12,7 +12,9 @@ Experimento de vida artificial. Organismos simples, que empiezan casi como una b
 
 **Fase 1 — evolución básica: cerrada (2026-10-23).** Organismos con un genoma de genes-regla: cada gen conecta lo que el organismo percibe con una acción primitiva, de modo que las acciones disponibles salen del ADN. Tienen metabolismo, división, mutación (puntual, duplicación, eliminación, gen nuevo), mutagénesis por estrés y aprendizaje durante la vida. Se cumplieron los cuatro criterios de éxito, y la evolución "inventó" el giro, una conducta que LUCA no tenía ([bitácora](docs/bitacora/2026-10-23-fase1-evaluacion.md)).
 
-**Próximo: fase 2 — asociación.**
+**Fase 2 — asociación: cerrada (2026-10-23).** Los organismos pueden unirse, soltarse, compartir energía, dividirse quedando unidos y pasarse genes. Con la física actual, la asociación **no rinde** y no despega. En el control positivo, donde rinde, ocurre una transición abrupta: de casi 0 % a más del 98 % de enlazados en ~800 pasos, con un tapete de más de 10 000 organismos y aprovechados ([bitácora](docs/bitacora/2026-10-23-fase2-evaluacion.md)).
+
+**Próximo: fase 2b — condiciones ecológicas que vuelvan ventajosa la asociación.**
 
 ## Uso
 

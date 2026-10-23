@@ -41,13 +41,15 @@ Complementamos con el **protocolo ODD** (*Overview, Design concepts, Details*; G
 |---|---|---|
 | 1 | Organismos tipo bacteria: genoma de genes-regla, metabolismo, división, mutación, mutagénesis por estrés, aprendizaje | ¿La población persiste y se adapta? ¿Ayudan el estrés y el aprendizaje? |
 | 2 | Primitivas de **asociación**: unirse a un vecino, compartir energía, transferencia horizontal de genes | ¿Bajo qué condiciones evoluciona la asociación? ¿Aparecen aprovechados? |
+| 2b | **Condiciones ecológicas** que hagan rendir al grupo (recurso complejo, depredación, dispersión), como física del mundo | ¿Qué condiciones vuelven ventajosa la asociación? (la fase 2 mostró que poder asociarse no alcanza) |
 | 3 | **El colectivo como individuo**: reproducción del grupo (fragmentación / brote) | ¿Aparecen especialización y dependencia? |
 | 4 | Señales, memoria interna, comunicación | ¿Se propaga la información útil? ¿Memoria distribuida? |
 | 5 | Asociación entre colectivos | ¿Se apilan niveles o el sistema se estanca? |
 | 6 | Problemas del entorno que exijan coordinación y anticipación | ¿Los colectivos resuelven lo que los individuos no? |
+| — | Mundo 3D (si alguna fase lo justifica) | ¿La geometría (superficie/volumen, interior) habilita organizaciones nuevas? |
 
 ## 4. Herramientas
 
-- Python 3.11+ con NumPy (vectorizado) y Matplotlib. Si hace falta escala, se migrará el núcleo a JAX o Rust.
+- Python 3.11+ con NumPy (vectorizado) y Matplotlib. GPU NVIDIA opcional mediante CuPy, detectada automáticamente (`docs/dispositivos.md`).
 - `pytest` para tests; `openspec validate` para los artefactos de cada fase.
 - Corridas grandes: se preparan como scripts con configuración en archivo para ejecutarlas en una máquina local con más recursos.

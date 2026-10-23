@@ -18,7 +18,7 @@
 ## 4. Experimentos
 
 - [x] 4.1 `experiments/fase2/evaluar.py` con criterios C1–C4 y condiciones exploratorias; verificar a escala reducida
-- [ ] 4.2 Ejecutar la evaluación, registrar en `docs/bitacora/` y actualizar el ODD
+- [x] 4.2 Ejecutar la evaluación, registrar en `docs/bitacora/` y actualizar el ODD
 - [x] 4.3 Revisión con `revisor-cientifico` y correcciones
 
 ## Workflow follow-up

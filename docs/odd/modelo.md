@@ -57,3 +57,15 @@ Sin datos externos. Variabilidad ambiental: estacionalidad `K·(1 + A·sin(2πt/
 - **Mutación** con tasa `m = min(μ·(1 + σ·estrés), 0.2)`: puntual por peso (prob. `m`, N(0, 0.3)); cambio de primitiva `0.3m`; duplicación `0.5m`; eliminación `0.5m` por gen; gen nuevo `0.2·G·m` por genoma; rasgos log-normales con prob. `min(1, 10m)`. Control: modo "barajado" (estrés de otro organismo al azar).
 - **Estrés**: `estrés ← 0.95·estrés + 0.05·hambre`, con `hambre = clip((25 − E)/25, 0, 1)`, calculado antes de la división.
 - **Aprendizaje**: `r = clip((ΔE − base)/5, −1, 1)`; `ΔP_g = η·r·(1 − a_g²)·s` para los genes de la primitiva ejecutada; decaimiento 1 %/paso; ajustes acotados a ±2; `base ← 0.9·base + 0.1·ΔE`.
+
+## Anexo: fase 2 (asociación), cerrada el 2026-10-23
+
+Se agrega a la física, sin cambiar lo anterior (detalle en `openspec/specs/asociacion/spec.md` y en el diseño archivado de la fase 2):
+- **Primitivas:** unirse (con el de enfrente; costo 0,1), soltarse (rompe todos los enlaces; 0,05), compartir (cede 20 % de E en partes iguales a los enlazados, que reciben ×0,9; 0,05; ocurre antes de comer), dividirse unido (como dividirse; el hijo queda enlazado y orientado como su progenitor) y conjugar (copia un gen al azar en una ranura libre de un enlazado; 0,5).
+- **Enlaces:** guardados por dirección con la identidad del socio. Mantenerlos cuesta 0,02 por enlace y paso. Se validan en cada paso: se rompen si el socio deja de estar en esa posición relativa o muere.
+- **Movimiento:** simultáneo, y se puede entrar a la celda que deja alguien que avanza en la misma dirección. **Adhesión** (activada por defecto): un grupo enlazado se mueve junto o no se mueve (punto fijo), y quien queda frenado no paga el avance.
+- **Sensores sociales:** enlaces/8, energía media de los enlazados, enlazado al frente, similitud de etiqueta con el de enfrente.
+- **Etiqueta** heredable de 2 valores, sin efecto físico.
+- **Aprendizaje:** no refuerza dividirse, dividirse unido, compartir ni conjugar; descuenta del ΔE la energía recibida de otros.
+- **Controles:** asociación desactivada, inerte (las primitivas cuestan pero no hacen nada), sin beneficio (eficiencia 0) y positivo (eficiencia 2).
+- **Dispositivo:** CPU (NumPy) o GPU (CuPy), detectado automáticamente. El azar se genera siempre en CPU.
