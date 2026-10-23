@@ -4,3 +4,4 @@ __pycache__/
 runs/
 *.npz
 !experiments/**/*.npz
+runs_*.log
