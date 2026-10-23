@@ -7,6 +7,7 @@ Un genoma se representa como un dict de arreglos con una primera dimensión por 
     b      (n, G)          - sesgo
     mu, sens, eta (n,)     - rasgos heredables: tasa base de mutación,
                              sensibilidad al estrés y tasa de aprendizaje
+    etiqueta (n, 2)        - marca heredable sin efecto físico, perceptible por los vecinos
 """
 
 from __future__ import annotations
@@ -16,18 +17,33 @@ import numpy as np
 from .config import HerenciaCfg
 
 # Primitivas: la "física" fija de las acciones posibles.
-DESCANSAR, AVANZAR, GIRAR_IZQ, GIRAR_DER, VOLTERETA, COMER, DIVIDIRSE = range(7)
-PRIMITIVAS = ["descansar", "avanzar", "girar_izq", "girar_der", "voltereta", "comer", "dividirse"]
+(DESCANSAR, AVANZAR, GIRAR_IZQ, GIRAR_DER, VOLTERETA, COMER, DIVIDIRSE,
+ UNIRSE, SOLTARSE, COMPARTIR, DIVIDIRSE_UNIDO, CONJUGAR) = range(12)
+PRIMITIVAS = ["descansar", "avanzar", "girar_izq", "girar_der", "voltereta", "comer", "dividirse",
+              "unirse", "soltarse", "compartir", "dividirse_unido", "conjugar"]
 NUM_PRIM = len(PRIMITIVAS)
+PRIM_BASICAS = np.arange(DIVIDIRSE + 1)
+PRIM_ASOCIACION = np.array([UNIRSE, SOLTARSE, COMPARTIR, DIVIDIRSE_UNIDO, CONJUGAR])
+# acciones cuyo valor no se mide en energía propia: no se refuerzan por aprendizaje
+PRIM_SIN_REFUERZO = np.array([DIVIDIRSE, DIVIDIRSE_UNIDO, COMPARTIR, CONJUGAR])
 
-# Sensores locales.
+# Sensores locales (los sociales van al final para conservar los índices de la fase 1).
 (S_CONST, S_AQUI, S_FRENTE, S_FRENTE_IZQ, S_FRENTE_DER, S_ENERGIA,
- S_VECINOS, S_BLOQUEADO, S_DELTA_E, S_RUIDO) = range(10)
+ S_VECINOS, S_BLOQUEADO, S_DELTA_E, S_RUIDO,
+ S_ENLACES, S_ENERGIA_SOCIOS, S_SOCIO_FRENTE, S_SIMILITUD_FRENTE) = range(14)
 SENSORES = ["const", "recurso_aqui", "recurso_frente", "recurso_frente_izq", "recurso_frente_der",
-            "energia", "vecinos", "bloqueado", "delta_e", "ruido"]
+            "energia", "vecinos", "bloqueado", "delta_e", "ruido",
+            "enlaces", "energia_socios", "socio_frente", "similitud_frente"]
 NUM_SENS = len(SENSORES)
 
-CAMPOS = ("activo", "prim", "w", "b", "mu", "sens", "eta")
+CAMPOS = ("activo", "prim", "w", "b", "mu", "sens", "eta", "etiqueta")
+
+
+def primitivas_permitidas(asociacion: bool, conjugacion: bool) -> np.ndarray:
+    if not asociacion:
+        return PRIM_BASICAS.copy()
+    todas = np.arange(NUM_PRIM)
+    return todas if conjugacion else todas[todas != CONJUGAR]
 
 
 def vacio(n: int, genes_max: int) -> dict[str, np.ndarray]:
@@ -39,6 +55,7 @@ def vacio(n: int, genes_max: int) -> dict[str, np.ndarray]:
         "mu": np.zeros(n),
         "sens": np.zeros(n),
         "eta": np.zeros(n),
+        "etiqueta": np.zeros((n, 2)),
     }
 
 
@@ -82,11 +99,16 @@ def tasa_efectiva(mu: np.ndarray, sens: np.ndarray, estres: np.ndarray, cfg: Her
 
 
 def mutar(g: dict[str, np.ndarray], m: np.ndarray, cfg: HerenciaCfg,
-          rng: np.random.Generator) -> dict[str, np.ndarray]:
-    """Aplica los operadores de mutación in situ con tasa efectiva m (n,) y devuelve g."""
+          rng: np.random.Generator, permitidas: np.ndarray | None = None) -> dict[str, np.ndarray]:
+    """Aplica los operadores de mutación in situ con tasa efectiva m (n,) y devuelve g.
+
+    `permitidas`: primitivas que pueden aparecer por mutación (por defecto, todas).
+    """
     n, G = g["activo"].shape
     if n == 0 or not cfg.mutacion:
         return g
+    if permitidas is None:
+        permitidas = np.arange(NUM_PRIM)
     mm = m[:, None]
     activo = g["activo"]
 
@@ -98,7 +120,7 @@ def mutar(g: dict[str, np.ndarray], m: np.ndarray, cfg: HerenciaCfg,
 
     # cambio de primitiva
     mask_p = (rng.random((n, G)) < cfg.k_primitiva * mm) & activo
-    g["prim"][mask_p] = rng.integers(0, NUM_PRIM, mask_p.sum())
+    g["prim"][mask_p] = rng.choice(permitidas, mask_p.sum())
 
     # eliminación
     mask_del = (rng.random((n, G)) < cfg.k_eliminacion * mm) & activo
@@ -124,7 +146,7 @@ def mutar(g: dict[str, np.ndarray], m: np.ndarray, cfg: HerenciaCfg,
             continue
         k = libres[0]
         activo[i, k] = True
-        g["prim"][i, k] = rng.integers(0, NUM_PRIM)
+        g["prim"][i, k] = rng.choice(permitidas)
         g["w"][i, k] = rng.normal(0.0, 1.0, NUM_SENS)
         g["b"][i, k] = rng.normal(0.0, 1.0)
 
@@ -136,4 +158,9 @@ def mutar(g: dict[str, np.ndarray], m: np.ndarray, cfg: HerenciaCfg,
         mask = rng.random(n) < np.minimum(1.0, cfg.k_rasgo * m)
         factor = np.exp(rng.normal(0.0, cfg.sigma_log_rasgo, n))
         g[nombre] = np.where(mask, np.clip(g[nombre] * factor, lo, hi), g[nombre])
+
+    # etiqueta
+    mask = rng.random(n) < np.minimum(1.0, cfg.k_rasgo * m)
+    ruido = rng.normal(0.0, cfg.sigma_etiqueta, (n, 2))
+    g["etiqueta"] = np.where(mask[:, None], np.clip(g["etiqueta"] + ruido, 0.0, 1.0), g["etiqueta"])
     return g

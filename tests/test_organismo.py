@@ -113,10 +113,10 @@ def test_percepcion_local(cfg):
     colocar(sim, genoma_con(cfg, [(gen.DESCANSAR, 5.0, {})]), [10], [10], E=50)
     occ = sim.ocupacion()
     sim.rng = np.random.default_rng(0)
-    s1 = sim.sensar(occ)
+    s1 = sim.sensar(occ, sim.validar_enlaces(occ))
     sim.entorno.R[20, 20] += 5.0  # lejos
     sim.rng = np.random.default_rng(0)
-    s2 = sim.sensar(occ)
+    s2 = sim.sensar(occ, sim.validar_enlaces(occ))
     assert np.array_equal(s1, s2)
 
 

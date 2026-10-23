@@ -17,6 +17,18 @@ def imagen_mundo(sim, ruta: Path, titulo: str = "") -> None:
     p = sim.pob
     fig, ax = plt.subplots(figsize=(7, 7))
     ax.imshow(sim.entorno.R, cmap="Greens", vmin=0, vmax=sim.cfg.mundo.capacidad_max, interpolation="nearest")
+    if p.n and (p["socio"] >= 0).any():
+        from matplotlib.collections import LineCollection
+
+        socios = sim.validar_enlaces(sim.ocupacion())
+        i, k = np.nonzero(socios >= 0)
+        j = socios[i, k]
+        sel = i < j  # cada enlace una vez
+        i, j = i[sel], j[sel]
+        # sin dibujar los enlaces que cruzan el borde toroidal
+        corto = (np.abs(p["x"][i] - p["x"][j]) <= 1) & (np.abs(p["y"][i] - p["y"][j]) <= 1)
+        seg = np.stack([np.stack([p["x"][i], p["y"][i]], 1), np.stack([p["x"][j], p["y"][j]], 1)], 1)[corto]
+        ax.add_collection(LineCollection(seg, colors="black", linewidths=0.6, alpha=0.8))
     if p.n:
         if (p["cepa"] > 0).any():
             color = np.where(p["cepa"] == 1, "tab:red", "tab:blue")
@@ -40,7 +52,8 @@ def graficos(historial: list[dict[str, float]], ruta: Path, titulo: str = "") ->
     def serie(clave):
         return np.array([h.get(clave, np.nan) for h in historial], dtype=float)
 
-    fig, axs = plt.subplots(3, 2, figsize=(12, 10), sharex=True)
+    asociacion = any("frac_enlazados" in h for h in historial)
+    fig, axs = plt.subplots(4 if asociacion else 3, 2, figsize=(12, 13 if asociacion else 10), sharex=True)
     axs[0, 0].plot(t, serie("poblacion"))
     axs[0, 0].set_title("Población")
     axs[0, 1].plot(t, serie("energia_media"), label="energía media")
@@ -61,8 +74,19 @@ def graficos(historial: list[dict[str, float]], ruta: Path, titulo: str = "") ->
         axs[2, 1].plot(t, serie(f"tiene_{nombre}"), label=nombre)
     axs[2, 0].set_title("Uso de cada primitiva (fracción de acciones)")
     axs[2, 1].set_title("Fracción de organismos con el gen")
-    axs[2, 0].legend(fontsize=7)
-    for ax in axs[2]:
+    axs[2, 0].legend(fontsize=6, ncol=2)
+    if asociacion:
+        axs[3, 0].plot(t, serie("frac_enlazados"), label="fracción enlazados")
+        axs[3, 0].plot(t, serie("grupos_de_3_o_mas"), label="en grupos de 3+")
+        axs[3, 0].plot(t, serie("frac_aprovechados"), label="aprovechados (entre enlazados)")
+        axs[3, 0].legend(fontsize=7)
+        axs[3, 0].set_title("Asociación")
+        axs[3, 1].plot(t, serie("tamano_grupo_medio"), label="tamaño de grupo medio")
+        axs[3, 1].plot(t, serie("tamano_grupo_max") / 10, label="tamaño máximo / 10")
+        axs[3, 1].plot(t, 10 * serie("compartido_por_org_paso"), label="compartido ×10")
+        axs[3, 1].legend(fontsize=7)
+        axs[3, 1].set_title("Grupos e intercambio")
+    for ax in axs[-1]:
         ax.set_xlabel("paso")
     if titulo:
         fig.suptitle(titulo)

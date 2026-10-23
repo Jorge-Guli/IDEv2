@@ -7,14 +7,14 @@ from simbio.simulacion import Simulacion
 def test_misma_semilla_mismas_metricas(cfg):
     a = Simulacion(cfg).correr(300)
     b = Simulacion(cfg).correr(300)
-    assert a == b
+    assert repr(a) == repr(b)  # repr: las métricas NaN (sin enlaces) también se comparan
 
 
 def test_distinta_semilla_distintas_metricas(cfg):
     a = Simulacion(cfg).correr(300)
     cfg.sim.semilla = 99
     b = Simulacion(cfg).correr(300)
-    assert a != b
+    assert repr(a) != repr(b)
 
 
 def test_configuracion_toml_y_ajustes(tmp_path):

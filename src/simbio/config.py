@@ -51,6 +51,7 @@ class HerenciaCfg:
     k_gen_nuevo: float = 0.2
     k_rasgo: float = 10.0  # prob. de mutar cada rasgo = min(1, k_rasgo·m)
     sigma_log_rasgo: float = 0.2
+    sigma_etiqueta: float = 0.05
     tasa_max: float = 0.2  # tope de la tasa de mutación efectiva
     memoria_estres: float = 0.05  # peso del paso actual en el promedio móvil del estrés
     umbral_hambre: float = 25.0  # energía por debajo de la cual el organismo acumula estrés
@@ -76,6 +77,20 @@ class AprendizajeCfg:
 
 
 @dataclass
+class AsociacionCfg:
+    activa: bool = True
+    conjugacion: bool = True
+    adhesion: bool = True  # un enlace impide alejarse: solo se avanza si todos los enlazados avanzan igual
+    costo_enlace: float = 0.02  # por enlace y paso, para cada extremo
+    costo_unirse: float = 0.1
+    costo_soltarse: float = 0.05
+    costo_compartir: float = 0.05
+    fraccion_compartir: float = 0.2
+    eficiencia_compartir: float = 0.9
+    costo_conjugar: float = 0.5
+
+
+@dataclass
 class SimCfg:
     semilla: int = 0
     pasos: int = 5000
@@ -90,6 +105,7 @@ class Config:
     fisica: FisicaCfg = field(default_factory=FisicaCfg)
     herencia: HerenciaCfg = field(default_factory=HerenciaCfg)
     aprendizaje: AprendizajeCfg = field(default_factory=AprendizajeCfg)
+    asociacion: AsociacionCfg = field(default_factory=AsociacionCfg)
     sim: SimCfg = field(default_factory=SimCfg)
 
     def to_dict(self) -> dict[str, Any]:

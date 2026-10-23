@@ -22,6 +22,8 @@ ESTADO = {
     "generacion": (np.int32, ()),
     "nacimiento": (np.int32, ()),
     "cepa": (np.int16, ()),
+    "dado": (np.float64, ()),  # energía cedida en la vida
+    "recibido": (np.float64, ()),  # energía recibida en la vida
 }
 
 
@@ -39,6 +41,7 @@ class Poblacion:
         d["ult_s"] = np.zeros((n, gen.NUM_SENS))
         d["ult_a"] = np.zeros((n, G))
         d["ult_act"][:] = -1
+        d["socio"] = np.full((n, 8), -1, dtype=np.int64)  # id del enlazado en cada dirección
         return d
 
     @property
@@ -65,10 +68,28 @@ class Poblacion:
             self.d[k] = self.d[k][mascara]
 
     def actualizar(self, mascara: np.ndarray, nuevos: dict[str, np.ndarray] | None) -> None:
-        """Conserva las filas de la máscara y agrega los nuevos, con una sola copia por arreglo."""
-        if nuevos is None:
-            if not mascara.all():
-                self.filtrar(mascara)
-            return
-        for k in self.d:
-            self.d[k] = np.concatenate([self.d[k][mascara], nuevos[k]], axis=0)
+        """Conserva las filas de la máscara y agrega los nuevos, tocando solo las filas que cambian.
+
+        Los recién nacidos ocupan las filas de los muertos; los huecos sobrantes se rellenan con las
+        últimas filas y se recorta; solo si hay más nacimientos que muertes se concatena el excedente.
+        El orden de las filas cambia, pero de forma determinista.
+        """
+        huecos = np.flatnonzero(~mascara)
+        nn = 0 if nuevos is None else len(nuevos["E"])
+        k = min(len(huecos), nn)
+        if k:
+            for c in self.d:
+                self.d[c][huecos[:k]] = nuevos[c][:k]
+        if nn > k:
+            for c in self.d:
+                self.d[c] = np.concatenate([self.d[c], nuevos[c][k:]], axis=0)
+        elif len(huecos) > k:
+            restantes = huecos[k:]
+            n_final = self.n - len(restantes)
+            # filas vivas del final que pasan a ocupar los huecos por debajo de n_final
+            destino = restantes[restantes < n_final]
+            cola = np.setdiff1d(np.arange(n_final, self.n), restantes, assume_unique=True)
+            for c in self.d:
+                if destino.size:
+                    self.d[c][destino] = self.d[c][cola]
+                self.d[c] = self.d[c][:n_final]
