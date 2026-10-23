@@ -132,9 +132,13 @@ class Simulacion:
             r = np.clip((dE - p["linea_base"]) / c.escala_recompensa, -1.0, 1.0) * valido
             mascara = (p["prim"] == p["ult_act"][:, None]) & p["activo"]
             grad = (1.0 - p["ult_a"] ** 2) * mascara * (p["eta"] * r)[:, None]
-            p["P"] = np.clip(p["P"] * (1.0 - c.decaimiento) + grad[:, :, None] * p["ult_s"][:, None, :],
-                             -c.limite, c.limite)
-            p["p"] = np.clip(p["p"] * (1.0 - c.decaimiento) + grad, -c.limite, c.limite)
+            # el decaimiento no puede sacar valores del rango: solo se recortan los genes actualizados
+            p["P"] *= 1.0 - c.decaimiento
+            p["p"] *= 1.0 - c.decaimiento
+            fi, gi = np.nonzero(grad)
+            if fi.size:
+                p["P"][fi, gi] = np.clip(p["P"][fi, gi] + grad[fi, gi, None] * p["ult_s"][fi], -c.limite, c.limite)
+                p["p"][fi, gi] = np.clip(p["p"][fi, gi] + grad[fi, gi], -c.limite, c.limite)
         p["linea_base"] = np.where(tuvo, (1 - c.memoria_linea_base) * p["linea_base"]
                                    + c.memoria_linea_base * dE, p["linea_base"])
 
@@ -181,6 +185,7 @@ class Simulacion:
             p["y"][ganadores], p["x"][ganadores] = celdas // W, celdas % W
 
             # dividirse
+            nuevos = None
             occ = self.ocupacion()
             i = np.flatnonzero((act == gen.DIVIDIRSE) & (p["E"] >= f.energia_min_division))
             if i.size:
@@ -200,13 +205,12 @@ class Simulacion:
                     nuevos = self._nuevos(hijos, celdas // W, celdas % W, p["E"][padres],
                                           padre=p["id"][padres], generacion=p["generacion"][padres] + 1,
                                           cepa=p["cepa"][padres], estres=p["estres"][padres])
-                    p.agregar(nuevos)
                     self.cont["nacimientos"] += padres.size
 
-            # muerte
+            # muerte (los recién nacidos siempre tienen energía positiva) y altas en una sola operación
             vivos = p["E"] > 0.0
             self.cont["muertes"] += int((~vivos).sum())
-            p.filtrar(vivos)
+            p.actualizar(vivos, nuevos)
 
             # estrés: promedio móvil del déficit de energía
             alfa = cfg.herencia.memoria_estres

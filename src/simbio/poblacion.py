@@ -63,3 +63,12 @@ class Poblacion:
     def filtrar(self, mascara: np.ndarray) -> None:
         for k in self.d:
             self.d[k] = self.d[k][mascara]
+
+    def actualizar(self, mascara: np.ndarray, nuevos: dict[str, np.ndarray] | None) -> None:
+        """Conserva las filas de la máscara y agrega los nuevos, con una sola copia por arreglo."""
+        if nuevos is None:
+            if not mascara.all():
+                self.filtrar(mascara)
+            return
+        for k in self.d:
+            self.d[k] = np.concatenate([self.d[k][mascara], nuevos[k]], axis=0)

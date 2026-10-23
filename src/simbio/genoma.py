@@ -47,8 +47,8 @@ def luca(cfg: HerenciaCfg) -> dict[str, np.ndarray]:
     g = vacio(1, cfg.genes_max)
     genes = [
         # primitiva, sesgo, {sensor: peso}
-        (COMER, -0.3, {S_AQUI: 8.0, S_ENERGIA: -4.0}),           # comer si hay recurso y no estoy lleno
-        (AVANZAR, 0.2, {S_FRENTE: 4.0, S_BLOQUEADO: -3.0}),      # avanzar, más si hay recurso al frente
+        (COMER, 0.5, {S_AQUI: 20.0, S_ENERGIA: -3.0}),           # comer si hay recurso y no estoy lleno
+        (AVANZAR, 0.3, {S_FRENTE: 4.0, S_AQUI: -10.0, S_BLOQUEADO: -3.0}),  # buscar si aquí no hay
         (VOLTERETA, -0.2, {S_RUIDO: 0.8, S_BLOQUEADO: 2.0}),    # voltereta al azar o si estoy bloqueado
         (DIVIDIRSE, -5.0, {S_ENERGIA: 8.0}),                    # dividirse con energía alta
     ]

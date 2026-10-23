@@ -1,0 +1,10 @@
+# Entorno variable: estaciones con escasez marcada (E1). El cambio abrupto se fija desde el script.
+[mundo]
+alto = 128
+ancho = 128
+amplitud_estacional = 0.6
+periodo_estacional = 2000
+
+[sim]
+poblacion_inicial = 200
+registrar_cada = 100

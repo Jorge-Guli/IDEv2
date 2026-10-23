@@ -1,0 +1,8 @@
+# Configuración base de la fase 1: entorno constante en parches.
+[mundo]
+alto = 128
+ancho = 128
+
+[sim]
+poblacion_inicial = 200
+registrar_cada = 100
