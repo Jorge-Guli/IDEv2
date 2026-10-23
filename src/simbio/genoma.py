@@ -40,10 +40,12 @@ NUM_SENS = len(SENSORES)
 CAMPOS = ("activo", "prim", "w", "b", "mu", "sens", "eta", "etiqueta")
 
 
-def primitivas_permitidas(asociacion: bool, conjugacion: bool, bien_publico: bool = False) -> np.ndarray:
+def primitivas_permitidas(asociacion: bool, conjugacion: bool, bien_publico: bool = False,
+                          division_unida: bool = True) -> np.ndarray:
     permitidas = list(PRIM_BASICAS)
     if asociacion:
-        permitidas += [p for p in PRIM_ASOCIACION if conjugacion or p != CONJUGAR]
+        permitidas += [p for p in PRIM_ASOCIACION
+                       if (conjugacion or p != CONJUGAR) and (division_unida or p != DIVIDIRSE_UNIDO)]
     if bien_publico:
         permitidas.append(SECRETAR)
     return np.array(permitidas)

@@ -12,6 +12,7 @@ activa = true
 modo = "tamano"
 prob_ataque = 0.015
 refugio = 2
+inicio = 2000  # aclimatación: el depredador actúa desde el paso 2000
 
 [sim]
 poblacion_inicial = 200

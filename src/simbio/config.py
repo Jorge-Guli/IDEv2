@@ -86,6 +86,7 @@ class AsociacionCfg:
     movimiento: str = "unanime"
     fraccion_empuje: float = 0.5  # en "empuje": |suma de empujes| mínimo, como fracción del tamaño del grupo
     inerte: bool = False  # control: las primitivas de asociación cuestan pero no tienen efecto
+    division_unida: bool = True  # False: la primitiva dividirse unido no existe (solo unirse crea enlaces)
     costo_enlace: float = 0.02  # por enlace y paso, para cada extremo
     costo_unirse: float = 0.1
     costo_soltarse: float = 0.05
@@ -119,8 +120,12 @@ class BienPublicoCfg:
 @dataclass
 class DepredacionCfg:
     activa: bool = False
-    modo: str = "tamano"  # "tamano": refugio por tamaño de grupo; "uniforme": todo ataque es mortal (control)
+    # "tamano": refugio por tamaño de grupo; "uniforme": todo ataque es mortal (control);
+    # "aleatorio": un ataque perdona con prob_perdon, sin relación con los enlaces (control de protección igualada)
+    modo: str = "tamano"
     prob_ataque: float = 0.002  # por organismo y paso
+    prob_perdon: float = 0.9  # solo en modo "aleatorio"
+    inicio: int = 0  # paso desde el que actúa el depredador (aclimatación previa)
     refugio: int = 4  # grupos de este tamaño o mayores no pueden ser comidos
     gradual: bool = True  # bajo el refugio, un ataque mata con prob. 1 − (tamaño − 1)/(refugio − 1)
 

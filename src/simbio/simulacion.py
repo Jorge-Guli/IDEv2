@@ -39,8 +39,10 @@ class Simulacion:
                                                cfg.sim.umbral_gpu_celdas)
         xp = self.xp
         self.DY, self.DX, self.OPUESTA = xp.asarray(DY), xp.asarray(DX), xp.asarray(OPUESTA)
-        semilla_entorno, semilla_sim = np.random.SeedSequence(cfg.sim.semilla).spawn(2)
+        # spawn(3) conserva los dos primeros flujos de spawn(2): las corridas anteriores no cambian
+        semilla_entorno, semilla_sim, semilla_dep = np.random.SeedSequence(cfg.sim.semilla).spawn(3)
         self.rng = np.random.default_rng(semilla_sim)
+        self.rng_dep = np.random.default_rng(semilla_dep)  # depredador: mismos sorteos en todos los modos
         self.entorno = Entorno(cfg.mundo, np.random.default_rng(semilla_entorno), xp, cfg.bien_publico)
         self.pob = Poblacion(cfg.herencia.genes_max, xp)
         self.t = 0
@@ -55,7 +57,8 @@ class Simulacion:
             a.costo_unirse, a.costo_soltarse, a.costo_compartir, a.costo_conjugar, cfg.bien_publico.costo_secretar]
         self.costo_accion = xp.asarray(costo)
         self.sin_refuerzo = xp.asarray(gen.PRIM_SIN_REFUERZO)
-        self.permitidas = gen.primitivas_permitidas(a.activa, a.conjugacion, cfg.bien_publico.activo)
+        self.permitidas = gen.primitivas_permitidas(a.activa, a.conjugacion, cfg.bien_publico.activo,
+                                                    a.division_unida)
         self.bloqueadas = xp.asarray(~np.isin(np.arange(gen.NUM_PRIM), self.permitidas))
         self._reiniciar_contadores()
         self.sembrar(genomas, cepas)
@@ -119,7 +122,8 @@ class Simulacion:
         xp = self.xp
         self.cont = {"nacimientos": 0, "muertes": 0, "comido": 0.0, "org_pasos": 0,
                      "compartido": 0.0, "recibido": 0.0, "comido_libre": 0.0,
-                     "comido_libre_sec": 0.0, "comido_libre_nosec": 0.0, "depredados": 0, "conjugaciones": 0, "enlaces_creados": 0,
+                     "comido_libre_sec": 0.0, "comido_libre_nosec": 0.0, "depredados": 0,
+                     "depredados_en_refugio": 0, "conjugaciones": 0, "enlaces_creados": 0,
                      "acciones": xp.zeros(gen.NUM_PRIM, dtype=xp.int64)}
 
     def vecinos_enlazados(self, occ: np.ndarray) -> np.ndarray:
@@ -299,7 +303,7 @@ class Simulacion:
             self.cont["conjugaciones"] += 1
 
     # ------------------------------------------------------------------ movimiento
-    def _avanzar(self, act: np.ndarray, occ: np.ndarray, socios: np.ndarray) -> None:
+    def _avanzar(self, act: np.ndarray, occ: np.ndarray, socios: np.ndarray, vivos=None) -> None:
         """Movimiento simultáneo.
 
         Se puede entrar a una celda libre o a una que deja, en el mismo paso, alguien que avanza en la
@@ -314,7 +318,7 @@ class Simulacion:
             # los grupos enlazados se mueven por empuje colectivo; los sueltos, con la regla común
             enlazado = self._mover_grupos(act, occ, socios)
             act = xp.where(enlazado, gen.DESCANSAR, act).astype(xp.int8)
-            occ = self.ocupacion()
+            occ = self.ocupacion(vivos)
         i = xp.flatnonzero(act == gen.AVANZAR)
         if i.size == 0:
             return
@@ -350,23 +354,36 @@ class Simulacion:
         p["y"][i[m]], p["x"][i[m]] = ty[m], tx[m]
 
     def _depredar(self, socios) -> None:
-        """Ataques del depredador: mortales salvo para quien está en un grupo de tamaño de refugio o mayor
-        (modo "tamano"). Los atacados quedan sin energía y mueren antes de actuar en este paso."""
+        """Ataques del depredador sobre los vivos (tras pagar los costos del paso). Modo "tamano": el ataque
+        mata según el tamaño del grupo conexo de vivos (refugio); "uniforme": siempre mata; "aleatorio":
+        perdona con prob_perdon, sin relación con los enlaces. Se sortean siempre los mismos números con un
+        generador propio, de modo que los modos son comparables semilla a semilla. Los muertos quedan sin
+        energía y mueren antes de actuar en este paso."""
         p, d = self.pob, self.cfg.depredacion
-        atacado = self.rng.random(p.n) < d.prob_ataque
-        if not atacado.any():
+        u_ataque, u_letal = self.rng_dep.random(p.n), self.rng_dep.random(p.n)
+        if self.t < d.inicio:
             return
+        vivo = dev.a_cpu(p["E"]) > 0.0
+        atacado = vivo & (u_ataque < d.prob_ataque)
         if d.modo == "tamano":
-            lab = componentes(dev.a_cpu(socios))
+            soc = dev.a_cpu(socios).copy()
+            soc[~vivo] = -1
+            soc[(soc >= 0) & ~vivo[np.maximum(soc, 0)]] = -1  # quien muere de hambre en este paso no protege
+            lab = componentes(soc)
             tam = np.bincount(lab, minlength=p.n)[lab]
             if d.gradual and d.refugio > 1:
                 # cuanto más grande el grupo, más difícil de tragar: muerte con prob. 1 − (tam − 1)/(refugio − 1)
-                mata = 1.0 - (tam - 1) / (d.refugio - 1)
-                atacado &= self.rng.random(p.n) < mata
+                mata = np.clip(1.0 - (tam - 1) / (d.refugio - 1), 0.0, 1.0)
             else:
-                atacado &= tam < d.refugio
-        p["E"][self.xp.asarray(np.flatnonzero(atacado))] = -1.0
-        self.cont["depredados"] += int(atacado.sum())
+                mata = (tam < d.refugio).astype(float)
+            letal = atacado & (u_letal < mata)
+            self.cont["depredados_en_refugio"] += int((letal & (tam >= d.refugio)).sum())
+        elif d.modo == "aleatorio":
+            letal = atacado & (u_letal >= d.prob_perdon)
+        else:
+            letal = atacado
+        p["E"][self.xp.asarray(np.flatnonzero(letal))] = -1.0
+        self.cont["depredados"] += int(letal.sum())
 
     def _mover_grupos(self, act, occ, socios):
         """Empuje colectivo: cada grupo conexo se desplaza una celda en la dirección (de las 8) más alineada
@@ -440,6 +457,7 @@ class Simulacion:
                 act = xp.where(vivos, act, gen.DESCANSAR).astype(xp.int8)
                 occ = self.ocupacion(vivos)
                 socios = self.validar_enlaces(occ)
+                socios[~vivos] = -1  # los muertos no sostienen enlaces ni empujan
 
             # giros
             d = p["dir"].astype(xp.int64)
@@ -486,7 +504,7 @@ class Simulacion:
                     ent.Z[yi, xi] += bp.enzima_por_secrecion
 
             # avanzar
-            self._avanzar(act, occ, socios)
+            self._avanzar(act, occ, socios, vivos)
 
             # enlaces: se rompen los estirados, luego soltarse, unirse y conjugar
             occ = self.ocupacion(vivos)
@@ -619,6 +637,7 @@ class Simulacion:
             if self.cfg.depredacion.activa:
                 fila["frac_en_refugio"] = float((tam >= self.cfg.depredacion.refugio).mean())
                 fila["depredados"] = c["depredados"]
+                fila["depredados_en_refugio"] = c["depredados_en_refugio"]
             et = p["etiqueta"]
             fila["dist_etiqueta_enlazados"] = float(xp.linalg.norm(et[ii] - et[jj], axis=1).mean()) if ii.size \
                 else float("nan")

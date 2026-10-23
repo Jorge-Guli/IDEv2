@@ -17,16 +17,18 @@ Cada organismo vivo es atacado con probabilidad `p` por paso. El ataque mata si 
 - *Alternativa: depredadores como agentes móviles.* Más realista y con coevolución, pero agrega otra dinámica que interpretar. Queda para más adelante si hace falta.
 
 ### D2. Momento del ataque
-Al comienzo del paso, con los enlaces validados. Los muertos por ataque reciben energía −∞ y caen en la "muerte antes de actuar" ya existente: no comen, no se mueven, no ocupan su celda.
+Después de pagar los costos del paso y solo sobre los vivos (energía > 0). El tamaño de grupo se calcula entre los vivos, con los enlaces del inicio del paso: quien muere de hambre en ese paso no protege. Los atacados quedan con energía −1 y caen en la "muerte antes de actuar" ya existente. El depredador usa un generador propio y sortea siempre los mismos números en todos los modos, para que las semillas sean comparables entre condiciones. Hay una aclimatación (`inicio`) antes de que empiece a actuar.
 
 ### D3. Tamaño de grupo
 Componentes conexas de los enlaces válidos, por propagación de etiquetas (la misma función que usa el empuje colectivo, refactorizada).
 
 ### D4. Parámetros iniciales (`experiments/configs/depredacion.toml`)
-Física base (recurso simple con capacidad 10), `movimiento = "empuje"`, `p = 0,002` (vida media de 500 pasos para un suelto, comparable a su tiempo generacional de ~400) y `refugio = 4`. Se calibran con un piloto: LUCA tiene que sobrevivir a la depredación uniforme.
+Física base (recurso simple con capacidad 10), `movimiento = "empuje"`, `p = 0,015`, `refugio = 2` (gradual), `inicio = 2000`. Calibrado con pilotos (semillas 1 y 2, que no entran en la evaluación): con 0,002–0,01 no hay efecto, con 0,02 todo se extingue y con refugio 4 la pendiente es demasiado débil para que la selección la recorra.
 
-### D5. Control uniforme
-`depredacion.modo = "uniforme"`: misma `p`, todo ataque es mortal. Si la asociación evoluciona con refugio y no en modo uniforme, la causa es el refugio y no la mortalidad.
+### D5. Controles
+- `uniforme`: misma `p`, todo ataque es mortal.
+- `aleatorio`: el ataque perdona con probabilidad `prob_perdon` (0,9), sin relación con los enlaces. Es una protección de magnitud parecida, pero que no depende de asociarse. Si la asociación aparece en `refugio` y no en `aleatorio`, la causa es que la protección dependa de estar unido.
+- `asociacion.division_unida = false` (exploratorio): solo `unirse` crea enlaces.
 
 ## Risks / Trade-offs
 - [Que el refugio "premie" la asociación de forma demasiado directa] → es la física del mecanismo biológico que se estudia; lo exploratorio es si la evolución encuentra el camino (descubrir la asociación y coordinar el movimiento del grupo) y qué estructuras produce.

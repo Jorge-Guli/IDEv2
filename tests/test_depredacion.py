@@ -93,3 +93,45 @@ def test_refugio_gradual(cfg):
     sim.paso()
     muertos = 45 - sim.pob.n
     assert 5 <= muertos <= 25  # esperado: 15 (un tercio)
+
+
+def test_modo_aleatorio_perdona(cfg):
+    sim = sim_vacia(_cfg(cfg, modo="aleatorio", prob_perdon=1.0))
+    colocar(sim, quieto(cfg), [5], [5], E=50)
+    sim.paso()
+    assert sim.pob.n == 1
+
+
+def test_aclimatacion(cfg):
+    sim = sim_vacia(_cfg(cfg, inicio=3))
+    colocar(sim, quieto(cfg), [5], [5], E=50)
+    sim.correr(3)
+    assert sim.pob.n == 1
+    sim.paso()
+    assert sim.pob.n == 0
+
+
+def test_socio_que_muere_de_hambre_no_protege(cfg):
+    sim = sim_vacia(_cfg(cfg, refugio=2))
+    _fila(sim, cfg, [5, 6])
+    sim.pob["E"][1] = 0.1  # muere por costos en este paso
+    sim.paso()
+    assert sim.pob.n == 0
+
+
+def test_mismos_sorteos_en_todos_los_modos(cfg):
+    """El generador del depredador no altera el de la simulación: sin enlaces, tamano == uniforme."""
+    cfg.mundo.alto = cfg.mundo.ancho = 40
+    cfg.depredacion.activa = True
+    cfg.depredacion.prob_ataque = 0.01
+    cfg.asociacion.activa = False
+    a = repr(Simulacion(cfg).correr(200))
+    cfg.depredacion.modo = "uniforme"
+    b = repr(Simulacion(cfg).correr(200))
+    assert a == b
+
+
+def test_sin_division_unida(cfg):
+    cfg.asociacion.division_unida = False
+    sim = Simulacion(cfg)
+    assert gen.DIVIDIRSE_UNIDO not in sim.permitidas and gen.UNIRSE in sim.permitidas

@@ -23,3 +23,30 @@ Medidas del último cuarto de cada corrida.
 - **P1–P4 se cumplen** → primera condición identificada en la que la asociación evoluciona por sí sola. Siguiente paso: fase 3 (el colectivo como individuo), con este mundo como base. ¿Se reproducen los grupos como unidad? ¿Aparece división del trabajo?
 - **P1 sí y P2 no** → la mortalidad por sí sola favorece la asociación; revisar el mecanismo antes de seguir.
 - **P1 no** → los pilotos fueron casualidad; revisar la calibración (intensidad y refugio).
+
+## Versión 2 (reemplaza a la anterior, escrita antes de la nueva evaluación)
+
+**Por qué hay una versión 2.** La revisión científica señaló, mientras corría la primera evaluación:
+- la intensidad 0,015 está al borde de la extinción, y la calibración usó las semillas 1 y 2, que también entraban en la evaluación;
+- las corridas extintas se descartaban en silencio de los promedios;
+- P4 era casi una tautología (con refugio siempre muere menos gente) y P3 se cumplía por construcción;
+- había errores menores de código: ataques a organismos que ya morían de hambre, muertos que seguían en el empuje del grupo y un generador aleatorio compartido que impedía comparar semillas de a pares.
+
+La evaluación se detuvo antes de terminar. **Lo que alcancé a ver** (y declaro para que conste): en esa corrida, `refugio` se había extinguido en las semillas 5 y 6 y `uniforme` sobrevivía en la semilla 3. No vi ninguna fracción en refugio de la evaluación.
+
+**Cambios de diseño:**
+- **Semillas nuevas:** 11–20 aquí y 21–30 en el equipo local. Las semillas de calibración no se usan.
+- **Aclimatación:** el depredador actúa desde el paso 2000, para que la extinción inicial no domine.
+- **Control nuevo, `aleatorio`:** un ataque perdona con probabilidad 0,9, sin relación con los enlaces. Es una protección parecida en magnitud, pero que no depende de asociarse.
+- **Barrido de dosis:** intensidades 0,0125, 0,015 y 0,0175.
+- **Exploratorios:** sin división unida (solo `unirse` crea enlaces) y refugio 3.
+- **Las hipótesis las calcula el script** (`evaluar_hipotesis`). Las fracciones se evalúan sobre las corridas que sobrevivieron y las extinciones se informan aparte.
+
+| # | Hipótesis | Regla |
+|---|---|---|
+| P1 | Con refugio por tamaño evoluciona la **división unida** (grupos clonales) | `refugio`: sobreviven ≥ 7/10, y `frac_en_refugio` > 0,5 en ≥ 80 % de las que sobrevivieron |
+| P2 | Sin refugio, no evoluciona | `uniforme`: `frac_en_refugio` < 0,1 en ≥ 80 % de las que sobrevivieron |
+| P3 | La causa es que la protección **dependa de asociarse**, no la menor mortalidad | `aleatorio`: `frac_en_refugio` < 0,1 en ≥ 80 % de las que sobrevivieron |
+| P4 | El efecto no depende de un único valor de intensidad | `refugio_p0125` y `refugio_p0175`: `frac_en_refugio` > 0,5 en ≥ 80 % de las que sobrevivieron |
+
+Se agrega la siguiente lectura: P1 mide que evolucione la división unida, un solo cambio de primitiva, análogo a las células hijas que no se separan en Boraas et al. (1998). No implica coordinación ni unión activa entre extraños; eso es lo que explora `refugio_sin_division_unida`.
