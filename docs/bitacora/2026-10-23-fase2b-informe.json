@@ -1,0 +1,2162 @@
+{
+  "parametros": {
+    "pasos": 30000,
+    "semillas": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "minutos": 52.0
+  },
+  "criterios": {
+    "C1_persistencia": {
+      "aprobado": true,
+      "publico": "4/5"
+    },
+    "C2_conservacion": {
+      "aprobado": true,
+      "error_relativo_maximo": 3.1632946427493186e-16,
+      "digerido_total": 4477.96
+    },
+    "C3_reproducibilidad": {
+      "aprobado": true
+    },
+    "C4_rendimiento": {
+      "aprobado": true,
+      "pasos_por_segundo": 50.4,
+      "poblacion": 1157
+    }
+  },
+  "exploratorios": {
+    "publico": {
+      "poblacion": {
+        "media": 319.68243243243245,
+        "por_semilla": [
+          256.4865,
+          270.4595,
+          434.3514,
+          317.4324,
+          NaN
+        ]
+      },
+      "tiene_secretar": {
+        "media": 0.03835615700033037,
+        "por_semilla": [
+          0.0071,
+          0.0047,
+          0.0222,
+          0.1195,
+          NaN
+        ]
+      },
+      "usa_secretar": {
+        "media": 0.00023247701308247077,
+        "por_semilla": [
+          0.0001,
+          0.0002,
+          0.0004,
+          0.0003,
+          NaN
+        ]
+      },
+      "frac_no_secretores": {
+        "media": 0.9616438429996697,
+        "por_semilla": [
+          0.9929,
+          0.9953,
+          0.9778,
+          0.8805,
+          NaN
+        ]
+      },
+      "comido_libre_por_org_paso": {
+        "media": 0.0001202915783936067,
+        "por_semilla": [
+          0.0001,
+          0.0001,
+          0.0002,
+          0.0001,
+          NaN
+        ]
+      },
+      "libre_por_secretores": {
+        "media": 0.002980817735308056,
+        "por_semilla": [
+          0.0027,
+          0.0051,
+          0.0038,
+          0.0003,
+          NaN
+        ]
+      },
+      "libre_por_no_secretores": {
+        "media": 8.199186889670953e-05,
+        "por_semilla": [
+          0.0001,
+          0.0001,
+          0.0001,
+          0.0001,
+          NaN
+        ]
+      },
+      "comido_por_org_paso": {
+        "media": 0.5194769180195387,
+        "por_semilla": [
+          0.5216,
+          0.5138,
+          0.5197,
+          0.5228,
+          NaN
+        ]
+      },
+      "enzima_total": {
+        "media": 0.21271006681908916,
+        "por_semilla": [
+          0.0775,
+          0.1054,
+          0.4835,
+          0.1845,
+          NaN
+        ]
+      },
+      "frac_enlazados": {
+        "media": 0.001216659640699033,
+        "por_semilla": [
+          0.0004,
+          0.0012,
+          0.0012,
+          0.002,
+          NaN
+        ]
+      },
+      "grupos_de_3_o_mas": {
+        "media": 0.00024177820394919694,
+        "por_semilla": [
+          0.0,
+          0.0,
+          0.0004,
+          0.0005,
+          NaN
+        ]
+      },
+      "tamano_grupo_medio": {
+        "media": 1.001521291395874,
+        "por_semilla": [
+          1.0004,
+          1.0012,
+          1.0019,
+          1.0026,
+          NaN
+        ]
+      },
+      "frac_enlazados_secretores": {
+        "media": 0.002666213515270119,
+        "por_semilla": [
+          0.0,
+          0.0,
+          0.0045,
+          0.0062,
+          NaN
+        ]
+      },
+      "frac_enlazados_no_secretores": {
+        "media": 0.001163915325361527,
+        "por_semilla": [
+          0.0004,
+          0.0012,
+          0.0012,
+          0.0019,
+          NaN
+        ]
+      },
+      "energia_secretores": {
+        "media": 27.19335372521324,
+        "por_semilla": [
+          18.5077,
+          35.2208,
+          26.4586,
+          28.5864,
+          NaN
+        ]
+      },
+      "energia_no_secretores": {
+        "media": 28.98705842288147,
+        "por_semilla": [
+          20.416,
+          29.8633,
+          32.2981,
+          33.3708,
+          NaN
+        ]
+      },
+      "tiene_dividirse_unido": {
+        "media": 0.006871532988019026,
+        "por_semilla": [
+          0.0031,
+          0.0107,
+          0.0025,
+          0.0112,
+          NaN
+        ]
+      },
+      "tiene_compartir": {
+        "media": 0.011054413289893084,
+        "por_semilla": [
+          0.0129,
+          0.0036,
+          0.013,
+          0.0147,
+          NaN
+        ]
+      },
+      "tiene_unirse": {
+        "media": 0.005501832529491934,
+        "por_semilla": [
+          0.0061,
+          0.0037,
+          0.0016,
+          0.0106,
+          NaN
+        ]
+      },
+      "usa_compartir": {
+        "media": 0.00032175809769369044,
+        "por_semilla": [
+          0.0003,
+          0.0001,
+          0.0004,
+          0.0005,
+          NaN
+        ]
+      },
+      "frac_aprovechados": {
+        "media": 0.0,
+        "por_semilla": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          NaN
+        ]
+      },
+      "dist_etiqueta_enlazados": {
+        "media": 0.05395286625965397,
+        "por_semilla": [
+          0.0232,
+          0.0331,
+          0.0701,
+          0.0894,
+          NaN
+        ]
+      },
+      "dist_etiqueta_azar": {
+        "media": 0.1747290697770733,
+        "por_semilla": [
+          0.0948,
+          0.1272,
+          0.3736,
+          0.1033,
+          NaN
+        ]
+      },
+      "complejo_total": {
+        "media": 170782.11643082974,
+        "por_semilla": [
+          165659.6443,
+          184525.8257,
+          157884.6599,
+          175058.3358,
+          NaN
+        ]
+      },
+      "libre_total": {
+        "media": 1.7646025995367889,
+        "por_semilla": [
+          0.6766,
+          0.7836,
+          4.0995,
+          1.4988,
+          NaN
+        ]
+      },
+      "t_secrecion_50": [
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "tamano_grupo_max_total": [
+        2,
+        2,
+        4,
+        3,
+        1
+      ]
+    },
+    "publico_asoc_inerte": {
+      "poblacion": {
+        "media": 329.02702702702703,
+        "por_semilla": [
+          257.8919,
+          281.9459,
+          433.8919,
+          342.3784,
+          NaN
+        ]
+      },
+      "tiene_secretar": {
+        "media": 0.08067568031365543,
+        "por_semilla": [
+          0.029,
+          0.0161,
+          0.0093,
+          0.2683,
+          NaN
+        ]
+      },
+      "usa_secretar": {
+        "media": 0.0006400548457126318,
+        "por_semilla": [
+          0.0007,
+          0.0001,
+          0.0002,
+          0.0015,
+          NaN
+        ]
+      },
+      "frac_no_secretores": {
+        "media": 0.9193243196863446,
+        "por_semilla": [
+          0.971,
+          0.9839,
+          0.9907,
+          0.7317,
+          NaN
+        ]
+      },
+      "comido_libre_por_org_paso": {
+        "media": 0.0003859127381493384,
+        "por_semilla": [
+          0.0003,
+          0.0001,
+          0.0001,
+          0.0011,
+          NaN
+        ]
+      },
+      "libre_por_secretores": {
+        "media": 0.0035142255880338436,
+        "por_semilla": [
+          0.0068,
+          0.0017,
+          0.0023,
+          0.0032,
+          NaN
+        ]
+      },
+      "libre_por_no_secretores": {
+        "media": 0.00013602235456684742,
+        "por_semilla": [
+          0.0002,
+          0.0,
+          0.0001,
+          0.0003,
+          NaN
+        ]
+      },
+      "comido_por_org_paso": {
+        "media": 0.5129079485861247,
+        "por_semilla": [
+          0.5022,
+          0.519,
+          0.5152,
+          0.5152,
+          NaN
+        ]
+      },
+      "enzima_total": {
+        "media": 0.5698573984049577,
+        "por_semilla": [
+          0.4933,
+          0.2258,
+          0.179,
+          1.3813,
+          NaN
+        ]
+      },
+      "frac_enlazados": {
+        "media": 0.0,
+        "por_semilla": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          NaN
+        ]
+      },
+      "grupos_de_3_o_mas": {
+        "media": 0.0,
+        "por_semilla": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          NaN
+        ]
+      },
+      "tamano_grupo_medio": {
+        "media": 1.0,
+        "por_semilla": [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          NaN
+        ]
+      },
+      "frac_enlazados_secretores": {
+        "media": 0.0,
+        "por_semilla": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          NaN
+        ]
+      },
+      "frac_enlazados_no_secretores": {
+        "media": 0.0,
+        "por_semilla": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          NaN
+        ]
+      },
+      "energia_secretores": {
+        "media": 22.086804025115107,
+        "por_semilla": [
+          30.9175,
+          18.6373,
+          15.7357,
+          23.0568,
+          NaN
+        ]
+      },
+      "energia_no_secretores": {
+        "media": 20.905793021232967,
+        "por_semilla": [
+          32.9306,
+          17.0904,
+          16.4653,
+          17.1369,
+          NaN
+        ]
+      },
+      "tiene_dividirse_unido": {
+        "media": 0.4808458481478737,
+        "por_semilla": [
+          0.0093,
+          0.9548,
+          0.9129,
+          0.0464,
+          NaN
+        ]
+      },
+      "tiene_compartir": {
+        "media": 0.015171778358219874,
+        "por_semilla": [
+          0.0196,
+          0.0129,
+          0.0059,
+          0.0223,
+          NaN
+        ]
+      },
+      "tiene_unirse": {
+        "media": 0.01084960575105129,
+        "por_semilla": [
+          0.012,
+          0.0105,
+          0.0093,
+          0.0115,
+          NaN
+        ]
+      },
+      "usa_compartir": {
+        "media": 0.00031761643247373017,
+        "por_semilla": [
+          0.0003,
+          0.0002,
+          0.0004,
+          0.0004,
+          NaN
+        ]
+      },
+      "frac_aprovechados": {
+        "media": 0.0,
+        "por_semilla": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          NaN
+        ]
+      },
+      "dist_etiqueta_enlazados": {
+        "media": NaN,
+        "por_semilla": [
+          NaN,
+          NaN,
+          NaN,
+          NaN,
+          NaN
+        ]
+      },
+      "dist_etiqueta_azar": {
+        "media": 0.16482315096799177,
+        "por_semilla": [
+          0.1038,
+          0.1223,
+          0.1868,
+          0.2464,
+          NaN
+        ]
+      },
+      "complejo_total": {
+        "media": 170762.44602505336,
+        "por_semilla": [
+          165642.2129,
+          184527.2296,
+          157896.1467,
+          174984.1949,
+          NaN
+        ]
+      },
+      "libre_total": {
+        "media": 7.164831337329719,
+        "por_semilla": [
+          5.8486,
+          0.9305,
+          1.1187,
+          20.7616,
+          NaN
+        ]
+      },
+      "t_secrecion_50": [
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "tamano_grupo_max_total": [
+        1,
+        1,
+        1,
+        1,
+        1
+      ]
+    },
+    "privado": {
+      "poblacion": {
+        "media": 1479.1081081081084,
+        "por_semilla": [
+          1438.0,
+          1644.1892,
+          1355.6486,
+          1478.5946,
+          NaN
+        ]
+      },
+      "tiene_secretar": {
+        "media": 0.9991055185671048,
+        "por_semilla": [
+          0.9996,
+          0.9999,
+          0.997,
+          0.9999,
+          NaN
+        ]
+      },
+      "usa_secretar": {
+        "media": 0.5048152985117637,
+        "por_semilla": [
+          0.5087,
+          0.5478,
+          0.4531,
+          0.5097,
+          NaN
+        ]
+      },
+      "frac_no_secretores": {
+        "media": 0.0008944814328951737,
+        "por_semilla": [
+          0.0004,
+          0.0001,
+          0.003,
+          0.0001,
+          NaN
+        ]
+      },
+      "comido_libre_por_org_paso": {
+        "media": 0.0,
+        "por_semilla": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          NaN
+        ]
+      },
+      "libre_por_secretores": {
+        "media": 0.0,
+        "por_semilla": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          NaN
+        ]
+      },
+      "libre_por_no_secretores": {
+        "media": 0.0,
+        "por_semilla": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          NaN
+        ]
+      },
+      "comido_por_org_paso": {
+        "media": 0.17365380648409018,
+        "por_semilla": [
+          0.1567,
+          0.1417,
+          0.2185,
+          0.1777,
+          NaN
+        ]
+      },
+      "enzima_total": {
+        "media": 0.0,
+        "por_semilla": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          NaN
+        ]
+      },
+      "frac_enlazados": {
+        "media": 0.0011669133869966267,
+        "por_semilla": [
+          0.0012,
+          0.0017,
+          0.0009,
+          0.0009,
+          NaN
+        ]
+      },
+      "grupos_de_3_o_mas": {
+        "media": 0.0002034109841704474,
+        "por_semilla": [
+          0.0005,
+          0.0,
+          0.0002,
+          0.0001,
+          NaN
+        ]
+      },
+      "tamano_grupo_medio": {
+        "media": 1.0014555301458044,
+        "por_semilla": [
+          1.0019,
+          1.0017,
+          1.0012,
+          1.0011,
+          NaN
+        ]
+      },
+      "frac_enlazados_secretores": {
+        "media": 0.001167975789550985,
+        "por_semilla": [
+          0.0012,
+          0.0017,
+          0.0009,
+          0.0009,
+          NaN
+        ]
+      },
+      "frac_enlazados_no_secretores": {
+        "media": 0.0,
+        "por_semilla": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          NaN
+        ]
+      },
+      "energia_secretores": {
+        "media": 35.56583416185539,
+        "por_semilla": [
+          41.1322,
+          30.9335,
+          36.4195,
+          33.7783,
+          NaN
+        ]
+      },
+      "energia_no_secretores": {
+        "media": 22.262338268097977,
+        "por_semilla": [
+          18.709,
+          16.5127,
+          36.9353,
+          16.8923,
+          NaN
+        ]
+      },
+      "tiene_dividirse_unido": {
+        "media": 0.034799688079358994,
+        "por_semilla": [
+          0.0049,
+          0.1165,
+          0.0055,
+          0.0123,
+          NaN
+        ]
+      },
+      "tiene_compartir": {
+        "media": 0.015238832534666276,
+        "por_semilla": [
+          0.0071,
+          0.0294,
+          0.0141,
+          0.0104,
+          NaN
+        ]
+      },
+      "tiene_unirse": {
+        "media": 0.014107759456574137,
+        "por_semilla": [
+          0.0087,
+          0.0254,
+          0.0107,
+          0.0116,
+          NaN
+        ]
+      },
+      "usa_compartir": {
+        "media": 0.000356713187624543,
+        "por_semilla": [
+          0.0003,
+          0.0005,
+          0.0002,
+          0.0004,
+          NaN
+        ]
+      },
+      "frac_aprovechados": {
+        "media": 0.0016891891891891893,
+        "por_semilla": [
+          0.0,
+          0.0068,
+          0.0,
+          0.0,
+          NaN
+        ]
+      },
+      "dist_etiqueta_enlazados": {
+        "media": 0.09916609428046641,
+        "por_semilla": [
+          0.118,
+          0.0851,
+          0.1031,
+          0.0905,
+          NaN
+        ]
+      },
+      "dist_etiqueta_azar": {
+        "media": 0.22139082475153354,
+        "por_semilla": [
+          0.1869,
+          0.2061,
+          0.292,
+          0.2006,
+          NaN
+        ]
+      },
+      "complejo_total": {
+        "media": 104430.99249119504,
+        "por_semilla": [
+          100343.6328,
+          103645.9097,
+          105158.3189,
+          108576.1085,
+          NaN
+        ]
+      },
+      "libre_total": {
+        "media": 0.0,
+        "por_semilla": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          NaN
+        ]
+      },
+      "t_secrecion_50": [
+        1600,
+        8600,
+        2400,
+        4000,
+        null
+      ],
+      "tamano_grupo_max_total": [
+        5,
+        3,
+        4,
+        5,
+        1
+      ]
+    },
+    "secrecion_inerte": {
+      "poblacion": {
+        "media": 332.94594594594594,
+        "por_semilla": [
+          243.8378,
+          285.4595,
+          461.3784,
+          341.1081,
+          NaN
+        ]
+      },
+      "tiene_secretar": {
+        "media": 0.010183748104847179,
+        "por_semilla": [
+          0.0052,
+          0.0043,
+          0.004,
+          0.0273,
+          NaN
+        ]
+      },
+      "usa_secretar": {
+        "media": 0.00024551842947247653,
+        "por_semilla": [
+          0.0004,
+          0.0004,
+          0.0001,
+          0.0001,
+          NaN
+        ]
+      },
+      "frac_no_secretores": {
+        "media": 0.9898162518951529,
+        "por_semilla": [
+          0.9948,
+          0.9957,
+          0.996,
+          0.9727,
+          NaN
+        ]
+      },
+      "comido_libre_por_org_paso": {
+        "media": 0.0,
+        "por_semilla": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          NaN
+        ]
+      },
+      "libre_por_secretores": {
+        "media": 0.0,
+        "por_semilla": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          NaN
+        ]
+      },
+      "libre_por_no_secretores": {
+        "media": 0.0,
+        "por_semilla": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          NaN
+        ]
+      },
+      "comido_por_org_paso": {
+        "media": 0.5119744793685489,
+        "por_semilla": [
+          0.5087,
+          0.5132,
+          0.5118,
+          0.5142,
+          NaN
+        ]
+      },
+      "enzima_total": {
+        "media": 0.0,
+        "por_semilla": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          NaN
+        ]
+      },
+      "frac_enlazados": {
+        "media": 0.0008780796272662419,
+        "por_semilla": [
+          0.0013,
+          0.0004,
+          0.0009,
+          0.001,
+          NaN
+        ]
+      },
+      "grupos_de_3_o_mas": {
+        "media": 0.00016315916015059243,
+        "por_semilla": [
+          0.0,
+          0.0,
+          0.0002,
+          0.0005,
+          NaN
+        ]
+      },
+      "tamano_grupo_medio": {
+        "media": 1.0010412387874168,
+        "por_semilla": [
+          1.0013,
+          1.0004,
+          1.001,
+          1.0014,
+          NaN
+        ]
+      },
+      "frac_enlazados_secretores": {
+        "media": 0.0,
+        "por_semilla": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          NaN
+        ]
+      },
+      "frac_enlazados_no_secretores": {
+        "media": 0.0008866929112529126,
+        "por_semilla": [
+          0.0013,
+          0.0004,
+          0.0009,
+          0.001,
+          NaN
+        ]
+      },
+      "energia_secretores": {
+        "media": 31.563825381148213,
+        "por_semilla": [
+          23.2948,
+          39.0332,
+          29.4615,
+          34.4658,
+          NaN
+        ]
+      },
+      "energia_no_secretores": {
+        "media": 32.985870829467544,
+        "por_semilla": [
+          28.9249,
+          32.6542,
+          34.7935,
+          35.5709,
+          NaN
+        ]
+      },
+      "tiene_dividirse_unido": {
+        "media": 0.01355768880593556,
+        "por_semilla": [
+          0.035,
+          0.0071,
+          0.0089,
+          0.0032,
+          NaN
+        ]
+      },
+      "tiene_compartir": {
+        "media": 0.0184433080294714,
+        "por_semilla": [
+          0.0371,
+          0.018,
+          0.0148,
+          0.0039,
+          NaN
+        ]
+      },
+      "tiene_unirse": {
+        "media": 0.006356444574799312,
+        "por_semilla": [
+          0.008,
+          0.002,
+          0.0013,
+          0.0142,
+          NaN
+        ]
+      },
+      "usa_compartir": {
+        "media": 0.0003806573387790373,
+        "por_semilla": [
+          0.0007,
+          0.0006,
+          0.0002,
+          0.0001,
+          NaN
+        ]
+      },
+      "frac_aprovechados": {
+        "media": 0.0,
+        "por_semilla": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          NaN
+        ]
+      },
+      "dist_etiqueta_enlazados": {
+        "media": 0.12495686485232997,
+        "por_semilla": [
+          0.069,
+          0.0298,
+          0.293,
+          0.108,
+          NaN
+        ]
+      },
+      "dist_etiqueta_azar": {
+        "media": 0.14792372038926835,
+        "por_semilla": [
+          0.1831,
+          0.128,
+          0.1694,
+          0.1113,
+          NaN
+        ]
+      },
+      "complejo_total": {
+        "media": 170790.02077356743,
+        "por_semilla": [
+          165662.8818,
+          184530.313,
+          157902.1652,
+          175064.7231,
+          NaN
+        ]
+      },
+      "libre_total": {
+        "media": 0.0,
+        "por_semilla": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          NaN
+        ]
+      },
+      "t_secrecion_50": [
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "tamano_grupo_max_total": [
+        3,
+        3,
+        4,
+        3,
+        1
+      ]
+    },
+    "sembrado_secretor": {
+      "poblacion": {
+        "media": 317.2094594594595,
+        "por_semilla": [
+          244.3243,
+          239.1351,
+          445.0541,
+          340.3243,
+          NaN
+        ]
+      },
+      "tiene_secretar": {
+        "media": 0.01429406196859033,
+        "por_semilla": [
+          0.0082,
+          0.0028,
+          0.0131,
+          0.0331,
+          NaN
+        ]
+      },
+      "usa_secretar": {
+        "media": 0.00023728628871528775,
+        "por_semilla": [
+          0.0001,
+          0.0001,
+          0.0002,
+          0.0005,
+          NaN
+        ]
+      },
+      "frac_no_secretores": {
+        "media": 0.9857059380314096,
+        "por_semilla": [
+          0.9918,
+          0.9972,
+          0.9869,
+          0.9669,
+          NaN
+        ]
+      },
+      "comido_libre_por_org_paso": {
+        "media": 0.00010918110638776668,
+        "por_semilla": [
+          0.0001,
+          0.0,
+          0.0001,
+          0.0002,
+          NaN
+        ]
+      },
+      "libre_por_secretores": {
+        "media": 0.006613271069113084,
+        "por_semilla": [
+          0.0016,
+          0.0081,
+          0.0017,
+          0.0151,
+          NaN
+        ]
+      },
+      "libre_por_no_secretores": {
+        "media": 4.186247638320079e-05,
+        "por_semilla": [
+          0.0,
+          0.0,
+          0.0001,
+          0.0001,
+          NaN
+        ]
+      },
+      "comido_por_org_paso": {
+        "media": 0.5309770050185851,
+        "por_semilla": [
+          0.5507,
+          0.5468,
+          0.5088,
+          0.5176,
+          NaN
+        ]
+      },
+      "enzima_total": {
+        "media": 0.2335178394336271,
+        "por_semilla": [
+          0.1649,
+          0.0792,
+          0.2323,
+          0.4576,
+          NaN
+        ]
+      },
+      "frac_enlazados": {
+        "media": 0.0006316377247897779,
+        "por_semilla": [
+          0.0004,
+          0.0005,
+          0.0004,
+          0.0013,
+          NaN
+        ]
+      },
+      "grupos_de_3_o_mas": {
+        "media": 0.00020340827902533759,
+        "por_semilla": [
+          0.0,
+          0.0,
+          0.0,
+          0.0008,
+          NaN
+        ]
+      },
+      "tamano_grupo_medio": {
+        "media": 1.000915965246411,
+        "por_semilla": [
+          1.0004,
+          1.0005,
+          1.0004,
+          1.0024,
+          NaN
+        ]
+      },
+      "frac_enlazados_secretores": {
+        "media": 0.0003556187766714082,
+        "por_semilla": [
+          0.0,
+          0.0,
+          0.0,
+          0.0014,
+          NaN
+        ]
+      },
+      "frac_enlazados_no_secretores": {
+        "media": 0.0006211292107784938,
+        "por_semilla": [
+          0.0004,
+          0.0005,
+          0.0004,
+          0.0012,
+          NaN
+        ]
+      },
+      "energia_secretores": {
+        "media": 29.479545836357865,
+        "por_semilla": [
+          33.1951,
+          12.8751,
+          34.0203,
+          37.8277,
+          NaN
+        ]
+      },
+      "energia_no_secretores": {
+        "media": 29.05867566831607,
+        "por_semilla": [
+          32.6179,
+          15.4683,
+          31.7749,
+          36.3736,
+          NaN
+        ]
+      },
+      "tiene_dividirse_unido": {
+        "media": 0.06574503295084727,
+        "por_semilla": [
+          0.1407,
+          0.0999,
+          0.0035,
+          0.0188,
+          NaN
+        ]
+      },
+      "tiene_compartir": {
+        "media": 0.23679224085575004,
+        "por_semilla": [
+          0.9102,
+          0.0246,
+          0.0054,
+          0.0069,
+          NaN
+        ]
+      },
+      "tiene_unirse": {
+        "media": 0.02200225543755018,
+        "por_semilla": [
+          0.0125,
+          0.0667,
+          0.0036,
+          0.0052,
+          NaN
+        ]
+      },
+      "usa_compartir": {
+        "media": 0.00024280694325137326,
+        "por_semilla": [
+          0.0,
+          0.0003,
+          0.0003,
+          0.0004,
+          NaN
+        ]
+      },
+      "frac_aprovechados": {
+        "media": 0.0,
+        "por_semilla": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          NaN
+        ]
+      },
+      "dist_etiqueta_enlazados": {
+        "media": 0.09552231472799115,
+        "por_semilla": [
+          0.0,
+          0.1861,
+          0.093,
+          0.1029,
+          NaN
+        ]
+      },
+      "dist_etiqueta_azar": {
+        "media": 0.10355544261808416,
+        "por_semilla": [
+          0.0676,
+          0.1086,
+          0.1087,
+          0.1293,
+          NaN
+        ]
+      },
+      "complejo_total": {
+        "media": 170781.96290788313,
+        "por_semilla": [
+          165659.1988,
+          184528.7005,
+          157895.6708,
+          175044.2816,
+          NaN
+        ]
+      },
+      "libre_total": {
+        "media": 2.062013426398975,
+        "por_semilla": [
+          0.9697,
+          0.2809,
+          1.1992,
+          5.7982,
+          NaN
+        ]
+      },
+      "t_secrecion_50": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "tamano_grupo_max_total": [
+        2,
+        4,
+        4,
+        4,
+        1
+      ]
+    },
+    "sembrado_secretor_asoc_inerte": {
+      "poblacion": {
+        "media": 338.30630630630634,
+        "por_semilla": [
+          245.8649,
+          NaN,
+          463.0,
+          306.0541,
+          NaN
+        ]
+      },
+      "tiene_secretar": {
+        "media": 0.19854005083874612,
+        "por_semilla": [
+          0.5808,
+          NaN,
+          0.009,
+          0.0058,
+          NaN
+        ]
+      },
+      "usa_secretar": {
+        "media": 0.0011032587253890082,
+        "por_semilla": [
+          0.0029,
+          NaN,
+          0.0002,
+          0.0002,
+          NaN
+        ]
+      },
+      "frac_no_secretores": {
+        "media": 0.801459949161254,
+        "por_semilla": [
+          0.4192,
+          NaN,
+          0.991,
+          0.9942,
+          NaN
+        ]
+      },
+      "comido_libre_por_org_paso": {
+        "media": 0.0006733297075289884,
+        "por_semilla": [
+          0.0019,
+          NaN,
+          0.0001,
+          0.0001,
+          NaN
+        ]
+      },
+      "libre_por_secretores": {
+        "media": 0.007224401817020943,
+        "por_semilla": [
+          0.0032,
+          NaN,
+          0.0023,
+          0.0162,
+          NaN
+        ]
+      },
+      "libre_por_no_secretores": {
+        "media": 5.0267258456001065e-05,
+        "por_semilla": [
+          0.0001,
+          NaN,
+          0.0001,
+          0.0,
+          NaN
+        ]
+      },
+      "comido_por_org_paso": {
+        "media": 0.5215627128117157,
+        "por_semilla": [
+          0.5225,
+          NaN,
+          0.5103,
+          0.5318,
+          NaN
+        ]
+      },
+      "enzima_total": {
+        "media": 0.8276532920801162,
+        "por_semilla": [
+          1.9763,
+          NaN,
+          0.4058,
+          0.1009,
+          NaN
+        ]
+      },
+      "frac_enlazados": {
+        "media": 0.0,
+        "por_semilla": [
+          0.0,
+          NaN,
+          0.0,
+          0.0,
+          NaN
+        ]
+      },
+      "grupos_de_3_o_mas": {
+        "media": 0.0,
+        "por_semilla": [
+          0.0,
+          NaN,
+          0.0,
+          0.0,
+          NaN
+        ]
+      },
+      "tamano_grupo_medio": {
+        "media": 1.0,
+        "por_semilla": [
+          1.0,
+          NaN,
+          1.0,
+          1.0,
+          NaN
+        ]
+      },
+      "frac_enlazados_secretores": {
+        "media": 0.0,
+        "por_semilla": [
+          0.0,
+          NaN,
+          0.0,
+          0.0,
+          NaN
+        ]
+      },
+      "frac_enlazados_no_secretores": {
+        "media": 0.0,
+        "por_semilla": [
+          0.0,
+          NaN,
+          0.0,
+          0.0,
+          NaN
+        ]
+      },
+      "energia_secretores": {
+        "media": 24.111915341881996,
+        "por_semilla": [
+          26.2568,
+          NaN,
+          14.4505,
+          31.6285,
+          NaN
+        ]
+      },
+      "energia_no_secretores": {
+        "media": 26.547100620944992,
+        "por_semilla": [
+          27.8029,
+          NaN,
+          14.4896,
+          37.3487,
+          NaN
+        ]
+      },
+      "tiene_dividirse_unido": {
+        "media": 0.3439827869001788,
+        "por_semilla": [
+          0.0361,
+          NaN,
+          0.9797,
+          0.0161,
+          NaN
+        ]
+      },
+      "tiene_compartir": {
+        "media": 0.018580983754834496,
+        "por_semilla": [
+          0.0368,
+          NaN,
+          0.0062,
+          0.0127,
+          NaN
+        ]
+      },
+      "tiene_unirse": {
+        "media": 0.010319584747836038,
+        "por_semilla": [
+          0.0193,
+          NaN,
+          0.0057,
+          0.006,
+          NaN
+        ]
+      },
+      "usa_compartir": {
+        "media": 0.0005056812016912894,
+        "por_semilla": [
+          0.0006,
+          NaN,
+          0.0001,
+          0.0008,
+          NaN
+        ]
+      },
+      "frac_aprovechados": {
+        "media": 0.0,
+        "por_semilla": [
+          0.0,
+          NaN,
+          0.0,
+          0.0,
+          NaN
+        ]
+      },
+      "dist_etiqueta_enlazados": {
+        "media": NaN,
+        "por_semilla": [
+          NaN,
+          NaN,
+          NaN,
+          NaN,
+          NaN
+        ]
+      },
+      "dist_etiqueta_azar": {
+        "media": 0.1419842992607399,
+        "por_semilla": [
+          0.1638,
+          NaN,
+          0.1494,
+          0.1128,
+          NaN
+        ]
+      },
+      "complejo_total": {
+        "media": 166169.78716245727,
+        "por_semilla": [
+          165555.2943,
+          NaN,
+          157895.2614,
+          175058.8058,
+          NaN
+        ]
+      },
+      "libre_total": {
+        "media": 11.050983060476042,
+        "por_semilla": [
+          29.9032,
+          NaN,
+          1.799,
+          1.4508,
+          NaN
+        ]
+      },
+      "t_secrecion_50": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "tamano_grupo_max_total": [
+        1,
+        1,
+        1,
+        1,
+        1
+      ]
+    },
+    "sembrado_colonial": {
+      "poblacion": {
+        "media": NaN,
+        "por_semilla": [
+          NaN,
+          NaN,
+          NaN,
+          NaN,
+          NaN
+        ]
+      },
+      "tiene_secretar": {
+        "media": NaN,
+        "por_semilla": [
+          NaN,
+          NaN,
+          NaN,
+          NaN,
+          NaN
+        ]
+      },
+      "usa_secretar": {
+        "media": NaN,
+        "por_semilla": [
+          NaN,
+          NaN,
+          NaN,
+          NaN,
+          NaN
+        ]
+      },
+      "frac_no_secretores": {
+        "media": NaN,
+        "por_semilla": [
+          NaN,
+          NaN,
+          NaN,
+          NaN,
+          NaN
+        ]
+      },
+      "comido_libre_por_org_paso": {
+        "media": NaN,
+        "por_semilla": [
+          NaN,
+          NaN,
+          NaN,
+          NaN,
+          NaN
+        ]
+      },
+      "libre_por_secretores": {
+        "media": NaN,
+        "por_semilla": [
+          NaN,
+          NaN,
+          NaN,
+          NaN,
+          NaN
+        ]
+      },
+      "libre_por_no_secretores": {
+        "media": NaN,
+        "por_semilla": [
+          NaN,
+          NaN,
+          NaN,
+          NaN,
+          NaN
+        ]
+      },
+      "comido_por_org_paso": {
+        "media": NaN,
+        "por_semilla": [
+          NaN,
+          NaN,
+          NaN,
+          NaN,
+          NaN
+        ]
+      },
+      "enzima_total": {
+        "media": NaN,
+        "por_semilla": [
+          NaN,
+          NaN,
+          NaN,
+          NaN,
+          NaN
+        ]
+      },
+      "frac_enlazados": {
+        "media": NaN,
+        "por_semilla": [
+          NaN,
+          NaN,
+          NaN,
+          NaN,
+          NaN
+        ]
+      },
+      "grupos_de_3_o_mas": {
+        "media": NaN,
+        "por_semilla": [
+          NaN,
+          NaN,
+          NaN,
+          NaN,
+          NaN
+        ]
+      },
+      "tamano_grupo_medio": {
+        "media": NaN,
+        "por_semilla": [
+          NaN,
+          NaN,
+          NaN,
+          NaN,
+          NaN
+        ]
+      },
+      "frac_enlazados_secretores": {
+        "media": NaN,
+        "por_semilla": [
+          NaN,
+          NaN,
+          NaN,
+          NaN,
+          NaN
+        ]
+      },
+      "frac_enlazados_no_secretores": {
+        "media": NaN,
+        "por_semilla": [
+          NaN,
+          NaN,
+          NaN,
+          NaN,
+          NaN
+        ]
+      },
+      "energia_secretores": {
+        "media": NaN,
+        "por_semilla": [
+          NaN,
+          NaN,
+          NaN,
+          NaN,
+          NaN
+        ]
+      },
+      "energia_no_secretores": {
+        "media": NaN,
+        "por_semilla": [
+          NaN,
+          NaN,
+          NaN,
+          NaN,
+          NaN
+        ]
+      },
+      "tiene_dividirse_unido": {
+        "media": NaN,
+        "por_semilla": [
+          NaN,
+          NaN,
+          NaN,
+          NaN,
+          NaN
+        ]
+      },
+      "tiene_compartir": {
+        "media": NaN,
+        "por_semilla": [
+          NaN,
+          NaN,
+          NaN,
+          NaN,
+          NaN
+        ]
+      },
+      "tiene_unirse": {
+        "media": NaN,
+        "por_semilla": [
+          NaN,
+          NaN,
+          NaN,
+          NaN,
+          NaN
+        ]
+      },
+      "usa_compartir": {
+        "media": NaN,
+        "por_semilla": [
+          NaN,
+          NaN,
+          NaN,
+          NaN,
+          NaN
+        ]
+      },
+      "frac_aprovechados": {
+        "media": NaN,
+        "por_semilla": [
+          NaN,
+          NaN,
+          NaN,
+          NaN,
+          NaN
+        ]
+      },
+      "dist_etiqueta_enlazados": {
+        "media": NaN,
+        "por_semilla": [
+          NaN,
+          NaN,
+          NaN,
+          NaN,
+          NaN
+        ]
+      },
+      "dist_etiqueta_azar": {
+        "media": NaN,
+        "por_semilla": [
+          NaN,
+          NaN,
+          NaN,
+          NaN,
+          NaN
+        ]
+      },
+      "complejo_total": {
+        "media": NaN,
+        "por_semilla": [
+          NaN,
+          NaN,
+          NaN,
+          NaN,
+          NaN
+        ]
+      },
+      "libre_total": {
+        "media": NaN,
+        "por_semilla": [
+          NaN,
+          NaN,
+          NaN,
+          NaN,
+          NaN
+        ]
+      },
+      "t_secrecion_50": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "tamano_grupo_max_total": [
+        2,
+        4,
+        4,
+        3,
+        2
+      ]
+    },
+    "sembrado_colonial_asoc_inerte": {
+      "poblacion": {
+        "media": 334.4774774774775,
+        "por_semilla": [
+          208.6216,
+          NaN,
+          458.4865,
+          336.3243,
+          NaN
+        ]
+      },
+      "tiene_secretar": {
+        "media": 0.019791353204568374,
+        "por_semilla": [
+          0.0339,
+          NaN,
+          0.0113,
+          0.0142,
+          NaN
+        ]
+      },
+      "usa_secretar": {
+        "media": 0.0003721339860518925,
+        "por_semilla": [
+          0.0005,
+          NaN,
+          0.0002,
+          0.0004,
+          NaN
+        ]
+      },
+      "frac_no_secretores": {
+        "media": 0.9802086467954315,
+        "por_semilla": [
+          0.9661,
+          NaN,
+          0.9887,
+          0.9858,
+          NaN
+        ]
+      },
+      "comido_libre_por_org_paso": {
+        "media": 0.00018202864267784607,
+        "por_semilla": [
+          0.0003,
+          NaN,
+          0.0001,
+          0.0002,
+          NaN
+        ]
+      },
+      "libre_por_secretores": {
+        "media": 0.004740893523672174,
+        "por_semilla": [
+          0.0041,
+          NaN,
+          0.0043,
+          0.0058,
+          NaN
+        ]
+      },
+      "libre_por_no_secretores": {
+        "media": 0.00011979996796713107,
+        "por_semilla": [
+          0.0002,
+          NaN,
+          0.0001,
+          0.0001,
+          NaN
+        ]
+      },
+      "comido_por_org_paso": {
+        "media": 0.5236469450935597,
+        "por_semilla": [
+          0.5499,
+          NaN,
+          0.5137,
+          0.5074,
+          NaN
+        ]
+      },
+      "enzima_total": {
+        "media": 0.40133553074631517,
+        "por_semilla": [
+          0.3297,
+          NaN,
+          0.5209,
+          0.3534,
+          NaN
+        ]
+      },
+      "frac_enlazados": {
+        "media": 0.0,
+        "por_semilla": [
+          0.0,
+          NaN,
+          0.0,
+          0.0,
+          NaN
+        ]
+      },
+      "grupos_de_3_o_mas": {
+        "media": 0.0,
+        "por_semilla": [
+          0.0,
+          NaN,
+          0.0,
+          0.0,
+          NaN
+        ]
+      },
+      "tamano_grupo_medio": {
+        "media": 1.0,
+        "por_semilla": [
+          1.0,
+          NaN,
+          1.0,
+          1.0,
+          NaN
+        ]
+      },
+      "frac_enlazados_secretores": {
+        "media": 0.0,
+        "por_semilla": [
+          0.0,
+          NaN,
+          0.0,
+          0.0,
+          NaN
+        ]
+      },
+      "frac_enlazados_no_secretores": {
+        "media": 0.0,
+        "por_semilla": [
+          0.0,
+          NaN,
+          0.0,
+          0.0,
+          NaN
+        ]
+      },
+      "energia_secretores": {
+        "media": 26.336356281398153,
+        "por_semilla": [
+          22.5793,
+          NaN,
+          15.6808,
+          40.749,
+          NaN
+        ]
+      },
+      "energia_no_secretores": {
+        "media": 23.30850436172921,
+        "por_semilla": [
+          21.3785,
+          NaN,
+          15.1534,
+          33.3936,
+          NaN
+        ]
+      },
+      "tiene_dividirse_unido": {
+        "media": 0.5699657233615855,
+        "por_semilla": [
+          0.7649,
+          NaN,
+          0.032,
+          0.913,
+          NaN
+        ]
+      },
+      "tiene_compartir": {
+        "media": 0.02334281601401131,
+        "por_semilla": [
+          0.0099,
+          NaN,
+          0.012,
+          0.0481,
+          NaN
+        ]
+      },
+      "tiene_unirse": {
+        "media": 0.010588613036948876,
+        "por_semilla": [
+          0.0069,
+          NaN,
+          0.0112,
+          0.0137,
+          NaN
+        ]
+      },
+      "usa_compartir": {
+        "media": 0.0007006419818044373,
+        "por_semilla": [
+          0.0008,
+          NaN,
+          0.0006,
+          0.0007,
+          NaN
+        ]
+      },
+      "frac_aprovechados": {
+        "media": 0.0,
+        "por_semilla": [
+          0.0,
+          NaN,
+          0.0,
+          0.0,
+          NaN
+        ]
+      },
+      "dist_etiqueta_enlazados": {
+        "media": NaN,
+        "por_semilla": [
+          NaN,
+          NaN,
+          NaN,
+          NaN,
+          NaN
+        ]
+      },
+      "dist_etiqueta_azar": {
+        "media": 0.14716064348000613,
+        "por_semilla": [
+          0.0949,
+          NaN,
+          0.187,
+          0.1595,
+          NaN
+        ]
+      },
+      "complejo_total": {
+        "media": 166199.6440445424,
+        "por_semilla": [
+          165652.1955,
+          NaN,
+          157893.3859,
+          175053.3507,
+          NaN
+        ]
+      },
+      "libre_total": {
+        "media": 2.314249728589926,
+        "por_semilla": [
+          2.51,
+          NaN,
+          2.0774,
+          2.3553,
+          NaN
+        ]
+      },
+      "t_secrecion_50": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "tamano_grupo_max_total": [
+        1,
+        1,
+        1,
+        1,
+        1
+      ]
+    }
+  }
+}

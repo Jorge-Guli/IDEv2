@@ -69,3 +69,13 @@ Se agrega a la física, sin cambiar lo anterior (detalle en `openspec/specs/asoc
 - **Aprendizaje:** no refuerza dividirse, dividirse unido, compartir ni conjugar; descuenta del ΔE la energía recibida de otros.
 - **Controles:** asociación desactivada, inerte (las primitivas cuestan pero no hacen nada), sin beneficio (eficiencia 0) y positivo (eficiencia 2).
 - **Dispositivo:** CPU (NumPy) o GPU (CuPy), detectado automáticamente. El azar se genera siempre en CPU.
+
+## Anexo: fase 2b (bien público), cerrada el 2026-10-23
+
+Se activa con `bien_publico.activo = true`. Detalle en `openspec/specs/bien-publico/spec.md`.
+- **Campos:** recurso complejo C (no comestible; parches propios, regeneración 0,01, capacidad 20), enzima Z y alimento libre A.
+- **Primitiva secretar** (costo 0,3): agrega 1 unidad de Z en la propia celda, después de comer. No se refuerza por aprendizaje.
+- **Dinámica del entorno, en cada paso:** Z se difunde (0,1) y se degrada (0,3); la digestión convierte `d = C·(1 − exp(−0,05·Z))` de C en A; A se difunde (0,8) y se degrada (0,02).
+- **Comer:** toma de R y después de A, hasta 4 por paso. Los sensores de alimento miden R + A; hay un sensor nuevo, `complejo_aqui`.
+- **Controles:** secreción inerte; bien privado (el secretor digiere al instante en su celda lo que su enzima digeriría en su vida y se lo queda).
+- **Movimiento de grupos:** se agrega el modo opcional `asociacion.movimiento = "empuje"`. Cada grupo conexo se desplaza una celda en la dirección más alineada con la suma de las orientaciones de sus miembros que avanzan, si esa suma alcanza la mitad del tamaño del grupo y el destino está libre.
