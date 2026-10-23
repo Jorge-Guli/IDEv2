@@ -98,7 +98,8 @@ class SimCfg:
     poblacion_inicial: int = 200
     registrar_cada: int = 50
     imagen_cada: int = 0  # 0: solo imagen final
-    dispositivo: str = "auto"  # "auto" (GPU si hay), "cpu" o "gpu"
+    dispositivo: str = "auto"  # "auto" (GPU si hay y el mundo es grande), "cpu" o "gpu"
+    umbral_gpu_celdas: int = 90_000  # en "auto", mundos más chicos corren en CPU (más rápida ahí)
 
 
 @dataclass

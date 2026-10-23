@@ -13,6 +13,9 @@ from __future__ import annotations
 
 import os
 import warnings
+
+# CuPy avisa que no encuentra CUDA_PATH aunque funcione con las cabeceras instaladas por pip ([ctk])
+warnings.filterwarnings("ignore", message="CUDA path could not be detected")
 from types import ModuleType
 
 import numpy as np
@@ -43,12 +46,17 @@ def _cupy_disponible() -> ModuleType | None:
         return None
 
 
-def elegir(preferencia: str = "auto") -> tuple[ModuleType, str]:
-    """Devuelve (xp, nombre). 'gpu' falla si no hay GPU utilizable; 'auto' cae a CPU sin error."""
+def elegir(preferencia: str = "auto", celdas: int | None = None,
+           umbral_gpu: int = 90_000) -> tuple[ModuleType, str]:
+    """Devuelve (xp, nombre). 'gpu' falla si no hay GPU utilizable; 'auto' cae a CPU sin error.
+
+    En 'auto', la GPU se usa solo si el mundo tiene al menos `umbral_gpu` celdas: con pocos organismos,
+    el costo fijo de cada operación en GPU la vuelve más lenta que la CPU.
+    """
     preferencia = os.environ.get("SIMBIO_DISPOSITIVO", preferencia).lower()
     if preferencia not in ("auto", "cpu", "gpu"):
         raise ValueError(f"dispositivo desconocido: {preferencia!r} (usar auto, cpu o gpu)")
-    if preferencia == "cpu":
+    if preferencia == "cpu" or (preferencia == "auto" and celdas is not None and celdas < umbral_gpu):
         return np, "cpu"
     cp = _cupy_disponible()
     if cp is not None:
@@ -87,19 +95,9 @@ def a_cpu(arr):
 
 def sumar_en(arr, idx, valores) -> None:
     """arr[idx] += valores acumulando índices repetidos (np.add.at)."""
-    if modulo(arr) is np:
-        np.add.at(arr, idx, valores)
-    else:
-        import cupyx
-
-        cupyx.scatter_add(arr, idx, valores)
+    modulo(arr).add.at(arr, idx, valores)
 
 
 def minimo_en(arr, idx, valores) -> None:
     """arr[idx] = min(arr[idx], valores) con índices repetidos (np.minimum.at)."""
-    if modulo(arr) is np:
-        np.minimum.at(arr, idx, valores)
-    else:
-        import cupyx
-
-        cupyx.scatter_min(arr, idx, valores)
+    modulo(arr).minimum.at(arr, idx, valores)

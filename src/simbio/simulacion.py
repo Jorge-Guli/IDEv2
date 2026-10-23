@@ -20,7 +20,8 @@ class Simulacion:
     def __init__(self, cfg: Config, genomas: dict[str, np.ndarray] | None = None,
                  cepas: np.ndarray | None = None):
         self.cfg = cfg
-        self.xp, self.dispositivo = dev.elegir(cfg.sim.dispositivo)
+        self.xp, self.dispositivo = dev.elegir(cfg.sim.dispositivo, cfg.mundo.alto * cfg.mundo.ancho,
+                                               cfg.sim.umbral_gpu_celdas)
         xp = self.xp
         self.DY, self.DX, self.OPUESTA = xp.asarray(DY), xp.asarray(DX), xp.asarray(OPUESTA)
         semilla_entorno, semilla_sim = np.random.SeedSequence(cfg.sim.semilla).spawn(2)
@@ -63,6 +64,10 @@ class Simulacion:
 
     def _nuevos(self, genomas, y, x, E, padre, generacion, cepa, estres) -> dict[str, np.ndarray]:
         xp = self.xp
+        # acepta arreglos de CPU o del dispositivo
+        genomas = gen.a_dispositivo(genomas, xp)
+        y, x, E, padre, generacion, cepa, estres = (xp.asarray(v) for v in (y, x, E, padre, generacion, cepa,
+                                                                            estres))
         n = len(E)
         d = self.pob.vacia(n)
         for k in gen.CAMPOS:

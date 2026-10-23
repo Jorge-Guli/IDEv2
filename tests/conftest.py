@@ -5,6 +5,13 @@ from simbio.config import Config
 from simbio.simulacion import Simulacion
 
 
+@pytest.fixture(autouse=True)
+def _cpu_salvo_pruebas_de_dispositivo(request, monkeypatch):
+    """Los tests construyen casos con arreglos de CPU: corren en CPU salvo los de test_dispositivo."""
+    if request.module.__name__.split(".")[-1] != "test_dispositivo":
+        monkeypatch.setenv("SIMBIO_DISPOSITIVO", "cpu")
+
+
 @pytest.fixture
 def cfg() -> Config:
     c = Config()

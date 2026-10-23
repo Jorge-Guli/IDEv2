@@ -17,7 +17,7 @@ from .simulacion import Simulacion
 
 def _corrida(nombre: str, lado: int, pasos: int, semilla: int = 1) -> tuple[list[dict], float, int]:
     cfg = Config()
-    cfg.sim.dispositivo = nombre
+    cfg.sim.dispositivo = nombre  # forzado: aquí se compara a propósito, sin el umbral de "auto"
     cfg.sim.semilla = semilla
     cfg.sim.registrar_cada = 50
     cfg.mundo.alto = cfg.mundo.ancho = lado
@@ -30,8 +30,11 @@ def _corrida(nombre: str, lado: int, pasos: int, semilla: int = 1) -> tuple[list
 
 
 def main(rapido: bool = False) -> None:
-    xp, nombre = dev.elegir("auto")
-    print(f"Dispositivo detectado (auto): {dev.descripcion(nombre)}")
+    xp, nombre = dev.elegir("gpu") if dev._cupy_disponible() is not None else dev.elegir("cpu")
+    print(f"GPU disponible: {dev.descripcion(nombre)}" if nombre == "gpu" else "GPU disponible: no")
+    umbral = Config().sim.umbral_gpu_celdas
+    print(f"En modo automático se usa GPU en mundos de {umbral} celdas o más (≈{int(umbral ** 0.5)}²); "
+          f"configurable con --set sim.umbral_gpu_celdas=N")
     if nombre == "cpu":
         print("No hay GPU utilizable: la simulación corre en CPU con NumPy. Ver docs/dispositivos.md para usar GPU.")
     lados = [64] if rapido else [128, 256, 512]

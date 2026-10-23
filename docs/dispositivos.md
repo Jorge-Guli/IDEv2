@@ -4,7 +4,7 @@ El simulador **detecta el hardware automáticamente**. Si hay una GPU NVIDIA y C
 
 ## Elegir el dispositivo
 
-- Automático (por defecto): `--set sim.dispositivo=auto`
+- Automático (por defecto): `--set sim.dispositivo=auto`. Usa GPU solo si hay una utilizable **y** el mundo tiene al menos `sim.umbral_gpu_celdas` celdas (90 000 por defecto, ≈300²). En mundos chicos la CPU es más rápida.
 - Forzar CPU: `--set sim.dispositivo=cpu`, o la variable de entorno `SIMBIO_DISPOSITIVO=cpu`
 - Forzar GPU: `--set sim.dispositivo=gpu`. Falla con un mensaje claro si no hay GPU utilizable.
 
@@ -25,7 +25,15 @@ Muestra qué se detectó, cuántos pasos por segundo rinde cada dispositivo seg�
 
 ## Cuándo conviene la GPU
 
-Mover datos a la GPU tiene un costo fijo por paso, y con pocos organismos (~2000) la CPU puede ser igual o más rápida. La GPU rinde con mundos grandes y decenas o cientos de miles de organismos. `python -m simbio dispositivo` lo mide en tu equipo.
+Cada operación en GPU tiene un costo fijo, así que con pocos organismos la CPU es más rápida. Medido en una RTX 5060 Ti contra su CPU (2026-10-23):
+
+| Mundo | Organismos | CPU (pasos/s) | GPU (pasos/s) |
+|---|---|---|---|
+| 128² | 929 | 402 | 21 |
+| 256² | 3 793 | 83 | 55 |
+| 512² | 21 073 | 17 | 40 |
+
+El cruce está cerca de 300², y de ahí sale el umbral por defecto del modo automático. `python -m simbio dispositivo` lo mide en tu equipo; si tu cruce es otro, ajusta `sim.umbral_gpu_celdas`.
 
 ## Instalar soporte de GPU (NVIDIA)
 
