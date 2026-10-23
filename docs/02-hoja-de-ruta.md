@@ -8,8 +8,8 @@ Este documento es **el camino que sigue el proyecto, en orden**, con el porqué 
 |---|---|---|---|
 | 1 | Evolución básica | ✅ cerrada | La base evoluciona y se adapta; la evolución "inventó" el giro ([bitácora](bitacora/2026-10-23-fase1-evaluacion.md)) |
 | 2 | Asociación (unirse, compartir, dividirse unido, conjugar) | ✅ cerrada | Poder asociarse **no alcanza**: no rinde y la selección la purga. Si rinde, hay una transición abrupta ([bitácora](bitacora/2026-10-23-fase2-evaluacion.md)) |
-| E | Sembrar la asociación | ▶ en curso | — |
-| 2b | Bien público: enzimas y recurso complejo | siguiente | — |
+| E | Sembrar la asociación | ✅ hecho | La asociación es **inestable**: aunque esté, la división común reaparece en menos de 1000 pasos ([bitácora](bitacora/2026-10-23-experimento-E-sembrar.md)) |
+| 2b | Bien público: enzimas y recurso complejo | ▶ en curso | Dilema confirmado: con bien privado la secreción evoluciona sola; con bien público, no (15 semillas). En curso: ¿los grupos clonales la rescatan? ([prerregistro](bitacora/2026-10-23-fase2b-prerregistro.md)) |
 
 ## El camino, en orden
 
@@ -59,3 +59,6 @@ Este documento es **el camino que sigue el proyecto, en orden**, con el porqué 
 | 2026-10-23 | Cerrar la fase 2 con resultado "la asociación no rinde" e insertar la fase 2b antes de la 3 | Los controles (inerte, sin beneficio, positivo) descartan bug, falta de detección y sesgo mutacional |
 | 2026-10-23 | Hacer primero el experimento E (sembrar) | Es barato y decide entre "inestable" y "difícil de descubrir", que llevan a caminos distintos |
 | 2026-10-23 | En 2b, empezar por el bien público (enzimas) | Es el mecanismo más documentado y abre a la vez cooperación, aprovechados y agrupación clonal |
+| 2026-10-23 | Recalibrar el bien público antes de evaluarlo | La revisión mostró que secretar rendía de 50 a 150 veces su costo: no había dilema |
+| 2026-10-23 | Agregar el movimiento por empuje colectivo (opcional) | Las colonias morían inmóviles; en biología, las colonias se mueven por la suma de los empujes de sus células |
+| 2026-10-23 | Repetir H2 y H3 con un genoma secretor viable | El primero secretaba en exceso y colapsaba con o sin colonias: confundía el resultado |
