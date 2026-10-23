@@ -38,12 +38,15 @@ Primitiva 12. Cuesta `costo_secretar` y agrega `enzima_por_secrecion` a Z en la 
 Se agrega `complejo_aqui = C / K_c_max` al final; los índices anteriores no cambian. `recurso_aqui`, `frente`, `frente_izq` y `frente_der` pasan a medir `(R + A) / K_max`. Con el bien público desactivado, A = 0 y no cambia nada.
 
 ### D6. Parámetros iniciales (`experiments/configs/bien_publico.toml`)
-- Recurso simple escaso: `capacidad_max = 3`.
-- Recurso complejo abundante: `K_c = 15`, regeneración 0,01, parches de escala 8.
-- Enzima: secreción 1,0, costo 0,3, degradación 0,1, difusión 0,1, `k = 0,5`.
-- Alimento libre: rendimiento 1,0, degradación 0,02, difusión 0,2.
+- Recurso simple escaso: `capacidad_max = 5` (con 3, LUCA se extingue antes de descubrir la secreción).
+- Recurso complejo abundante: `K_c = 20`, regeneración 0,01, parches de escala 8.
+- Enzima: secreción 1,0, costo 0,3, degradación 0,3, difusión 0,1, `k = 0,05`.
+- Alimento libre: rendimiento 1,0, degradación 0,02, difusión 0,8.
 
-Se calibran para que LUCA sobreviva solo con el recurso simple y para que secretar en grupo rinda más que su costo. La calibración queda en la bitácora.
+**Recalibrado tras la revisión.** Con `k = 0,5` y degradación 0,1, un secretor recuperaba entre 50 y 150 veces su costo aunque lo rodearan aprovechados: no había dilema, secretar era "comer mejor". El objetivo prerregistrado de calibración (`experiments/fase2b/calibrar.py`) es que un secretor solo **no** recupere su costo y un grupo sí: beneficio propio / costo < 1 < grupo / costo. Con los valores elegidos, 0,81 < 1 < 1,39, y lo producido en total es 2,1 veces el costo.
+
+### D8. Control de bien privado
+`bien_publico.privado = true`: al secretar, el secretor digiere al instante en su celda lo que la enzima digeriría durante su vida (exponente `k·Z/δ`) y se queda con todo; no deja enzima ni alimento libre. Sirve para contrastar el bien público con el privado.
 
 ### D7. Métricas
 - `tiene_secretar` y `usa_secretar` (automáticas).

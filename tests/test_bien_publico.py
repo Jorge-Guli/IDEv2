@@ -117,3 +117,30 @@ def test_corrida_con_bien_publico(cfg):
     sim.correr(300)
     h = sim.historial[-1]
     assert sim.pob.n > 0 and "complejo_total" in h and "frac_enlazados_secretores" in h
+
+
+def test_ingesta_del_libre_conserva(cfg):
+    """Lo que se come del alimento libre baja A exactamente en lo que sube E."""
+    sim = sim_vacia(_cfg_bp(cfg, difusion_libre=0.0, degradacion_libre=0.0, regeneracion_complejo=0.0))
+    sim.entorno.R[:] = 0
+    sim.entorno.K_base[:] = 0
+    sim.entorno.C[:] = 0
+    colocar(sim, genoma_con(cfg, [(gen.COMER, 5.0, {})]), [5], [5], E=50)
+    sim.entorno.A[5, 5] = 2.5
+    A0 = float(sim.entorno.A.sum())
+    sim.paso()
+    f = cfg.fisica
+    ganado = sim.pob["E"][0] - (50 - f.costo_basal - f.costo_por_gen - f.costo_comer)
+    assert np.isclose(A0 - float(sim.entorno.A.sum()), ganado)
+    assert np.isclose(ganado, 2.5)
+
+
+def test_bien_privado(cfg):
+    sim = sim_vacia(_cfg_bp(cfg, privado=True))
+    sim.entorno.C[5, 5] = sim.entorno.Kc[5, 5] = 10.0
+    colocar(sim, genoma_con(cfg, [(gen.SECRETAR, 5.0, {})]), [5], [5], E=50)
+    sim.paso()
+    b, f = cfg.bien_publico, cfg.fisica
+    d = 10.0 * (1 - np.exp(-b.tasa_digestion * b.enzima_por_secrecion / b.degradacion_enzima))
+    assert sim.entorno.Z.sum() == 0
+    assert np.isclose(sim.pob["E"][0], 50 - f.costo_basal - f.costo_por_gen - b.costo_secretar + d)

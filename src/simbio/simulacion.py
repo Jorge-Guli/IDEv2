@@ -103,7 +103,8 @@ class Simulacion:
     def _reiniciar_contadores(self) -> None:
         xp = self.xp
         self.cont = {"nacimientos": 0, "muertes": 0, "comido": 0.0, "org_pasos": 0,
-                     "compartido": 0.0, "recibido": 0.0, "comido_libre": 0.0, "conjugaciones": 0, "enlaces_creados": 0,
+                     "compartido": 0.0, "recibido": 0.0, "comido_libre": 0.0,
+                     "comido_libre_sec": 0.0, "comido_libre_nosec": 0.0, "conjugaciones": 0, "enlaces_creados": 0,
                      "acciones": xp.zeros(gen.NUM_PRIM, dtype=xp.int64)}
 
     def vecinos_enlazados(self, occ: np.ndarray) -> np.ndarray:
@@ -379,15 +380,30 @@ class Simulacion:
             del_simple = xp.minimum(toma, ent.R[yi, xi])  # primero el recurso simple, después el libre
             ent.R[yi, xi] -= del_simple
             if cfg.bien_publico.activo:
-                ent.A[yi, xi] -= toma - del_simple
-                self.cont["comido_libre"] += float((toma - del_simple).sum())
+                libre = toma - del_simple
+                ent.A[yi, xi] -= libre
+                xp.maximum(ent.A, 0.0, out=ent.A)  # (R + A) − R puede diferir de A en el redondeo
+                secretor = (p["prim"][i] == gen.SECRETAR).any(axis=1) & p["activo"][i].any(axis=1)
+                self.cont["comido_libre"] += float(libre.sum())
+                self.cont["comido_libre_sec"] += float(libre[secretor].sum())
+                self.cont["comido_libre_nosec"] += float(libre[~secretor].sum())
             p["E"][i] += toma
             self.cont["comido"] += float(toma.sum())
 
             # secretar enzima (después de comer, en la propia celda)
-            if cfg.bien_publico.activo and not cfg.bien_publico.secrecion_inerte:
+            bp = cfg.bien_publico
+            if bp.activo and not bp.secrecion_inerte:
                 i = xp.flatnonzero(act == gen.SECRETAR)
-                ent.Z[p["y"][i], p["x"][i]] += cfg.bien_publico.enzima_por_secrecion
+                yi, xi = p["y"][i], p["x"][i]
+                if bp.privado:
+                    # control de bien privado: digiere ya en su celda lo que la enzima digeriría en su vida
+                    # (exponente k·Z/δ) y se lo queda el secretor; no deja enzima
+                    d = ent.C[yi, xi] * (1.0 - xp.exp(-bp.tasa_digestion * bp.enzima_por_secrecion
+                                                       / max(bp.degradacion_enzima, 1e-9)))
+                    ent.C[yi, xi] -= d
+                    p["E"][i] = xp.minimum(p["E"][i] + bp.rendimiento * d, f.energia_max)
+                else:
+                    ent.Z[yi, xi] += bp.enzima_por_secrecion
 
             # avanzar
             self._avanzar(act, occ, socios)
@@ -530,10 +546,14 @@ class Simulacion:
             fila["frac_aprovechados"] = float(aprovecha.sum() / max(enlazado.sum(), 1))
             if self.cfg.bien_publico.activo:
                 secretor = perfil[:, gen.SECRETAR] > 0
+                fila["frac_no_secretores"] = float((~secretor).mean())
                 for nombre, m in (("secretores", secretor), ("no_secretores", ~secretor)):
                     k = int(m.sum())
                     fila[f"frac_enlazados_{nombre}"] = float(enlazado[m].mean()) if k else float("nan")
                     fila[f"energia_{nombre}"] = float(p["E"][m].mean()) if k else float("nan")
+                    # alimento libre comido en el intervalo, por organismo del grupo (al momento de medir)
+                    clave = "comido_libre_sec" if nombre == "secretores" else "comido_libre_nosec"
+                    fila[f"libre_por_{nombre}"] = c[clave] / max(k, 1) / max(self.cfg.sim.registrar_cada, 1)
         for k, nombre in enumerate(gen.PRIMITIVAS):
             fila[f"usa_{nombre}"] = float(c["acciones"][k] / org_pasos)
         return fila

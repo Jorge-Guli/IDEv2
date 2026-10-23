@@ -15,21 +15,47 @@ from pathlib import Path
 
 import numpy as np
 
-from simbio import config, corrida
+from simbio import config, corrida, genoma as gen
 from simbio.simulacion import Simulacion
 
 RAIZ = Path(__file__).resolve().parents[2]
 CONFIG = RAIZ / "experiments" / "configs" / "bien_publico.toml"
 
+# nombre: (ajustes, genoma inicial). Los genomas sembrados responden a "¿se mantiene si ya está?",
+# las corridas desde LUCA a "¿se descubre?".
 CONDICIONES = {
-    "bp": [],
-    "bp_secrecion_inerte": ["bien_publico.secrecion_inerte=true"],  # secretar cuesta pero no produce nada
-    "bp_sin_asociacion": ["asociacion.activa=false"],
-    "bp_asociacion_inerte": ["asociacion.inerte=true"],  # mismo espectro mutacional, asociación sin efecto
-    "bp_difusion_alta": ["bien_publico.difusion_libre=0.8"],  # el beneficio se reparte más lejos
-    "bp_difusion_nula": ["bien_publico.difusion_libre=0.0"],  # el beneficio queda en la celda donde se digiere
+    "publico": ([], "luca"),
+    "publico_asoc_inerte": (["asociacion.inerte=true"], "luca"),
+    "privado": (["bien_publico.privado=true"], "luca"),
+    "secrecion_inerte": (["bien_publico.secrecion_inerte=true"], "luca"),
+    "sembrado_secretor": ([], "secretor"),
+    "sembrado_secretor_asoc_inerte": (["asociacion.inerte=true"], "secretor"),
+    "sembrado_colonial": ([], "secretor_colonial"),
+    # control del anterior: la división unida es una división común (sin grupos clonales)
+    "sembrado_colonial_asoc_inerte": (["asociacion.inerte=true"], "secretor_colonial"),
 }
-METRICAS = ["poblacion", "tiene_secretar", "usa_secretar", "comido_libre_por_org_paso", "frac_enlazados",
+
+
+def genoma_inicial(tipo: str, cfg) -> dict | None:
+    if tipo == "luca":
+        return None
+    g = gen.luca(cfg.herencia)
+    k = int(np.flatnonzero(~g["activo"][0])[0])
+    g["activo"][0, k] = True
+    g["prim"][0, k] = gen.SECRETAR  # secretar si hay recurso complejo y no hay comida aquí
+    g["b"][0, k] = -0.5
+    g["w"][0, k, gen.S_COMPLEJO_AQUI] = 3.0
+    g["w"][0, k, gen.S_AQUI] = -3.0
+    if tipo == "secretor_colonial":
+        g["prim"][g["prim"] == gen.DIVIDIRSE] = gen.DIVIDIRSE_UNIDO
+    n = cfg.sim.poblacion_inicial
+    G = gen.repetir(g, n)
+    G["etiqueta"] = np.random.default_rng(cfg.sim.semilla).random((n, 2))
+    return G
+
+
+METRICAS = ["poblacion", "tiene_secretar", "usa_secretar", "frac_no_secretores", "comido_libre_por_org_paso",
+            "libre_por_secretores", "libre_por_no_secretores", "comido_por_org_paso", "enzima_total", "frac_enlazados",
             "grupos_de_3_o_mas", "tamano_grupo_medio", "frac_enlazados_secretores", "frac_enlazados_no_secretores",
             "energia_secretores", "energia_no_secretores", "tiene_dividirse_unido", "tiene_compartir",
             "tiene_unirse", "usa_compartir", "frac_aprovechados", "dist_etiqueta_enlazados", "dist_etiqueta_azar",
@@ -38,9 +64,10 @@ METRICAS = ["poblacion", "tiene_secretar", "usa_secretar", "comido_libre_por_org
 
 def _correr(tarea):
     salida, nombre, semilla, pasos = tarea
-    cfg = config.cargar(CONFIG, CONDICIONES[nombre] + ["sim.registrar_cada=200"])
+    ajustes, tipo = CONDICIONES[nombre]
+    cfg = config.cargar(CONFIG, ajustes + ["sim.registrar_cada=200"])
     cfg.sim.semilla, cfg.sim.pasos = semilla, pasos
-    sim = corrida.correr(cfg, Path(salida) / nombre / f"semilla_{semilla}")
+    sim = corrida.correr(cfg, Path(salida) / nombre / f"semilla_{semilla}", genomas=genoma_inicial(tipo, cfg))
     h = sim.historial
     ultimo = [r for r in h if r["t"] >= 0.75 * pasos]
     res = {"nombre": nombre, "semilla": semilla, "pasos": sim.t, "poblacion_final": sim.pob.n}
@@ -55,7 +82,7 @@ def _correr(tarea):
 
 
 def _huella(_):
-    sim = Simulacion(config.cargar(CONFIG, ["mundo.alto=64", "mundo.ancho=64"]))
+    sim = Simulacion(config.cargar(CONFIG, ["mundo.alto=64", "mundo.ancho=64", "sim.dispositivo=cpu"]))
     h = hashlib.sha256(repr(sim.correr(1500)).encode())
     for k in sorted(sim.pob.d):
         h.update(np.ascontiguousarray(sim.pob.d[k]).tobytes())
@@ -85,7 +112,7 @@ def _conservacion(_):
 
 
 def _rendimiento():
-    cfg = config.cargar(CONFIG, ["mundo.alto=150", "mundo.ancho=150", "sim.poblacion_inicial=1500",
+    cfg = config.cargar(CONFIG, ["mundo.alto=260", "mundo.ancho=260", "sim.poblacion_inicial=1500",
                                  "sim.registrar_cada=100000", "sim.dispositivo=cpu"])
     sim = Simulacion(cfg)
     sim.correr(1500)
@@ -113,7 +140,7 @@ def main():
     por = {}
     for r in resultados:
         por.setdefault(r["nombre"], []).append(r)
-    persisten = sum(r["pasos"] >= args.pasos and r["poblacion_final"] > 0 for r in por["bp"])
+    persisten = sum(r["pasos"] >= args.pasos and r["poblacion_final"] > 0 for r in por["publico"])
     umbral = int(np.ceil(0.8 * len(semillas)))
     resumen = {n: {**{m: {"media": float(np.nanmean([r[m] for r in rs])),
                           "por_semilla": [round(r[m], 4) for r in rs]} for m in METRICAS},
@@ -123,7 +150,7 @@ def main():
     informe = {
         "parametros": {"pasos": args.pasos, "semillas": semillas, "minutos": round((time.time() - t0) / 60, 1)},
         "criterios": {
-            "C1_persistencia": {"aprobado": persisten >= umbral, "bp": f"{persisten}/{len(semillas)}"},
+            "C1_persistencia": {"aprobado": persisten >= umbral, "publico": f"{persisten}/{len(semillas)}"},
             "C2_conservacion": {"aprobado": conservacion["error_relativo_maximo"] < 1e-9
                                 and conservacion["digerido_total"] > 0, **conservacion},
             "C3_reproducibilidad": {"aprobado": huellas[0] == huellas[1]},
