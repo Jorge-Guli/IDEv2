@@ -1,0 +1,65 @@
+"""Población como estructura de arreglos: un arreglo por atributo, una fila por organismo."""
+
+from __future__ import annotations
+
+import numpy as np
+
+from . import genoma as gen
+
+ESTADO = {
+    # nombre: (dtype, forma extra)
+    "y": (np.int32, ()),
+    "x": (np.int32, ()),
+    "dir": (np.int8, ()),
+    "E": (np.float64, ()),
+    "estres": (np.float64, ()),
+    "linea_base": (np.float64, ()),
+    "delta_e": (np.float64, ()),
+    "E_prev": (np.float64, ()),
+    "ult_act": (np.int8, ()),
+    "id": (np.int64, ()),
+    "padre": (np.int64, ()),
+    "generacion": (np.int32, ()),
+    "nacimiento": (np.int32, ()),
+    "cepa": (np.int16, ()),
+}
+
+
+class Poblacion:
+    def __init__(self, genes_max: int):
+        self.genes_max = genes_max
+        self.d: dict[str, np.ndarray] = self.vacia(0)
+
+    def vacia(self, n: int) -> dict[str, np.ndarray]:
+        G = self.genes_max
+        d = {k: np.zeros((n, *forma), dtype=dt) for k, (dt, forma) in ESTADO.items()}
+        d.update(gen.vacio(n, G))
+        d["P"] = np.zeros((n, G, gen.NUM_SENS))  # ajustes plásticos de pesos
+        d["p"] = np.zeros((n, G))  # ajustes plásticos de sesgos
+        d["ult_s"] = np.zeros((n, gen.NUM_SENS))
+        d["ult_a"] = np.zeros((n, G))
+        d["ult_act"][:] = -1
+        return d
+
+    @property
+    def n(self) -> int:
+        return len(self.d["E"])
+
+    def __getitem__(self, clave: str) -> np.ndarray:
+        return self.d[clave]
+
+    def __setitem__(self, clave: str, valor: np.ndarray) -> None:
+        self.d[clave] = valor
+
+    def genomas(self, idx: np.ndarray | None = None) -> dict[str, np.ndarray]:
+        if idx is None:
+            idx = np.arange(self.n)
+        return {k: self.d[k][idx].copy() for k in gen.CAMPOS}
+
+    def agregar(self, nuevos: dict[str, np.ndarray]) -> None:
+        for k in self.d:
+            self.d[k] = np.concatenate([self.d[k], nuevos[k]], axis=0)
+
+    def filtrar(self, mascara: np.ndarray) -> None:
+        for k in self.d:
+            self.d[k] = self.d[k][mascara]
