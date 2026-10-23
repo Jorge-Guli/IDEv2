@@ -26,7 +26,7 @@ class Simulacion:
         self.DY, self.DX, self.OPUESTA = xp.asarray(DY), xp.asarray(DX), xp.asarray(OPUESTA)
         semilla_entorno, semilla_sim = np.random.SeedSequence(cfg.sim.semilla).spawn(2)
         self.rng = np.random.default_rng(semilla_sim)
-        self.entorno = Entorno(cfg.mundo, np.random.default_rng(semilla_entorno), xp)
+        self.entorno = Entorno(cfg.mundo, np.random.default_rng(semilla_entorno), xp, cfg.bien_publico)
         self.pob = Poblacion(cfg.herencia.genes_max, xp)
         self.t = 0
         self.sig_id = 0
@@ -35,12 +35,12 @@ class Simulacion:
         f, a = cfg.fisica, cfg.asociacion
         costo = np.zeros(gen.NUM_PRIM)
         costo[[gen.AVANZAR, gen.GIRAR_IZQ, gen.GIRAR_DER, gen.VOLTERETA, gen.COMER,
-               gen.UNIRSE, gen.SOLTARSE, gen.COMPARTIR, gen.CONJUGAR]] = [
+               gen.UNIRSE, gen.SOLTARSE, gen.COMPARTIR, gen.CONJUGAR, gen.SECRETAR]] = [
             f.costo_avanzar, f.costo_girar, f.costo_girar, f.costo_voltereta, f.costo_comer,
-            a.costo_unirse, a.costo_soltarse, a.costo_compartir, a.costo_conjugar]
+            a.costo_unirse, a.costo_soltarse, a.costo_compartir, a.costo_conjugar, cfg.bien_publico.costo_secretar]
         self.costo_accion = xp.asarray(costo)
         self.sin_refuerzo = xp.asarray(gen.PRIM_SIN_REFUERZO)
-        self.permitidas = gen.primitivas_permitidas(a.activa, a.conjugacion)
+        self.permitidas = gen.primitivas_permitidas(a.activa, a.conjugacion, cfg.bien_publico.activo)
         self.bloqueadas = xp.asarray(~np.isin(np.arange(gen.NUM_PRIM), self.permitidas))
         self._reiniciar_contadores()
         self.sembrar(genomas, cepas)
@@ -103,7 +103,7 @@ class Simulacion:
     def _reiniciar_contadores(self) -> None:
         xp = self.xp
         self.cont = {"nacimientos": 0, "muertes": 0, "comido": 0.0, "org_pasos": 0,
-                     "compartido": 0.0, "recibido": 0.0, "conjugaciones": 0, "enlaces_creados": 0,
+                     "compartido": 0.0, "recibido": 0.0, "comido_libre": 0.0, "conjugaciones": 0, "enlaces_creados": 0,
                      "acciones": xp.zeros(gen.NUM_PRIM, dtype=xp.int64)}
 
     def vecinos_enlazados(self, occ: np.ndarray) -> np.ndarray:
@@ -132,7 +132,7 @@ class Simulacion:
         H, W = ent.alto, ent.ancho
         Emax = self.cfg.fisica.energia_max
         y, x, d = p["y"], p["x"], p["dir"].astype(xp.int64)
-        R = ent.R / max(self.cfg.mundo.capacidad_max, 1e-12)
+        R = ent.comestible() / max(self.cfg.mundo.capacidad_max, 1e-12)
         s = xp.zeros((p.n, gen.NUM_SENS))
         s[:, gen.S_CONST] = 1.0
         s[:, gen.S_AQUI] = R[y, x]
@@ -160,6 +160,8 @@ class Simulacion:
         dist = xp.linalg.norm(p["etiqueta"] - p["etiqueta"][xp.maximum(frente, 0)], axis=1)
         hay &= self.cfg.asociacion.activa  # sin asociación, los cuatro sensores sociales valen 0
         s[:, gen.S_SIMILITUD_FRENTE] = xp.where(hay, 1.0 - dist / xp.sqrt(2.0), 0.0)
+        if self.cfg.bien_publico.activo:
+            s[:, gen.S_COMPLEJO_AQUI] = ent.C[y, x] / max(self.cfg.bien_publico.capacidad_complejo_max, 1e-12)
         return s
 
     def decidir(self, s: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
@@ -372,10 +374,20 @@ class Simulacion:
             # comer
             i = xp.flatnonzero(act == gen.COMER)
             yi, xi = p["y"][i], p["x"][i]
-            toma = xp.minimum(xp.minimum(ent.R[yi, xi], f.toma_max), xp.maximum(f.energia_max - p["E"][i], 0.0))
-            ent.R[yi, xi] -= toma
+            toma = xp.minimum(xp.minimum(ent.comestible()[yi, xi], f.toma_max),
+                              xp.maximum(f.energia_max - p["E"][i], 0.0))
+            del_simple = xp.minimum(toma, ent.R[yi, xi])  # primero el recurso simple, después el libre
+            ent.R[yi, xi] -= del_simple
+            if cfg.bien_publico.activo:
+                ent.A[yi, xi] -= toma - del_simple
+                self.cont["comido_libre"] += float((toma - del_simple).sum())
             p["E"][i] += toma
             self.cont["comido"] += float(toma.sum())
+
+            # secretar enzima (después de comer, en la propia celda)
+            if cfg.bien_publico.activo and not cfg.bien_publico.secrecion_inerte:
+                i = xp.flatnonzero(act == gen.SECRETAR)
+                ent.Z[p["y"][i], p["x"][i]] += cfg.bien_publico.enzima_por_secrecion
 
             # avanzar
             self._avanzar(act, occ, socios)
@@ -471,6 +483,12 @@ class Simulacion:
         fila["comido_por_org_paso"] = c["comido"] / org_pasos
         fila["compartido_por_org_paso"] = c["compartido"] / org_pasos
         fila["recibido_por_org_paso"] = c["recibido"] / org_pasos
+        if self.cfg.bien_publico.activo:
+            ent = self.entorno
+            fila["complejo_total"] = float(ent.C.sum())
+            fila["enzima_total"] = float(ent.Z.sum())
+            fila["libre_total"] = float(ent.A.sum())
+            fila["comido_libre_por_org_paso"] = c["comido_libre"] / org_pasos
         fila["conjugaciones"] = c["conjugaciones"]
         fila["enlaces_creados"] = c["enlaces_creados"]
         if n:
@@ -510,6 +528,12 @@ class Simulacion:
             fila["dist_etiqueta_azar"] = float(xp.linalg.norm(et[a1] - et[a2], axis=1).mean())
             aprovecha = enlazado & (p["recibido"] > 2.0 * p["dado"] + 5.0)
             fila["frac_aprovechados"] = float(aprovecha.sum() / max(enlazado.sum(), 1))
+            if self.cfg.bien_publico.activo:
+                secretor = perfil[:, gen.SECRETAR] > 0
+                for nombre, m in (("secretores", secretor), ("no_secretores", ~secretor)):
+                    k = int(m.sum())
+                    fila[f"frac_enlazados_{nombre}"] = float(enlazado[m].mean()) if k else float("nan")
+                    fila[f"energia_{nombre}"] = float(p["E"][m].mean()) if k else float("nan")
         for k, nombre in enumerate(gen.PRIMITIVAS):
             fila[f"usa_{nombre}"] = float(c["acciones"][k] / org_pasos)
         return fila

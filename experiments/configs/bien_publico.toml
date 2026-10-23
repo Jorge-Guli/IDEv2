@@ -1,0 +1,13 @@
+# Fase 2b: bien público. Recurso simple escaso; recurso complejo abundante que solo se aprovecha
+# si alguien secreta enzima, y cuyo producto (alimento libre) puede comer cualquiera.
+[mundo]
+alto = 128
+ancho = 128
+capacidad_max = 5.0
+
+[bien_publico]
+activo = true
+
+[sim]
+poblacion_inicial = 200
+registrar_cada = 100

@@ -92,6 +92,24 @@ class AsociacionCfg:
 
 
 @dataclass
+class BienPublicoCfg:
+    activo: bool = False
+    secrecion_inerte: bool = False  # control: secretar cuesta pero no produce enzima
+    capacidad_complejo_max: float = 15.0
+    regeneracion_complejo: float = 0.01
+    escala_parche_complejo: float = 8.0
+    contraste_complejo: float = 1.0
+    costo_secretar: float = 0.3
+    enzima_por_secrecion: float = 1.0
+    degradacion_enzima: float = 0.1
+    difusion_enzima: float = 0.1
+    tasa_digestion: float = 0.5  # k en C·(1 − exp(−k·Z))
+    rendimiento: float = 1.0
+    degradacion_libre: float = 0.02
+    difusion_libre: float = 0.2
+
+
+@dataclass
 class SimCfg:
     semilla: int = 0
     pasos: int = 5000
@@ -109,6 +127,7 @@ class Config:
     herencia: HerenciaCfg = field(default_factory=HerenciaCfg)
     aprendizaje: AprendizajeCfg = field(default_factory=AprendizajeCfg)
     asociacion: AsociacionCfg = field(default_factory=AsociacionCfg)
+    bien_publico: BienPublicoCfg = field(default_factory=BienPublicoCfg)
     sim: SimCfg = field(default_factory=SimCfg)
 
     def to_dict(self) -> dict[str, Any]:

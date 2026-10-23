@@ -19,32 +19,34 @@ from .dispositivo import a_cpu, modulo
 
 # Primitivas: la "física" fija de las acciones posibles.
 (DESCANSAR, AVANZAR, GIRAR_IZQ, GIRAR_DER, VOLTERETA, COMER, DIVIDIRSE,
- UNIRSE, SOLTARSE, COMPARTIR, DIVIDIRSE_UNIDO, CONJUGAR) = range(12)
+ UNIRSE, SOLTARSE, COMPARTIR, DIVIDIRSE_UNIDO, CONJUGAR, SECRETAR) = range(13)
 PRIMITIVAS = ["descansar", "avanzar", "girar_izq", "girar_der", "voltereta", "comer", "dividirse",
-              "unirse", "soltarse", "compartir", "dividirse_unido", "conjugar"]
+              "unirse", "soltarse", "compartir", "dividirse_unido", "conjugar", "secretar"]
 NUM_PRIM = len(PRIMITIVAS)
 PRIM_BASICAS = np.arange(DIVIDIRSE + 1)
 PRIM_ASOCIACION = np.array([UNIRSE, SOLTARSE, COMPARTIR, DIVIDIRSE_UNIDO, CONJUGAR])
 # acciones cuyo valor no se mide en energía propia: no se refuerzan por aprendizaje
-PRIM_SIN_REFUERZO = np.array([DIVIDIRSE, DIVIDIRSE_UNIDO, COMPARTIR, CONJUGAR])
+PRIM_SIN_REFUERZO = np.array([DIVIDIRSE, DIVIDIRSE_UNIDO, COMPARTIR, CONJUGAR, SECRETAR])
 
 # Sensores locales (los sociales van al final para conservar los índices de la fase 1).
 (S_CONST, S_AQUI, S_FRENTE, S_FRENTE_IZQ, S_FRENTE_DER, S_ENERGIA,
  S_VECINOS, S_BLOQUEADO, S_DELTA_E, S_RUIDO,
- S_ENLACES, S_ENERGIA_SOCIOS, S_SOCIO_FRENTE, S_SIMILITUD_FRENTE) = range(14)
+ S_ENLACES, S_ENERGIA_SOCIOS, S_SOCIO_FRENTE, S_SIMILITUD_FRENTE, S_COMPLEJO_AQUI) = range(15)
 SENSORES = ["const", "recurso_aqui", "recurso_frente", "recurso_frente_izq", "recurso_frente_der",
             "energia", "vecinos", "bloqueado", "delta_e", "ruido",
-            "enlaces", "energia_socios", "socio_frente", "similitud_frente"]
+            "enlaces", "energia_socios", "socio_frente", "similitud_frente", "complejo_aqui"]
 NUM_SENS = len(SENSORES)
 
 CAMPOS = ("activo", "prim", "w", "b", "mu", "sens", "eta", "etiqueta")
 
 
-def primitivas_permitidas(asociacion: bool, conjugacion: bool) -> np.ndarray:
-    if not asociacion:
-        return PRIM_BASICAS.copy()
-    todas = np.arange(NUM_PRIM)
-    return todas if conjugacion else todas[todas != CONJUGAR]
+def primitivas_permitidas(asociacion: bool, conjugacion: bool, bien_publico: bool = False) -> np.ndarray:
+    permitidas = list(PRIM_BASICAS)
+    if asociacion:
+        permitidas += [p for p in PRIM_ASOCIACION if conjugacion or p != CONJUGAR]
+    if bien_publico:
+        permitidas.append(SECRETAR)
+    return np.array(permitidas)
 
 
 def vacio(n: int, genes_max: int, xp=np) -> dict[str, np.ndarray]:
