@@ -7,7 +7,7 @@
 ## 2. Experimentos
 
 - [x] 2.1 Calibrar `p` y el refugio con un piloto y prerregistrar las hipótesis
-- [ ] 2.2 `experiments/fase2c/evaluar.py`; ejecutar, revisar y registrar en la bitácora
+- [x] 2.2 `experiments/fase2c/evaluar.py`; ejecutar, revisar y registrar en la bitácora
 
 ## Workflow follow-up
 

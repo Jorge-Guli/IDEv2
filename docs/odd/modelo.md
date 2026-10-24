@@ -1,6 +1,6 @@
 # Descripción del modelo (protocolo ODD)
 
-> Versión vigente: **fase 1, cerrada el 2026-10-23** (evolución básica, sin asociación). Este documento sigue el protocolo ODD (*Overview, Design concepts, Details*; Grimm et al. 2006, 2020) y se actualiza al cerrar cada fase. Los valores por defecto están en `src/simbio/config.py`.
+> Versión vigente: **fase 2c, cerrada el 2026-10-24**. El cuerpo describe la fase 1 (evolución básica); las fases siguientes se agregan como anexos al final. Este documento sigue el protocolo ODD (*Overview, Design concepts, Details*; Grimm et al. 2006, 2020) y se actualiza al cerrar cada fase. Los valores por defecto están en `src/simbio/config.py`.
 
 ## 1. Visión general
 
@@ -79,3 +79,12 @@ Se activa con `bien_publico.activo = true`. Detalle en `openspec/specs/bien-publ
 - **Comer:** toma de R y después de A, hasta 4 por paso. Los sensores de alimento miden R + A; hay un sensor nuevo, `complejo_aqui`.
 - **Controles:** secreción inerte; bien privado (el secretor digiere al instante en su celda lo que su enzima digeriría en su vida y se lo queda).
 - **Movimiento de grupos:** se agrega el modo opcional `asociacion.movimiento = "empuje"`. Cada grupo conexo se desplaza una celda en la dirección más alineada con la suma de las orientaciones de sus miembros que avanzan, si esa suma alcanza la mitad del tamaño del grupo y el destino está libre.
+
+## Anexo: fase 2c (depredación limitada por tamaño), cerrada el 2026-10-24
+
+Se activa con `depredacion.activa = true`. Detalle en `openspec/specs/depredacion/spec.md`.
+- **Ataque:** en cada paso, después de pagar los costos y antes de actuar, cada organismo vivo es atacado con probabilidad `p` (desde el paso `inicio`; si `rampa > 0`, `p` sube linealmente desde 0 durante `rampa` pasos).
+- **Modo `tamano`:** un ataque mata con probabilidad `1 − (tamaño − 1)/(refugio − 1)`, donde el tamaño es el de la componente conexa de enlaces del organismo (o mata siempre bajo el refugio si `gradual = false`); los grupos de tamaño ≥ `refugio` no mueren.
+- **Controles:** `uniforme` (todo ataque mata) y `aleatorio` (un ataque perdona con probabilidad 0,9, sin relación con los enlaces).
+- **Azar:** el depredador usa un generador propio, y sortea siempre los mismos números en todas las condiciones, para que las comparaciones queden pareadas.
+- **Configuración de referencia:** `experiments/configs/depredacion.toml` (movimiento por empuje, `p = 0,015`, refugio 2, inicio 2000; la variante gradual agrega `rampa = 8000`).

@@ -15,7 +15,11 @@ Experimento de vida artificial. Organismos simples, que empiezan casi como una b
 
 **Fase 2 — asociación: cerrada (2026-10-23).** Los organismos pueden unirse, soltarse, compartir energía, dividirse quedando unidos y pasarse genes. Con la física actual, la asociación **no rinde** y no despega. En el control positivo, donde rinde, ocurre una transición abrupta: de casi 0 % a más del 98 % de enlazados en ~800 pasos, con un tapete de más de 10 000 organismos y aprovechados ([bitácora](docs/bitacora/2026-10-23-fase2-evaluacion.md)).
 
-**Próximo: fase 2b — condiciones ecológicas que vuelvan ventajosa la asociación.**
+**Fase 2b — bien público: cerrada (2026-10-23).** Con una enzima que digiere un recurso complejo hay dilema del bien público: con beneficio privado la secreción llega al ~100 %; con beneficio público no arranca. Asociarse no lo resuelve, porque la dispersión local ya deja a los parientes al lado ([bitácora](docs/bitacora/2026-10-23-fase2b-evaluacion.md)).
+
+**Fase 2c — depredación limitada por tamaño: cerrada (2026-10-24).** Un depredador que solo puede comer organismos sueltos y que aparece de a poco hace que **la asociación evolucione sola desde LUCA**: 18 de 20 semillas terminan con la mayoría de la población en grupos, sobre todo pares de parientes que se dividen quedando unidos. Con depredador uniforme o con protección al azar no pasa. Con aparición brusca, la prueba prerregistrada falló ([bitácora](docs/bitacora/2026-10-24-fase2c-evaluacion.md)).
+
+**Próximo: fase 3 — el colectivo como individuo** (reproducción del grupo, especialización y dependencia).
 
 ## Uso
 

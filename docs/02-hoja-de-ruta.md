@@ -10,8 +10,8 @@ Este documento es **el camino que sigue el proyecto, en orden**, con el porqué 
 | 2 | Asociación (unirse, compartir, dividirse unido, conjugar) | ✅ cerrada | Poder asociarse **no alcanza**: no rinde y la selección la purga. Si rinde, hay una transición abrupta ([bitácora](bitacora/2026-10-23-fase2-evaluacion.md)) |
 | E | Sembrar la asociación | ✅ hecho | La asociación es **inestable**: aunque esté, la división común reaparece en menos de 1000 pasos ([bitácora](bitacora/2026-10-23-experimento-E-sembrar.md)) |
 | 2b | Bien público: enzimas y recurso complejo | ✅ cerrada | Hay dilema: con bien privado la secreción evoluciona sola; con bien público, no. Pero **asociarse no la rescata**: el parentesco espacial (hijos al lado) ya cumple esa función ([bitácora](bitacora/2026-10-23-fase2b-evaluacion.md)) |
-| 2c | Depredación limitada por tamaño | ▶ cerrando | Con depredador **gradual** (a intensidad 0,015), la asociación evoluciona sola: 10/10 sobreviven y 9/10 viven mayormente en grupos de parientes. No aparece con depredador uniforme ni con protección aleatoria. La prueba prerregistrada con aparición brusca **falló**. Pendiente: dosis ([bitácora](bitacora/2026-10-24-fase2c-evaluacion.md)) |
-| 3 | El colectivo como individuo | siguiente | — |
+| 2c | Depredación limitada por tamaño | ✅ cerrada | **La asociación evoluciona sola desde LUCA** cuando el depredador solo puede comer sueltos y llega de a poco: 20/20 sobreviven y 18/20 viven mayormente en pares de parientes. No aparece con depredador uniforme ni con protección aleatoria. Con aparición brusca la prueba prerregistrada falló (11/15); a intensidad 0,0175 funciona en 9/9 y a 0,0125 en 7/9. Si un par solo queda protegido a medias, no evoluciona ([bitácora](bitacora/2026-10-24-fase2c-evaluacion.md)) |
+| 3 | El colectivo como individuo | ▶ siguiente | Punto de partida: los grupos de 2c |
 
 ## El camino, en orden
 
@@ -67,3 +67,4 @@ Este documento es **el camino que sigue el proyecto, en orden**, con el porqué 
 | 2026-10-24 | Rediseñar 2c tras la revisión (semillas nuevas, aclimatación, control aleatorio, hipótesis en el script) | Riesgo de sesgo por calibrar con semillas evaluadas y de extinciones descartadas en silencio |
 | 2026-10-24 | Probar el depredador gradual (prerregistrado como addendum) | P1 falló por extinciones al aparecer el depredador de golpe; la rampa confirmó el mecanismo sin cambiar ese veredicto |
 | 2026-10-23 | Cerrar 2b y pasar a depredación limitada por tamaño (2c) | El bien público no hace rendir la asociación porque el parentesco espacial ya lo resuelve; hace falta un beneficio que dependa del tamaño físico del grupo (Boraas 1998; Herron 2019) |
+| 2026-10-24 | Cerrar 2c y pasar a la fase 3 sobre la ecología de depredación gradual | P1-rampa se replicó con 20 semillas y los controles descartan mortalidad y protección inespecífica; los grupos existen pero son pares sin coordinación: falta que el grupo sea la unidad que se reproduce |
