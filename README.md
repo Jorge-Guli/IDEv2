@@ -23,7 +23,9 @@ Experimento de vida artificial. Organismos simples, que empiezan casi como una b
 
 **Fases 3b y 3c — invasión y movimiento por fuerza: cerradas (2026-10-24).** Con la regla de movimiento anterior, coordinarse casi no rinde (3b). Con una regla en la que el grupo se mueve por la suma de las fuerzas de sus miembros (α = 0,5), percibir a los socios aumenta mucho la fracción de la población en grupos de 3 o más (réplica con 20 semillas nuevas, p ≈ 0,002) ([bitácora](docs/bitacora/2026-10-24-fase3c-replica-evaluacion.md)).
 
-**Próximo: fase 3d — ablación y sensibilidad** (¿es coordinación?, ¿rumbo o señales?, ¿heredada o aprendida?, ¿vale con otro α?).
+**Fase 3d — ablación y sensibilidad: hecha (2026-10-24).** La percepción del rumbo de los socios actúa en vida: sin ella, las mismas poblaciones forman menos grupos y sostienen menos organismos. La alineación es heredada, el efecto vale para varios valores del arrastre y las señales arbitrarias nunca se usaron ([bitácora](docs/bitacora/2026-10-24-fase3d-evaluacion.md)).
+
+**Próximo: fase 4 — el colectivo como individuo** (reproducción del grupo, especialización y dependencia).
 
 ## Uso
 
