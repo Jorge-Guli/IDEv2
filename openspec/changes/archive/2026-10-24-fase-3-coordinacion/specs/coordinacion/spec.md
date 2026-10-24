@@ -25,11 +25,15 @@ Con `coordinacion.senales` activo, la primitiva `senalar` SHALL estar disponible
 - **THEN** ningún organismo emite señal y los sensores de señal valen 0
 
 ### Requirement: Control barajado
-Con `coordinacion.barajar` activo, los valores de los sensores de coordinación activos SHALL reemplazarse por los de otro organismo elegido por una permutación aleatoria del generador de la simulación.
+Con `coordinacion.barajar` activo, los valores de los sensores sobre los socios (rumbo, empuje y señal de los socios) de cada organismo enlazado SHALL reemplazarse por los de otro organismo enlazado, elegido por una permutación aleatoria del generador de la simulación. Los sueltos MUST seguir percibiendo 0, y la señal propia (memoria) MUST NOT barajarse.
 
 #### Scenario: Misma distribución, sin información
 - **WHEN** se barajan los sensores de rumbo
 - **THEN** el conjunto de valores percibidos es el mismo, pero no corresponde a los socios propios
+
+#### Scenario: Sueltos y memoria
+- **WHEN** se barajan los sensores con un organismo suelto en la población
+- **THEN** el suelto percibe 0 en los sensores de socios y cada organismo conserva su señal propia
 
 ### Requirement: Métricas de coordinación
 Cada registro SHALL incluir la alineación media del rumbo entre enlazados (coseno), el éxito del empuje colectivo (grupos que se movieron sobre los que intentaron moverse), también para grupos de 3 o más, y la señal media.

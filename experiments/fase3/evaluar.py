@@ -179,18 +179,20 @@ def _invariantes(_):
     return {"violaciones": violaciones, "enlaces_observados": enlaces}
 
 
-def _rendimiento():
+def _rendimiento(salida, semilla):
+    """Caso realista: 1500 genomas del ancestro (con grupos), depredador y movimiento por empuje, rumbo y señales.
+    (La primera versión arrancaba desde LUCA con el depredador activo y medía un mundo extinto.)"""
+    g = persistencia.cargar_genomas(Path(salida) / "ancestros" / f"semilla_{semilla}" / "poblacion.npz")
+    idx = np.random.default_rng(semilla).integers(0, len(g["mu"]), 1500)
     cfg = config.cargar(CONFIG, CONDICIONES["ambos"] + ["mundo.alto=180", "mundo.ancho=180",
-                                                         "sim.poblacion_inicial=1500", "sim.registrar_cada=100000",
-                                                         "sim.dispositivo=cpu", "depredacion.inicio=100000"])
-    # sin depredador: desde LUCA, un depredador activo desde el paso 0 extingue la población y se mediría un
-    # mundo vacío (error de la primera evaluación)
-    sim = Simulacion(cfg)
-    sim.correr(1500)
+                                                         "sim.registrar_cada=100000", "sim.dispositivo=cpu"])
+    sim = Simulacion(cfg, {k: v[idx] for k, v in g.items()})
+    sim.correr(1000)
     n0 = sim.pob.n
     t0 = time.time()
     sim.correr(500)
-    return {"pasos_por_segundo": round(500 / (time.time() - t0), 1), "poblacion": int((n0 + sim.pob.n) / 2)}
+    return {"pasos_por_segundo": round(500 / (time.time() - t0), 1), "poblacion": int((n0 + sim.pob.n) / 2),
+            "enlazados": round(float((sim.pob["socio"] >= 0).any(axis=1).mean()), 3)}
 
 
 def main():
@@ -211,7 +213,7 @@ def main():
         resultados = pool.map(_correr, [(str(args.salida), n, s, args.pasos) for n in condiciones for s in semillas])
         huellas = pool.map(_huella, range(2))
         invariantes = pool.map(_invariantes, range(1))[0]
-    rendimiento = _rendimiento()
+    rendimiento = _rendimiento(args.salida, semillas[0])
     por = {}
     for r in resultados:
         por.setdefault(r["nombre"], []).append(r)
@@ -231,7 +233,8 @@ def main():
             "C2_invariantes": {"aprobado": invariantes["violaciones"] == 0 and invariantes["enlaces_observados"] > 0,
                                **invariantes},
             "C3_reproducibilidad": {"aprobado": huellas[0] == huellas[1]},
-            "C4_rendimiento": {"aprobado": rendimiento["pasos_por_segundo"] >= 40 and rendimiento["poblacion"] >= 1000,
+            "C4_rendimiento": {"aprobado": rendimiento["pasos_por_segundo"] >= 40 and rendimiento["poblacion"] >= 1000
+                               and rendimiento["enlazados"] > 0.3,
                                **rendimiento},
         },
         "hipotesis": evaluar_hipotesis(por),

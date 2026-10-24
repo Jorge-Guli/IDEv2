@@ -107,6 +107,22 @@ def test_barajar_conserva_los_valores(cfg):
     assert not np.allclose(s[:, col], s0[:, col])
 
 
+def test_barajar_deja_en_cero_a_los_sueltos_y_la_memoria(cfg):
+    cfg.coordinacion.rumbo = cfg.coordinacion.senales = cfg.coordinacion.barajar = True
+    sim = sim_vacia(cfg)
+    for y in range(0, 12, 2):
+        n0 = sim.pob.n
+        colocar(sim, quieto(cfg), [y], [5], E=50, dir_=0)
+        colocar(sim, quieto(cfg), [y], [6], E=50, dir_=y % 8)
+        p = sim.pob
+        p["socio"][n0, ESTE], p["socio"][n0 + 1, OESTE] = p["id"][n0 + 1], p["id"][n0]
+    colocar(sim, quieto(cfg), [20], [20], E=50)  # suelto
+    sim.pob["senal"][:] = np.linspace(0.1, 0.9, sim.pob.n)
+    s = _sensar(sim)
+    assert not s[-1, np.r_[gen.SENS_RUMBO, gen.S_SENAL_SOCIOS]].any()
+    assert np.allclose(s[:, gen.S_SENAL_PROPIA], sim.pob["senal"])
+
+
 def test_genomas_viejos_se_completan(tmp_path):
     g = gen.vacio(3, 24)
     g["w"] = g["w"][..., :15]

@@ -19,7 +19,9 @@ Experimento de vida artificial. Organismos simples, que empiezan casi como una b
 
 **Fase 2c — depredación limitada por tamaño: cerrada (2026-10-24).** Un depredador que solo puede comer organismos sueltos y que aparece de a poco hace que **la asociación evolucione sola desde LUCA**: 18 de 20 semillas terminan con la mayoría de la población en grupos, sobre todo pares de parientes que se dividen quedando unidos. Con depredador uniforme o con protección al azar no pasa. Con aparición brusca, la prueba prerregistrada falló ([bitácora](docs/bitacora/2026-10-24-fase2c-evaluacion.md)).
 
-**Próximo: fase 3 — el colectivo como individuo** (reproducción del grupo, especialización y dependencia).
+**Fase 3 — coordinación del grupo: cerrada (2026-10-24).** Los grupos no pasan de pares porque los de 3 o más no logran moverse juntos. Si los organismos perciben el rumbo de sus socios, la alineación evoluciona, pero los grupos no crecen; un canal de señales no se inventa. Cuando moverse en grupo es fácil, los grupos crecen ([bitácora](docs/bitacora/2026-10-24-fase3-evaluacion.md)).
+
+**Próximo: fase 3b — prueba de invasión** de un trío coordinado, para decidir si falta tiempo evolutivo o hay que cambiar la regla de movimiento.
 
 ## Uso
 

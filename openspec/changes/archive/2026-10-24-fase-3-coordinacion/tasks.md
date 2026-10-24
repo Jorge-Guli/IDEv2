@@ -9,7 +9,7 @@
 ## 2. Experimentos
 
 - [x] 2.1 Exploración y pilotos (`docs/bitacora/2026-10-24-fase3-exploracion.md`); prerregistro
-- [ ] 2.2 `experiments/fase3/evaluar.py`: correr las semillas 41–50 (equipo local), revisar y registrar en la bitácora
+- [x] 2.2 `experiments/fase3/evaluar.py`: correr las semillas 41–50 (equipo local), revisar y registrar en la bitácora
 
 ## Workflow follow-up
 

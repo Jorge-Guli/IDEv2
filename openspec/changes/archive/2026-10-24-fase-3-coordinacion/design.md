@@ -18,7 +18,10 @@ El rumbo y el empuje de los socios se perciben solo a través de enlaces válido
 Si emitir una señal ocupara la acción del paso, señalar y moverse serían excluyentes y la sincronía se volvería casi imposible. Los genes de `senalar` suman impulso como cualquier otro, pero ese impulso, recortado a [0, 1], es la señal. Cuesta energía en proporción a su intensidad y no se refuerza por aprendizaje. La señal propia del paso anterior es un sensor: la memoria mínima de un paso.
 
 ### D3. Control barajado
-Permuta entre organismos los valores de los sensores nuevos. Conserva la distribución, y por lo tanto los grados de libertad extra del genoma, pero quita la información sobre los socios propios.
+Permuta entre organismos **enlazados** los valores de los sensores sobre los socios. Conserva la distribución condicional a estar enlazado, y por lo tanto los grados de libertad extra del genoma, pero quita la información sobre los socios propios. La señal propia no se baraja (es memoria). *Corregido tras la revisión:* la primera versión, usada en la evaluación de las semillas 41–50, permutaba entre toda la población (sueltos incluidos) y también barajaba la señal propia.
+
+### D7. Empuje colectivo vectorizado
+`_mover_grupos` suma los empujes por grupo de forma vectorizada y resuelve sin bucle los grupos cuyo movimiento no depende del orden (bloqueados por quien no se mueve, o sin interacción con otros candidatos). El resultado es idéntico al bucle original (test de equivalencia y huellas). Con poblaciones evolucionadas, la velocidad pasa de 32 a 50 pasos/s en el contenedor.
 
 ### D4. Escalada del refugio
 Lineal y con valores no enteros: la probabilidad de muerte del modo gradual sube de forma continua y la selección encuentra una pendiente.

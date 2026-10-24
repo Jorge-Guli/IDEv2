@@ -1,6 +1,6 @@
 # Descripción del modelo (protocolo ODD)
 
-> Versión vigente: **fase 2c, cerrada el 2026-10-24**. El cuerpo describe la fase 1 (evolución básica); las fases siguientes se agregan como anexos al final. Este documento sigue el protocolo ODD (*Overview, Design concepts, Details*; Grimm et al. 2006, 2020) y se actualiza al cerrar cada fase. Los valores por defecto están en `src/simbio/config.py`.
+> Versión vigente: **fase 3, cerrada el 2026-10-24**. El cuerpo describe la fase 1 (evolución básica); las fases siguientes se agregan como anexos al final. Este documento sigue el protocolo ODD (*Overview, Design concepts, Details*; Grimm et al. 2006, 2020) y se actualiza al cerrar cada fase. Los valores por defecto están en `src/simbio/config.py`.
 
 ## 1. Visión general
 
@@ -88,3 +88,13 @@ Se activa con `depredacion.activa = true`. Detalle en `openspec/specs/depredacio
 - **Controles:** `uniforme` (todo ataque mata) y `aleatorio` (un ataque perdona con probabilidad 0,9, sin relación con los enlaces).
 - **Azar:** el depredador usa un generador propio, y sortea siempre los mismos números en todas las condiciones, para que las comparaciones queden pareadas.
 - **Configuración de referencia:** `experiments/configs/depredacion.toml` (movimiento por empuje, `p = 0,015`, refugio 2, inicio 2000; la variante gradual agrega `rampa = 8000`).
+
+## Anexo: fase 3 (coordinación del grupo), cerrada el 2026-10-24
+
+Detalle en `openspec/specs/coordinacion/spec.md`. Cambia la forma del genoma (14 primitivas, 20 sensores): los resultados de las fases anteriores se reproducen en el commit `8099dd8`, y los genomas guardados se completan con pesos nulos al cargarlos.
+- **Escalada del refugio** (`depredacion.refugio_final`, `escalada_inicio`, `escalada_pasos`): el refugio vigente sube linealmente y puede no ser entero.
+- **Sensores de rumbo** (`coordinacion.rumbo`), solo a través de enlaces: seno y coseno medios del ángulo entre el rumbo de cada socio y el propio (en octavos de vuelta; seno positivo: el socio apunta hacia el lado de `girar_der`), y fracción de socios que avanzaron en el paso anterior.
+- **Señales** (`coordinacion.senales`): primitiva `senalar` cuyos genes no compiten por la acción; la señal es su impulso recortado a [0, 1], cuesta 0,05 por unidad y paso y no se refuerza. Sensores: señal media de los socios y señal propia del paso anterior.
+- **Control barajado:** los sensores sobre los socios toman los valores de otro organismo enlazado al azar.
+- **Empuje colectivo vectorizado**, con resultado idéntico al original.
+- **Limitación conocida:** en el empuje colectivo, un rumbo diagonal aporta √2 a la suma.

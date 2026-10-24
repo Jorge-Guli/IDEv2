@@ -206,10 +206,15 @@ class Simulacion:
         if c.senales:
             s[:, gen.S_SENAL_SOCIOS] = xp.where(enlazado, p["senal"][sm], 0.0).sum(axis=1) / hay
             s[:, gen.S_SENAL_PROPIA] = p["senal"]
-            cols += list(gen.SENS_SENAL)
-        if c.barajar and cols:  # control: la misma distribución de valores, sin relación con los socios propios
-            cols = xp.asarray(np.array(cols))
-            s[:, cols] = s[xp.asarray(self.rng.permutation(p.n))][:, cols]
+            cols += [gen.S_SENAL_SOCIOS]  # la señal propia es memoria, no información sobre los socios
+        if c.barajar and cols:
+            # control: cada enlazado recibe los valores de otro enlazado al azar (los sueltos siguen en 0); se
+            # conserva la distribución condicional a estar enlazado, sin relación con los socios propios
+            enl = xp.flatnonzero(n_enl > 0)
+            if enl.size > 1:
+                cols = xp.asarray(np.array(cols))
+                otro = enl[xp.asarray(self.rng.permutation(int(enl.size)))]
+                s[enl[:, None], cols[None, :]] = s[otro[:, None], cols[None, :]]
 
     def decidir(self, s: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
         """Devuelve la primitiva elegida por cada organismo y la activación de cada gen."""
@@ -438,30 +443,70 @@ class Simulacion:
         y, x = dev.a_cpu(p["y"]).copy(), dev.a_cpu(p["x"]).copy()
         d, a = dev.a_cpu(p["dir"]).astype(np.int64), dev.a_cpu(act)
         ocup = dev.a_cpu(occ).copy()
-        miembros_de = {}
-        for idx in np.flatnonzero(enlazado):
-            miembros_de.setdefault(lab[idx], []).append(idx)
-        grupos = list(miembros_de.values())
+        # grupos en orden de su menor índice (la etiqueta de componentes es el menor índice del grupo)
+        idx = np.flatnonzero(enlazado)
+        etiquetas, gi = np.unique(lab[idx], return_inverse=True)
+        n_g = etiquetas.size
+        orden = np.argsort(gi, kind="stable")
+        inicio = np.r_[0, np.cumsum(np.bincount(gi, minlength=n_g))]
+        tam = np.diff(inicio)
+        # empujes sumados por grupo, vectorizados; el bucle solo recorre los grupos que alcanzan el umbral
+        emp = a[idx] == gen.AVANZAR
+        n_emp = np.bincount(gi, weights=emp, minlength=n_g)
+        vx = np.bincount(gi, weights=emp * DX[d[idx]], minlength=n_g)
+        vy = np.bincount(gi, weights=emp * DY[d[idx]], minlength=n_g)
+        hay = n_emp > 0
+        self.cont["grupos_empujan"] += int(hay.sum())
+        self.cont["grupos3_empujan"] += int((hay & (tam >= 3)).sum())
+        candidato = hay & (np.hypot(vx, vy) >= cfg.fraccion_empuje * tam)
         norma = np.hypot(DX, DY)
-        for g in self.rng.permutation(len(grupos)):
-            m = np.array(grupos[g])
-            empujan = m[a[m] == gen.AVANZAR]
-            if empujan.size == 0:
+        kg = np.argmax((DX[None, :] * vx[:, None] + DY[None, :] * vy[:, None]) / norma[None, :], axis=1)
+        # camino rápido exacto (mismo resultado que procesar todo en orden aleatorio):
+        # - bloqueado fijo: alguna celda de destino la ocupa alguien que no se moverá en esta etapa
+        #   (un suelto o un grupo que no alcanza el umbral);
+        # - independiente: todas las celdas de destino están libres o son del propio grupo, ningún otro
+        #   candidato apunta a ellas ni a las celdas que el grupo deja. Su movimiento no depende del orden.
+        cand_i = candidato[gi]
+        ki = kg[gi]
+        ny_i, nx_i = (y[idx] + DY[ki]) % H, (x[idx] + DX[ki]) % W
+        dc = ny_i * W + nx_i
+        sc = y[idx] * W + x[idx]
+        o = ocup[ny_i, nx_i]
+        grupo_de = np.full(len(a), -1)
+        grupo_de[idx] = gi
+        propio = (o >= 0) & (grupo_de[np.maximum(o, 0)] == gi)
+        go = grupo_de[np.maximum(o, 0)]
+        ocupante_fijo = (o >= 0) & ~propio & ((go < 0) | ~candidato[np.maximum(go, 0)])
+        ocupado_ajeno = (o >= 0) & ~propio
+        celdas = H * W
+        n_dest = np.bincount(dc[cand_i], minlength=celdas)
+        propio_destino = np.zeros(len(a), dtype=bool)  # su celda de origen es destino de su propio grupo
+        propio_destino[o[propio & cand_i]] = True
+        ajeno_en_origen = n_dest[sc] - propio_destino[idx]
+        malo = ocupado_ajeno | (n_dest[dc] > 1) | (ajeno_en_origen > 0)
+        fijo = candidato & (np.bincount(gi, weights=ocupante_fijo, minlength=n_g) > 0)
+        indep = candidato & ~fijo & (np.bincount(gi, weights=malo, minlength=n_g) == 0)
+        self.cont["grupos_bloqueados"] += int(fijo.sum())
+        self.cont["grupos_mueven"] += int(indep.sum())
+        self.cont["grupos3_mueven"] += int((indep & (tam >= 3)).sum())
+        mi = indep[gi]
+        if mi.any():
+            ocup[y[idx[mi]], x[idx[mi]]] = -1
+            ocup[ny_i[mi], nx_i[mi]] = idx[mi]
+            y[idx[mi]], x[idx[mi]] = ny_i[mi], nx_i[mi]
+        resto = candidato & ~fijo & ~indep
+        for g in self.rng.permutation(n_g):
+            if not resto[g]:
                 continue
-            grande = m.size >= 3
-            self.cont["grupos_empujan"] += 1
-            self.cont["grupos3_empujan"] += grande
-            vx, vy = DX[d[empujan]].sum(), DY[d[empujan]].sum()
-            if np.hypot(vx, vy) < cfg.fraccion_empuje * m.size:
-                continue
-            k = int(np.argmax((DX * vx + DY * vy) / norma))
+            m = idx[orden[inicio[g]:inicio[g + 1]]]
+            k = int(kg[g])
             ny, nx = (y[m] + DY[k]) % H, (x[m] + DX[k]) % W
             destino = ocup[ny, nx]
             if not np.all((destino < 0) | (lab[np.maximum(destino, 0)] == lab[m[0]])):
                 self.cont["grupos_bloqueados"] += 1
                 continue
             self.cont["grupos_mueven"] += 1
-            self.cont["grupos3_mueven"] += grande
+            self.cont["grupos3_mueven"] += int(m.size >= 3)
             ocup[y[m], x[m]] = -1
             ocup[ny, nx] = m
             y[m], x[m] = ny, nx
