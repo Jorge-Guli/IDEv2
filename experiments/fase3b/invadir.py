@@ -82,9 +82,17 @@ def agregar_genes(g: dict, conectados: bool, variante: str = "ambos") -> dict:
 
 
 def siembra(salida, semilla, variante="ambos"):
-    g = fase3.siembra(salida, semilla)  # 600 genomas del ancestro, pesos nulos en los sensores nuevos
-    if g is None:
-        return None, None
+    """600 genomas del ancestro con pesos nulos en los sensores nuevos, elegidos solo entre los que tienen
+    ranuras libres para los tres genes extra (igual para las tres líneas). Devuelve también la fracción del
+    ancestro que quedó excluida por tener el genoma casi lleno."""
+    g = persistencia.cargar_genomas(Path(salida) / "ancestros" / f"semilla_{semilla}" / "poblacion.npz")
+    caben = np.flatnonzero((~g["activo"]).sum(axis=1) >= len(GENES))
+    if caben.size == 0:
+        return None, None, 1.0
+    excluidos = 1.0 - caben.size / len(g["mu"])
+    idx = caben[np.random.default_rng(semilla).integers(0, caben.size, SIEMBRA)]
+    g = {k: v[idx].copy() for k, v in g.items()}
+    g["w"][..., np.r_[gen.SENS_RUMBO, gen.SENS_SENAL]] = 0.0
     n_mut = int(FRAC_MUTANTE * SIEMBRA)
     cepas = np.zeros(SIEMBRA, dtype=np.int16)
     cepas[:n_mut], cepas[n_mut:2 * n_mut] = 1, 2
@@ -96,7 +104,7 @@ def siembra(salida, semilla, variante="ambos"):
     agregar_genes(sub, conectados=False)
     for k in g:
         g[k][n_mut:] = sub[k]
-    return g, cepas
+    return g, cepas, excluidos
 
 
 class Observador:
@@ -142,7 +150,7 @@ class Observador:
 def _correr(tarea):
     salida, condicion, semilla, variante = tarea
     nombre = f"{condicion}_{variante}"
-    g, cepas = siembra(salida, semilla, variante)
+    g, cepas, excluidos = siembra(salida, semilla, variante)
     if g is None:
         return {"nombre": nombre, "semilla": semilla, "sin_ancestro": True}
     cfg = config.cargar(CONFIG, AJUSTES + CONDICIONES[condicion])
@@ -160,7 +168,8 @@ def _correr(tarea):
         vals = np.array([f[k] for f in ultimo], dtype=float)
         return float(np.nanmean(vals)) if vals.size and not np.isnan(vals).all() else float("nan")
     return {
-        "nombre": nombre, "semilla": semilla, "sin_ancestro": False, "poblacion_final": sim.pob.n,
+        "nombre": nombre, "semilla": semilla, "sin_ancestro": False, "excluidos_genoma_lleno": round(excluidos, 4),
+        "poblacion_final": sim.pob.n,
         "n_residente": final.get("n_residente", 0), "n_coordinado": nc, "n_control": nk,
         "frac_coordinado": nc / (nc + nk) if nc + nk else None,
         "movilidad_g3": {c: (float(obs.mov[i, 0] / obs.mov[i, 1]) if obs.mov[i, 1] >= 200 else None)

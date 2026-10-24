@@ -48,3 +48,6 @@ En la fase 3, la percepción del rumbo de los socios hizo evolucionar la alineac
 - **Seguir invade y depende del refugio (I1 e I3):** la física premia la sincronía. El techo de la fase 3 es de accesibilidad evolutiva. Siguiente paso: probar si la evolución la encuentra con más tiempo o con más suministro de mutaciones sobre ese sensor.
 - **Nada invade:** la ecología no premia a los tríos coordinados. Se diseña una regla de movimiento nueva, con prerregistro, semillas nuevas y la anisotropía corregida.
 - **Que la alineación sea perjudicial es informativo:** girar cuesta un paso que no se usa para comer. Eso explicaría por qué en la fase 3 la alineación evolucionó de forma moderada.
+
+## Addendum (antes de tener resultados)
+La primera ejecución en el equipo local falló antes de correr ninguna rama: algunos ancestros tienen genomas con menos de 3 ranuras libres (de 24) y no admiten los genes extra. La siembra ahora elige los 600 genomas solo entre los que tienen ranuras libres, igual para las tres líneas. El informe registra la fracción excluida de cada ancestro (`excluidos_genoma_lleno`). Los ancestros ya generados se reutilizan.
