@@ -50,3 +50,18 @@ La evaluación se detuvo antes de terminar. **Lo que alcancé a ver** (y declaro
 | P4 | El efecto no depende de un único valor de intensidad | `refugio_p0125` y `refugio_p0175`: `frac_en_refugio` > 0,5 en ≥ 80 % de las que sobrevivieron |
 
 Se agrega la siguiente lectura: P1 mide que evolucione la división unida, un solo cambio de primitiva, análogo a las células hijas que no se separan en Boraas et al. (1998). No implica coordinación ni unión activa entre extraños; eso es lo que explora `refugio_sin_division_unida`.
+
+## Addendum a la versión 2: aparición gradual del depredador (antes de correrlo)
+
+**Resultado que lo motiva** (semillas 11–20, ya registrado):
+- P1 no alcanzó sus umbrales: sobrevivieron 6/10 y 4 de 6 superaron 0,5. P2 y P3 se cumplieron.
+- Las extinciones se concentraron justo después de que el depredador apareció de golpe en el paso 2000: el 40 % de las corridas con refugio y el 60 % de las uniformes.
+- En 3 de las 4 extinciones con refugio, la asociación ya había superado el 50 % antes de la caída.
+
+**Experimento nuevo** (semillas 31–40, que no se usaron antes): la intensidad del ataque sube linealmente de 0 a 0,015 durante 8000 pasos, a partir del paso 2000 (`depredacion.rampa = 8000`). Condiciones: `refugio_rampa`, `uniforme_rampa` y `aleatorio_rampa`.
+
+**Hipótesis**, con las mismas reglas que P1–P3:
+- **P1-rampa**: sobreviven ≥ 7/10 y `frac_en_refugio` > 0,5 en ≥ 80 % de las que sobreviven.
+- **P2-rampa** (uniforme) y **P3-rampa** (aleatorio): `frac_en_refugio` < 0,1 en ≥ 80 % de las que sobreviven.
+
+**Interpretación prevista:** si P1-rampa se cumple, el fallo de P1 se debió a la brusquedad de la aparición del depredador y no al mecanismo. El veredicto de P1 original **no cambia**: queda registrado como no cumplido.

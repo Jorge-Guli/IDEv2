@@ -364,7 +364,8 @@ class Simulacion:
         if self.t < d.inicio:
             return
         vivo = dev.a_cpu(p["E"]) > 0.0
-        atacado = vivo & (u_ataque < d.prob_ataque)
+        intensidad = d.prob_ataque * (min(1.0, (self.t - d.inicio + 1) / d.rampa) if d.rampa > 0 else 1.0)
+        atacado = vivo & (u_ataque < intensidad)
         if d.modo == "tamano":
             soc = dev.a_cpu(socios).copy()
             soc[~vivo] = -1

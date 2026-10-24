@@ -135,3 +135,12 @@ def test_sin_division_unida(cfg):
     cfg.asociacion.division_unida = False
     sim = Simulacion(cfg)
     assert gen.DIVIDIRSE_UNIDO not in sim.permitidas and gen.UNIRSE in sim.permitidas
+
+
+def test_rampa(cfg):
+    """Con rampa, al principio la intensidad es casi nula."""
+    sim = sim_vacia(_cfg(cfg, rampa=1000))
+    for x in range(0, 30, 2):
+        colocar(sim, quieto(cfg), [5], [x], E=50)
+    sim.paso()
+    assert sim.pob.n >= 14

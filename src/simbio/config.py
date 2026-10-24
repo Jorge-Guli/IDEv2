@@ -126,6 +126,7 @@ class DepredacionCfg:
     prob_ataque: float = 0.002  # por organismo y paso
     prob_perdon: float = 0.9  # solo en modo "aleatorio"
     inicio: int = 0  # paso desde el que actúa el depredador (aclimatación previa)
+    rampa: int = 0  # pasos en los que la probabilidad de ataque sube linealmente desde 0 (0: de golpe)
     refugio: int = 4  # grupos de este tamaño o mayores no pueden ser comidos
     gradual: bool = True  # bajo el refugio, un ataque mata con prob. 1 − (tamaño − 1)/(refugio − 1)
 

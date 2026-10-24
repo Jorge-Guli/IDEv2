@@ -36,6 +36,10 @@ CONDICIONES = {
     # exploratorios
     "refugio_sin_division_unida": ["asociacion.division_unida=false"],  # solo unirse crea enlaces
     "refugio_3": ["depredacion.refugio=3"],
+    # aparición gradual del depredador (prerregistro, addendum de la versión 2)
+    "refugio_rampa": ["depredacion.rampa=8000"],
+    "uniforme_rampa": ['depredacion.modo="uniforme"', "depredacion.rampa=8000"],
+    "aleatorio_rampa": ['depredacion.modo="aleatorio"', "depredacion.prob_perdon=0.9", "depredacion.rampa=8000"],
 }
 NUCLEO = ["refugio", "uniforme", "aleatorio", "sin_depredacion"]
 METRICAS = ["poblacion", "frac_en_refugio", "depredados_en_refugio", "frac_enlazados", "tamano_grupo_medio", "grupos_de_3_o_mas",
@@ -117,10 +121,12 @@ def evaluar_hipotesis(por: dict) -> dict:
                 "frac_en_refugio": [None if r["extinta"] else round(r["frac_en_refugio"], 3) for r in rs]}
     alta, baja = (lambda f: f > 0.5), (lambda f: f < 0.1)
     h = {}
-    if "refugio" in por:
-        r = resumen("refugio", alta)
-        h["P1_refugio"] = {**r, "cumple": r["sobrevivieron"] >= 0.7 * r["corridas"] and (r["frac_cumplen"] or 0) >= 0.8}
-    for clave, n in (("P2_uniforme", "uniforme"), ("P3_aleatorio", "aleatorio")):
+    for clave, n in (("P1_refugio", "refugio"), ("P1_rampa", "refugio_rampa")):
+        if n in por:
+            r = resumen(n, alta)
+            h[clave] = {**r, "cumple": r["sobrevivieron"] >= 0.7 * r["corridas"] and (r["frac_cumplen"] or 0) >= 0.8}
+    for clave, n in (("P2_uniforme", "uniforme"), ("P3_aleatorio", "aleatorio"),
+                     ("P2_rampa", "uniforme_rampa"), ("P3_rampa", "aleatorio_rampa")):
         if n in por:
             r = resumen(n, baja)
             h[clave] = {**r, "cumple": r["sobrevivieron"] > 0 and r["frac_cumplen"] >= 0.8}
