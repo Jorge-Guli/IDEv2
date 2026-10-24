@@ -33,6 +33,7 @@ _spec.loader.exec_module(fase3)  # ancestros, siembra y métricas
 CONFIG = RAIZ / "experiments" / "configs" / "coordinacion.toml"
 PERCEPCION = {
     "base": [],
+    "rumbo": ["coordinacion.rumbo=true"],  # fase 3d
     "ambos": ["coordinacion.rumbo=true", "coordinacion.senales=true"],
     "barajado": ["coordinacion.rumbo=true", "coordinacion.senales=true", "coordinacion.barajar=true"],
 }
@@ -40,6 +41,9 @@ MOVIMIENTO = {
     "empuje": [],
     "fuerza": ['asociacion.movimiento="fuerza"', "asociacion.exponente_arrastre=1.0"],
     "fuerza05": ['asociacion.movimiento="fuerza"', "asociacion.exponente_arrastre=0.5"],
+    # sensibilidad (fase 3d)
+    "fuerza033": ['asociacion.movimiento="fuerza"', "asociacion.exponente_arrastre=0.3333"],
+    "fuerza075": ['asociacion.movimiento="fuerza"', "asociacion.exponente_arrastre=0.75"],
 }
 CONDICIONES = {f"{m}_{p}": MOVIMIENTO[m] + PERCEPCION[p] for m in MOVIMIENTO for p in PERCEPCION}
 METRICAS = fase3.METRICAS
@@ -145,7 +149,9 @@ def main():
     args = ap.parse_args()
     args.salida.mkdir(parents=True, exist_ok=True)
     semillas = list(range(args.semilla_inicial, args.semilla_inicial + args.semillas))
-    condiciones = args.condiciones or list(CONDICIONES)
+    # por defecto, las nueve condiciones de la fase 3c (las de la fase 3d se piden con --condiciones)
+    condiciones = args.condiciones or [f"{m}_{p}" for m in ("empuje", "fuerza", "fuerza05")
+                                       for p in ("base", "ambos", "barajado")]
     t0 = time.time()
     with Pool(args.procesos) as pool:
         ancestros = pool.map(fase3._ancestro, [(str(args.salida), s) for s in semillas])
