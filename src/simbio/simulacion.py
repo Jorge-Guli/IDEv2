@@ -229,6 +229,8 @@ class Simulacion:
         # la señal es una salida continua aparte: sus genes no compiten por la acción del paso
         p["senal"] = xp.where(disponible[:, gen.SENALAR], xp.clip(impulso[:, gen.SENALAR], 0.0, 1.0), 0.0)
         impulso = xp.where(disponible & ~self.no_accion, impulso, -xp.inf)
+        # restricción flagelar: quien está en período refractario no puede avanzar (elige otra acción)
+        impulso[:, gen.AVANZAR] = xp.where(p["refractario"] > 0, -xp.inf, impulso[:, gen.AVANZAR])
         act = xp.argmax(impulso, axis=1)
         maximo = impulso[xp.arange(p.n), act]
         act = xp.where(maximo > 0.0, act, gen.DESCANSAR).astype(xp.int8)
@@ -554,6 +556,8 @@ class Simulacion:
             # no ocupa su celda ni sostiene enlaces; se retira al final del paso
             vivos = p["E"] > 0.0
             self.cont["acciones"] += xp.bincount(act[vivos], minlength=gen.NUM_PRIM)
+            p["n_avances"] += (act == gen.AVANZAR) & vivos
+            p["refractario"] = xp.maximum(p["refractario"] - 1, 0).astype(xp.int16)
             self.cont["org_pasos"] += int(vivos.sum())
             if not vivos.all():
                 self.cont["muertes"] += int((~vivos).sum())
@@ -653,6 +657,20 @@ class Simulacion:
                     self.cont["enlaces_creados"] += int(unido.sum())
                     self.cont["enlaces_por_division"] += int(unido.sum())
                     self.cont["nacimientos"] += padres.size
+                    p["n_divisiones"][padres] += 1
+                    T = f.refractario_division
+                    if T > 0 and f.refractario_modo == "division":
+                        p["refractario"][padres] = T
+                        nuevos["refractario"][:] = T
+            T = f.refractario_division
+            if T > 0 and f.refractario_modo == "aleatorio" and p.n:
+                # control: la misma frecuencia de períodos refractarios por organismo, sin relación con dividirse
+                n_div = 0 if nuevos is None else len(nuevos["id"])
+                tasa = 2.0 * n_div / p.n  # progenitor e hijo
+                sorteo = xp.asarray(self.rng.random(p.n)) < tasa
+                p["refractario"] = xp.where(sorteo, T, p["refractario"]).astype(xp.int16)
+                if nuevos is not None:
+                    nuevos["refractario"][:] = 0
 
             # bajas y altas en una sola operación (comer, compartir y dividirse no dejan la energía en cero)
             p.actualizar(vivos & (p["E"] > 0.0), nuevos)
@@ -689,6 +707,35 @@ class Simulacion:
                 break
             lab = nuevo
         return lab, ii, jj
+
+    def _especializacion(self, lab, tam) -> dict[str, float]:
+        """División del trabajo reproductivo en grupos de 3 o más (fase 4), con las tasas de vida de cada miembro
+        (divisiones y avances por paso de edad, edad ≥ 100):
+        - concentración: fracción de las divisiones del grupo que hizo el tercio más reproductivo de sus miembros
+          (≈ 1/3 sin especialización, más el ruido de muestreo);
+        - correlación media, dentro de los grupos, entre la tasa de avanzar y la de dividirse (negativa: unos
+          empujan y otros se reproducen);
+        - fracción de miembros que nunca se dividieron."""
+        p = self.pob
+        lab, tam = dev.a_cpu(lab), dev.a_cpu(tam)
+        edad = self.t - dev.a_cpu(p["nacimiento"]).astype(float)
+        nd, na = dev.a_cpu(p["n_divisiones"]).astype(float), dev.a_cpu(p["n_avances"]).astype(float)
+        ok = (tam >= 3) & (edad >= 100)
+        conc, corr, nunca = [], [], []
+        for g in np.unique(lab[ok]):
+            m = ok & (lab == g)
+            if m.sum() < 3:
+                continue
+            d, a = nd[m] / edad[m], na[m] / edad[m]
+            nunca.append(float((nd[m] == 0).mean()))
+            if nd[m].sum() > 0:
+                k = int(np.ceil(m.sum() / 3))
+                conc.append(float(np.sort(nd[m])[::-1][:k].sum() / nd[m].sum()))
+            if d.std() > 0 and a.std() > 0:
+                corr.append(float(np.corrcoef(d, a)[0, 1]))
+        media = lambda v: float(np.mean(v)) if v else float("nan")  # noqa: E731
+        return {"concentracion_reproductiva": media(conc), "corr_avanzar_dividir": media(corr),
+                "frac_nunca_dividio": media(nunca), "frac_refractarios": float((dev.a_cpu(p["refractario"]) > 0).mean())}
 
     def medir(self) -> dict[str, float]:
         xp = self.xp
@@ -755,6 +802,7 @@ class Simulacion:
                 fila[f"exito_empuje_{nombre}"] = (c[f"{nombre}_mueven"] / c[f"{nombre}_empujan"]
                                                   if c[f"{nombre}_empujan"] else float("nan"))
             fila["grupos_bloqueados"] = c["grupos_bloqueados"]
+            fila.update(self._especializacion(lab, tam))
             fila["senal_media"] = float(p["senal"].mean())
             et = p["etiqueta"]
             fila["dist_etiqueta_enlazados"] = float(xp.linalg.norm(et[ii] - et[jj], axis=1).mean()) if ii.size \

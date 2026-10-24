@@ -37,6 +37,11 @@ class FisicaCfg:
     toma_max: float = 4.0
     costo_division: float = 2.0
     energia_min_division: float = 20.0
+    # fase 4, restricción flagelar: tras dividirse, progenitor e hijo no pueden avanzar durante estos pasos (0: no)
+    refractario_division: int = 0
+    # "division": el período lo dispara la división; "aleatorio" (control): lo dispara un sorteo con la misma
+    # frecuencia por organismo que las divisiones del paso, sin relación con dividirse
+    refractario_modo: str = "division"
 
 
 @dataclass

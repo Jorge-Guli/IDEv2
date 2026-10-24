@@ -26,6 +26,9 @@ ESTADO = {
     "recibido": (np.float64, ()),  # energía recibida en la vida
     "recibido_paso": (np.float64, ()),  # energía recibida desde la última decisión
     "senal": (np.float64, ()),  # señal emitida en el último paso (fase 3)
+    "refractario": (np.int16, ()),  # pasos que faltan para poder avanzar (fase 4)
+    "n_avances": (np.int32, ()),  # veces que eligió avanzar en la vida (fase 4)
+    "n_divisiones": (np.int32, ()),  # divisiones logradas en la vida (fase 4)
 }
 
 
