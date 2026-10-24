@@ -123,7 +123,7 @@ class Simulacion:
         self.cont = {"nacimientos": 0, "muertes": 0, "comido": 0.0, "org_pasos": 0,
                      "compartido": 0.0, "recibido": 0.0, "comido_libre": 0.0,
                      "comido_libre_sec": 0.0, "comido_libre_nosec": 0.0, "depredados": 0,
-                     "depredados_en_refugio": 0, "conjugaciones": 0, "enlaces_creados": 0,
+                     "depredados_en_refugio": 0, "enlaces_por_union": 0, "enlaces_por_division": 0, "conjugaciones": 0, "enlaces_creados": 0,
                      "acciones": xp.zeros(gen.NUM_PRIM, dtype=xp.int64)}
 
     def vecinos_enlazados(self, occ: np.ndarray) -> np.ndarray:
@@ -278,6 +278,7 @@ class Simulacion:
         p["socio"][u, d] = p["id"][j]
         p["socio"][j, self.OPUESTA[d]] = p["id"][u]
         self.cont["enlaces_creados"] += int(u.size)
+        self.cont["enlaces_por_union"] += int(u.size)
 
     def _conjugar(self, act: np.ndarray, socios: np.ndarray) -> None:
         xp = self.xp
@@ -549,6 +550,7 @@ class Simulacion:
                     p["socio"][padres[unido], dirs[unido]] = nuevos["id"][unido]
                     nuevos["socio"][xp.flatnonzero(unido), self.OPUESTA[dirs[unido]]] = p["id"][padres[unido]]
                     self.cont["enlaces_creados"] += int(unido.sum())
+                    self.cont["enlaces_por_division"] += int(unido.sum())
                     self.cont["nacimientos"] += padres.size
 
             # bajas y altas en una sola operación (comer, compartir y dividirse no dejan la energía en cero)
@@ -606,6 +608,8 @@ class Simulacion:
             fila["comido_libre_por_org_paso"] = c["comido_libre"] / org_pasos
         fila["conjugaciones"] = c["conjugaciones"]
         fila["enlaces_creados"] = c["enlaces_creados"]
+        fila["enlaces_por_union"] = c["enlaces_por_union"]  # origen: unión activa con un vecino
+        fila["enlaces_por_division"] = c["enlaces_por_division"]  # origen: división unida
         if n:
             activo = p["activo"]
             fila.update({

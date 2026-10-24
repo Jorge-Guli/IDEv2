@@ -10,7 +10,7 @@ Este documento es **el camino que sigue el proyecto, en orden**, con el porqué 
 | 2 | Asociación (unirse, compartir, dividirse unido, conjugar) | ✅ cerrada | Poder asociarse **no alcanza**: no rinde y la selección la purga. Si rinde, hay una transición abrupta ([bitácora](bitacora/2026-10-23-fase2-evaluacion.md)) |
 | E | Sembrar la asociación | ✅ hecho | La asociación es **inestable**: aunque esté, la división común reaparece en menos de 1000 pasos ([bitácora](bitacora/2026-10-23-experimento-E-sembrar.md)) |
 | 2b | Bien público: enzimas y recurso complejo | ✅ cerrada | Hay dilema: con bien privado la secreción evoluciona sola; con bien público, no. Pero **asociarse no la rescata**: el parentesco espacial (hijos al lado) ya cumple esa función ([bitácora](bitacora/2026-10-23-fase2b-evaluacion.md)) |
-| 2c | Depredación limitada por tamaño | ▶ cerrando | ✅ **La asociación evoluciona sola**: con depredador gradual, 10/10 sobreviven y 9/10 viven mayormente en grupos (media 77 %); no aparece con protección aleatoria ni con depredador uniforme. Vías clonal y agregativa ([bitácora](bitacora/2026-10-24-fase2c-evaluacion.md)) |
+| 2c | Depredación limitada por tamaño | ▶ cerrando | Con depredador **gradual** (a intensidad 0,015), la asociación evoluciona sola: 10/10 sobreviven y 9/10 viven mayormente en grupos de parientes. No aparece con depredador uniforme ni con protección aleatoria. La prueba prerregistrada con aparición brusca **falló**. Pendiente: dosis ([bitácora](bitacora/2026-10-24-fase2c-evaluacion.md)) |
 | 3 | El colectivo como individuo | siguiente | — |
 
 ## El camino, en orden

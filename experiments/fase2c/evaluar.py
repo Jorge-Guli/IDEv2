@@ -78,9 +78,11 @@ def _forzar_asociacion(sim):
 
 
 def _huella(_):
-    sim = Simulacion(config.cargar(CONFIG, ["mundo.alto=64", "mundo.ancho=64", "sim.dispositivo=cpu"]))
+    # depredador activo dentro de la prueba (inicio bajo y rampa corta), para que el determinismo lo cubra
+    sim = Simulacion(config.cargar(CONFIG, ["mundo.alto=64", "mundo.ancho=64", "sim.dispositivo=cpu",
+                                            "depredacion.inicio=300", "depredacion.rampa=500"]))
     _forzar_asociacion(sim)
-    h = hashlib.sha256(repr(sim.correr(1500)).encode())
+    h = hashlib.sha256(repr(sim.correr(2000)).encode())
     for k in sorted(sim.pob.d):
         h.update(np.ascontiguousarray(sim.pob.d[k]).tobytes())
     return h.hexdigest()
@@ -169,8 +171,11 @@ def main():
     por = {}
     for r in resultados:
         por.setdefault(r["nombre"], []).append(r)
-    persisten = sum(not r["extinta"] for r in por.get("refugio", []))
+    # C1 por cada condición con refugio que se haya corrido (núcleo, rampa, dosis...)
+    persistencia = {n: f"{sum(not r['extinta'] for r in rs)}/{len(rs)}" for n, rs in por.items()
+                    if n.startswith("refugio")}
     umbral = int(np.ceil(0.7 * len(semillas)))
+    c1 = all(sum(not r["extinta"] for r in por[n]) >= umbral for n in persistencia) if persistencia else None
     resumen = {n: {**{m: {"media": float(np.nanmean([r[m] for r in rs])),
                           "por_semilla": [round(r[m], 4) for r in rs]} for m in METRICAS},
                    "t_enlazados_50": [r["t_enlazados_50"] for r in rs],
@@ -180,7 +185,7 @@ def main():
     informe = {
         "parametros": {"pasos": args.pasos, "semillas": semillas, "minutos": round((time.time() - t0) / 60, 1)},
         "criterios": {
-            "C1_persistencia": {"aprobado": persisten >= umbral, "refugio": f"{persisten}/{len(semillas)}"},
+            "C1_persistencia": {"aprobado": c1, **persistencia},
             "C2_invariantes": {"aprobado": invariantes["violaciones"] == 0 and invariantes["enlaces_observados"] > 0
                                and invariantes["depredados_en_refugio"] == 0, **invariantes},
             "C3_reproducibilidad": {"aprobado": huellas[0] == huellas[1]},
