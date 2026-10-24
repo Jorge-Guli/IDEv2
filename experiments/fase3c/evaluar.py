@@ -109,7 +109,29 @@ def evaluar_hipotesis(por: dict) -> dict:
                 h[f"F3_{m}_interaccion"] = {"diferencias": [round(d, 3) for d in dd],
                                             "media": round(float(np.mean(dd)), 3) if dd else None,
                                             "cumple": bool(dd) and sum(d >= 0.1 for d in dd) >= 0.7 * len(dd)}
+    # réplica (docs/bitacora/2026-10-24-fase3c-replica-prerregistro.md): probabilidad del régimen con grupos
+    def en_regimen(n):
+        return [v >= 0.2 for v in val(n).values()]
+
+    if all(f"fuerza05_{p}" in por for p in ("base", "ambos", "barajado")):
+        ra, rb, r0 = en_regimen("fuerza05_ambos"), en_regimen("fuerza05_barajado"), en_regimen("fuerza05_base")
+        p1 = _fisher_una_cola(sum(ra), len(ra), sum(rb), len(rb))
+        h["R1_regimen_ambos_vs_barajado"] = {"ambos": f"{sum(ra)}/{len(ra)}", "barajado": f"{sum(rb)}/{len(rb)}",
+                                             "p_fisher_una_cola": round(p1, 4), "cumple": p1 < 0.05}
+        dentro = {n: [v for v in val(f"fuerza05_{n}").values() if v >= 0.2] for n in ("ambos", "barajado", "base")}
+        h["R2_tamano_en_regimen"] = {n: round(float(np.mean(v)), 3) if v else None for n, v in dentro.items()}
+        p3 = min(1.0, 2 * min(_fisher_una_cola(sum(rb), len(rb), sum(r0), len(r0)),
+                              _fisher_una_cola(sum(r0), len(r0), sum(rb), len(rb))))
+        h["R3_barajado_vs_base"] = {"barajado": f"{sum(rb)}/{len(rb)}", "base": f"{sum(r0)}/{len(r0)}",
+                                    "p_fisher_dos_colas": round(p3, 4), "difieren": p3 < 0.05}
     return h
+
+
+def _fisher_una_cola(a, n1, b, n2):
+    """P(X ≥ a) para X hipergeométrica: éxitos del primer grupo dados los totales (Fisher exacto, una cola)."""
+    from math import comb
+    k, n = a + b, n1 + n2
+    return sum(comb(n1, i) * comb(n2, k - i) for i in range(a, min(n1, k) + 1)) / comb(n, k)
 
 
 def main():
