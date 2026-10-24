@@ -21,7 +21,9 @@ Experimento de vida artificial. Organismos simples, que empiezan casi como una b
 
 **Fase 3 — coordinación del grupo: cerrada (2026-10-24).** Los grupos no pasan de pares porque los de 3 o más no logran moverse juntos. Si los organismos perciben el rumbo de sus socios, la alineación evoluciona, pero los grupos no crecen; un canal de señales no se inventa. Cuando moverse en grupo es fácil, los grupos crecen ([bitácora](docs/bitacora/2026-10-24-fase3-evaluacion.md)).
 
-**Próximo: fase 3b — prueba de invasión** de un trío coordinado, para decidir si falta tiempo evolutivo o hay que cambiar la regla de movimiento.
+**Fases 3b y 3c — invasión y movimiento por fuerza: cerradas (2026-10-24).** Con la regla de movimiento anterior, coordinarse casi no rinde (3b). Con una regla en la que el grupo se mueve por la suma de las fuerzas de sus miembros (α = 0,5), percibir a los socios aumenta mucho la fracción de la población en grupos de 3 o más (réplica con 20 semillas nuevas, p ≈ 0,002) ([bitácora](docs/bitacora/2026-10-24-fase3c-replica-evaluacion.md)).
+
+**Próximo: fase 3d — ablación y sensibilidad** (¿es coordinación?, ¿rumbo o señales?, ¿heredada o aprendida?, ¿vale con otro α?).
 
 ## Uso
 

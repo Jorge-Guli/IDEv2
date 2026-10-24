@@ -20,6 +20,8 @@ def _referencia(self, act, occ, socios):
         miembros_de.setdefault(lab[idx], []).append(idx)
     grupos = list(miembros_de.values())
     norma = np.hypot(DX, DY)
+    fuerza = cfg.movimiento == "fuerza"
+    u = self.rng.random(len(grupos)) if fuerza else None  # la versión vectorizada sortea antes de permutar
     for g in self.rng.permutation(len(grupos)):
         m = np.array(grupos[g])
         empujan = m[a[m] == gen.AVANZAR]
@@ -28,10 +30,17 @@ def _referencia(self, act, occ, socios):
         grande = m.size >= 3
         self.cont["grupos_empujan"] += 1
         self.cont["grupos3_empujan"] += int(grande)
-        vx, vy = DX[d[empujan]].sum(), DY[d[empujan]].sum()
-        if np.hypot(vx, vy) < cfg.fraccion_empuje * m.size:
-            continue
-        k = int(np.argmax((DX * vx + DY * vy) / norma))
+        if fuerza:
+            vx, vy = (DX / norma)[d[empujan]].sum(), (DY / norma)[d[empujan]].sum()
+            k = int(np.argmax((DX * vx + DY * vy) / norma))
+            prob = min(1.0, (vx * DX[k] + vy * DY[k]) / norma[k] / m.size ** cfg.exponente_arrastre)
+            if not u[g] < prob:
+                continue
+        else:
+            vx, vy = DX[d[empujan]].sum(), DY[d[empujan]].sum()
+            if np.hypot(vx, vy) < cfg.fraccion_empuje * m.size:
+                continue
+            k = int(np.argmax((DX * vx + DY * vy) / norma))
         ny, nx = (y[m] + DY[k]) % H, (x[m] + DX[k]) % W
         destino = ocup[ny, nx]
         if not np.all((destino < 0) | (lab[np.maximum(destino, 0)] == lab[m[0]])):
@@ -70,4 +79,17 @@ def test_vectorizado_igual_a_referencia(cfg, monkeypatch):
         h2, d2 = _correr(cfg, _referencia, monkeypatch)
         assert repr(h1) == repr(h2)
         assert d1.keys() == d2.keys() and all(np.array_equal(d1[k], d2[k]) for k in d1)
+        assert sum(r.get("grupos_bloqueados", 0) for r in h1) > 0
+
+
+def test_fuerza_vectorizada_igual_a_referencia(cfg, monkeypatch):
+    cfg.asociacion.movimiento = "fuerza"
+    cfg.sim.poblacion_inicial = 500
+    cfg.sim.registrar_cada = 20
+    for alfa in (0.5, 1.0):
+        cfg.asociacion.exponente_arrastre = alfa
+        h1, d1 = _correr(cfg, None, monkeypatch)
+        h2, d2 = _correr(cfg, _referencia, monkeypatch)
+        assert repr(h1) == repr(h2)
+        assert all(np.array_equal(d1[k], d2[k]) for k in d1)
         assert sum(r.get("grupos_bloqueados", 0) for r in h1) > 0

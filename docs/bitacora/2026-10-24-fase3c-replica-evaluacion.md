@@ -25,22 +25,37 @@ Las reglas de la fase 3c original, aplicadas a estas semillas nuevas, también s
 - Las 4 semillas en las que `ambos` no entra al régimen incluyen las 3 con un ancestro poco asociado (74, 82 y 83). Ninguna condición forma grupos en esas semillas: sin asociación previa, la información sobre los socios no tiene sobre qué actuar.
 - El gen de señal está en ~3,5 % de la población: el canal de señales sigue sin usarse.
 
-## Lo que muestran los datos (semillas 61–90)
-1. **La regla de movimiento es necesaria:** con empuje, 0 de 30 corridas tienen grupos de 3 o más en el 20 % de la población.
-2. **La física sola no alcanza:** con fuerza α = 0,5 y sin percepción, solo 8 de 30 corridas (61–90) llegan al régimen con grupos.
-3. **La información sobre el rumbo de los socios es la que marca la diferencia:**
-   - en las 30 semillas, 23/30 con percepción contra 11/30 barajado y 8/30 base;
-   - el control barajado, que conserva la distribución de los valores pero no su relación con los socios propios, no se distingue de no percibir nada.
-4. **La coordinación evolucionó y se usa:** la alineación entre socios llega a 0,6–0,86 solo con información real.
+## Revisión científica
+Revisión independiente (subagente `revisor-cientifico`), con verificaciones ejecutadas:
+- **Código correcto.** "fuerza" cumple la spec. El camino rápido da el mismo estado que un bucle de referencia también con "fuerza". El consumo de azar es igual en las tres percepciones. El control barajado es justo, y si filtra algo, lo acerca a `ambos` (es conservador).
+- **El efecto principal es robusto, y más fuerte con la prueba correcta.** Las condiciones comparten ancestro y semilla, así que corresponde una prueba pareada:
+  - McNemar: 9 pares discordantes a favor de `ambos` y 0 en contra, p ≈ 0,002;
+  - permutación pareada sobre la fracción continua en grupos ≥ 3: p ≈ 3·10⁻⁵;
+  - R1 se cumple con cualquier umbral entre 0,05 y 0,35.
+- **"Conservar la asociación" no está sostenido.** Con enlazados ≥ 0,1: `ambos` 17/20, `barajado` 12/20, `base` 10/20 (p = 0,078). Entre las 12 semillas donde ambas condiciones conservan la asociación, `ambos` tiene más organismos en grupos de 3 o más (permutación pareada p = 0,001). El efecto está sobre todo en el **tamaño de los grupos**, no en conservar la asociación. La bimodalidad de 61–70 no se repite limpia: hay valores intermedios. R2 condiciona al resultado, así que tiene sesgo de selección.
+- **"Coordinación" no está demostrada como causa.** Piloto de ablación del revisor: 3 poblaciones evolucionadas con `ambos` y continuadas sin mutación. Al quitar la información, la alineación colapsa (0,53–0,80 → 0,12–0,27) y la población cae entre 6 y 12 %, pero los grupos ya formados no se pierden de forma consistente.
+- **Rumbo y señales están confundidos:** `ambos` incluye los dos. Las señales casi no evolucionan, así que la atribución al rumbo es plausible, pero no está probada.
+- **Alineación heredada o aprendida:** el aprendizaje está activo y los ajustes plásticos no se heredan. No se separó.
+- **Dependencia del modelo:** el resultado está acotado a α = 0,5 (con α = 1 no hay grupos). No se probaron 1/3 ni 0,75. La interacción con "empuje" (F3) no se replicó.
+- R3 ("barajado no difiere de base") es falta de evidencia, no evidencia de igualdad.
+- Las 3 semillas con ancestro poco asociado juegan en contra del efecto y no se excluyen.
 
-## Interpretación (prudente)
-- Hasta ahora, en este proyecto, es la mejor evidencia de que **una coordinación evolucionada, a partir de percepción local, permite un nivel de organización que sin ella no se sostiene**: grupos de 3 a 16 miembros que resisten a un depredador que no puede tragarlos.
-- **Límites:**
-  - Hizo falta cambiar la regla de movimiento, y esa decisión se tomó después de un resultado negativo (justificada por las fases 3 y 3b y prerregistrada).
-  - El exponente salió de un piloto.
-  - R1 surgió de mirar las semillas 61–70; por eso se replicó con 20 semillas nuevas.
-  - La afirmación causal sobre la coordinación descansa en el control barajado. Falta una ablación directa (poblaciones evolucionadas sin mutación, con los sensores en 0).
-  - Las señales no evolucionaron.
+## Lo que se afirma
+- **Con movimiento por fuerza y α = 0,5, la percepción de los socios (rumbo y señales) aumenta la fracción de la población en grupos de 3 o más cuando el depredador escala.** Réplica prerregistrada con 20 semillas nuevas; prueba pareada p ≈ 0,002 a 3·10⁻⁵; 23/30 corridas en régimen contra 11/30 barajado sumando 61–90.
+- La alineación entre socios aparece solo con información real y colapsa si se la quita.
+- La física "fuerza" (α = 0,5) permite grupos de 3 o más; con "empuje", 0 de 30 corridas los tuvieron.
+
+## Lo que todavía no se afirma
+- Que la información haga conservar la asociación.
+- Que sea la coordinación del movimiento la que produce los grupos.
+- Que sea el rumbo y no las señales.
+- Que la alineación se herede y no se aprenda en vida.
+- Que el resultado valga fuera de α = 0,5.
+- Que la información rinda más con fuerza que con empuje.
 
 ## Decisión
-Pendiente de la revisión científica.
+- **Se cierra la fase 3c adoptando "fuerza" con α = 0,5** como regla de movimiento de grupos del modelo. El prerregistro de la réplica lo preveía incluso si R1 fallaba.
+- Antes de usar la percepción del rumbo como mecanismo de grupo en la fase 4, una **fase 3d** prerregistrada:
+  - ablación completa sobre las poblaciones de la réplica, con brazos solo rumbo, solo señales y sin aprendizaje;
+  - sensibilidad a α ∈ {1/3; 0,75};
+  - una condición solo rumbo.

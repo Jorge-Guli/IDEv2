@@ -7,7 +7,8 @@
 ## 2. Experimentos
 
 - [x] 2.1 Piloto (semilla 301) y prerregistro
-- [ ] 2.2 `experiments/fase3c/evaluar.py`: semillas 61–70 en el equipo local; revisar y registrar
+- [x] 2.2 `experiments/fase3c/evaluar.py`: semillas 61–70 en el equipo local; revisar y registrar
+- [x] 2.3 Réplica prerregistrada (semillas 71–90, α = 0,5) y revisión científica
 
 ## Workflow follow-up
 

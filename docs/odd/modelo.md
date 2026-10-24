@@ -1,6 +1,6 @@
 # Descripción del modelo (protocolo ODD)
 
-> Versión vigente: **fase 3, cerrada el 2026-10-24**. El cuerpo describe la fase 1 (evolución básica); las fases siguientes se agregan como anexos al final. Este documento sigue el protocolo ODD (*Overview, Design concepts, Details*; Grimm et al. 2006, 2020) y se actualiza al cerrar cada fase. Los valores por defecto están en `src/simbio/config.py`.
+> Versión vigente: **fase 3c, cerrada el 2026-10-24**. El cuerpo describe la fase 1 (evolución básica); las fases siguientes se agregan como anexos al final. Este documento sigue el protocolo ODD (*Overview, Design concepts, Details*; Grimm et al. 2006, 2020) y se actualiza al cerrar cada fase. Los valores por defecto están en `src/simbio/config.py`.
 
 ## 1. Visión general
 
@@ -97,4 +97,9 @@ Detalle en `openspec/specs/coordinacion/spec.md`. Cambia la forma del genoma (14
 - **Señales** (`coordinacion.senales`): primitiva `senalar` cuyos genes no compiten por la acción; la señal es su impulso recortado a [0, 1], cuesta 0,05 por unidad y paso y no se refuerza. Sensores: señal media de los socios y señal propia del paso anterior.
 - **Control barajado:** los sensores sobre los socios toman los valores de otro organismo enlazado al azar.
 - **Empuje colectivo vectorizado**, con resultado idéntico al original.
-- **Limitación conocida:** en el empuje colectivo, un rumbo diagonal aporta √2 a la suma.
+- **Limitación conocida:** en el empuje colectivo, un rumbo diagonal aporta √2 a la suma (corregido en el modo "fuerza" de la fase 3c).
+
+## Anexo: fase 3c (movimiento de grupos por fuerza), cerrada el 2026-10-24
+
+- **Modo `asociacion.movimiento = "fuerza"`.** Cada empuje es un vector unitario. El grupo se desplaza en la dirección más alineada con la suma, con probabilidad min(1, proyección de la suma sobre esa dirección / tamaño^α), si el destino está libre. **Regla adoptada a partir de esta fase: α = 0,5** (`asociacion.exponente_arrastre`), el arrastre de una colonia plana. Con α = 1 no se sostienen ni los pares.
+- El modo "empuje" (umbral) sigue disponible sin cambios, para reproducir las fases anteriores.

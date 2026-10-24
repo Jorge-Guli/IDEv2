@@ -90,3 +90,17 @@ La fase 3 SHALL considerarse validada solo si: (C1) cada condición persiste 60 
 #### Scenario: Evaluación de la fase 3
 - **WHEN** se ejecuta `experiments/fase3/evaluar.py`
 - **THEN** se informan los ancestros, los criterios, las hipótesis y los exploratorios de cada condición
+
+### Requirement: Evaluación de la fase 3c
+La evaluación de la fase 3c SHALL cruzar la regla de movimiento (empuje, fuerza con α = 1, fuerza con α = 0,5) con la percepción (ninguna, rumbo y señales, barajada), con un ancestro por semilla y semillas que no se usaron en pilotos, y SHALL aplicar las reglas del prerregistro en el propio script. La alineación MUST calcularse solo en corridas con al menos 20 pares enlazados por registro.
+
+#### Scenario: Evaluación de la fase 3c
+- **WHEN** se ejecuta `experiments/fase3c/evaluar.py`
+- **THEN** se informan los ancestros, la persistencia, las hipótesis y los exploratorios de las nueve condiciones
+
+### Requirement: Réplica de la fase 3c
+Cuando se corren las tres percepciones con α = 0,5, el script SHALL calcular las reglas de la réplica: régimen con grupos (fracción ≥ 0,2 en grupos de 3 o más) de `ambos` contra `barajado` con Fisher exacto de una cola (R1), tamaño medio dentro del régimen (R2) y `barajado` contra `base` con dos colas (R3).
+
+#### Scenario: Réplica
+- **WHEN** se ejecuta la evaluación de la fase 3c con `fuerza05_base`, `fuerza05_ambos` y `fuerza05_barajado`
+- **THEN** el informe incluye R1, R2 y R3
