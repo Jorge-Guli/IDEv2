@@ -1,0 +1,1787 @@
+{
+  "parametros": {
+    "pasos": 20000,
+    "semillas": [
+      51,
+      52,
+      53,
+      54,
+      55,
+      56,
+      57,
+      58,
+      59,
+      60
+    ],
+    "variantes": [
+      "seguir",
+      "alinear",
+      "ambos"
+    ],
+    "minutos": 21.2
+  },
+  "ancestros": [
+    {
+      "semilla": 51,
+      "poblacion": 276.0,
+      "frac_en_refugio": 0.532608695652174
+    },
+    {
+      "semilla": 52,
+      "poblacion": 828.0,
+      "frac_en_refugio": 0.7524154589371981
+    },
+    {
+      "semilla": 53,
+      "poblacion": 986.0,
+      "frac_en_refugio": 0.8914807302231237
+    },
+    {
+      "semilla": 54,
+      "poblacion": 1379.0,
+      "frac_en_refugio": 0.8897751994198695
+    },
+    {
+      "semilla": 55,
+      "poblacion": 893.0,
+      "frac_en_refugio": 0.9316909294512878
+    },
+    {
+      "semilla": 56,
+      "poblacion": 1035.0,
+      "frac_en_refugio": 0.8956521739130435
+    },
+    {
+      "semilla": 57,
+      "poblacion": 797.0,
+      "frac_en_refugio": 0.5759096612296111
+    },
+    {
+      "semilla": 58,
+      "poblacion": 380.0,
+      "frac_en_refugio": 0.7210526315789474
+    },
+    {
+      "semilla": 59,
+      "poblacion": 1153.0,
+      "frac_en_refugio": 0.8629661751951431
+    },
+    {
+      "semilla": 60,
+      "poblacion": 1231.0,
+      "frac_en_refugio": 0.9528838342810723
+    }
+  ],
+  "hipotesis": {
+    "I1_invade_refugio3_seguir": {
+      "frac_coordinado": [
+        0.0,
+        1.0,
+        1.0,
+        null,
+        null,
+        0.0,
+        null,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "invade": 5,
+      "cumple": false
+    },
+    "invade_refugio2_seguir": {
+      "frac_coordinado": [
+        null,
+        null,
+        0.0,
+        null,
+        null,
+        null,
+        null,
+        null,
+        0.0,
+        0.0
+      ],
+      "invade": 0
+    },
+    "I3_mas_ventaja_con_refugio3_seguir": {
+      "mayor": 5,
+      "cumple": false
+    },
+    "I2_movilidad_g3_seguir": {
+      "diferencias": [
+        0.108,
+        0.098,
+        0.016,
+        0.002,
+        0.015,
+        0.037,
+        0.105,
+        0.061,
+        0.016,
+        0.068
+      ],
+      "cumple": true
+    },
+    "I1_invade_refugio3_alinear": {
+      "frac_coordinado": [
+        0.0,
+        0.0,
+        null,
+        null,
+        null,
+        0.0,
+        null,
+        null,
+        null,
+        null
+      ],
+      "invade": 0,
+      "cumple": false
+    },
+    "invade_refugio2_alinear": {
+      "frac_coordinado": [
+        null,
+        0.0,
+        0.0,
+        0.0,
+        null,
+        null,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "invade": 0
+    },
+    "I3_mas_ventaja_con_refugio3_alinear": {
+      "mayor": 0,
+      "cumple": false
+    },
+    "I2_movilidad_g3_alinear": {
+      "diferencias": [
+        -0.141,
+        -0.124,
+        -0.109,
+        -0.025,
+        -0.051,
+        -0.075,
+        -0.121,
+        -0.009,
+        -0.084
+      ],
+      "cumple": false
+    },
+    "I1_invade_refugio3_ambos": {
+      "frac_coordinado": [
+        0.0,
+        0.0,
+        null,
+        null,
+        null,
+        null,
+        null,
+        0.0,
+        null,
+        0.0
+      ],
+      "invade": 0,
+      "cumple": false
+    },
+    "invade_refugio2_ambos": {
+      "frac_coordinado": [
+        null,
+        null,
+        0.0,
+        null,
+        null,
+        null,
+        null,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "invade": 0
+    },
+    "I3_mas_ventaja_con_refugio3_ambos": {
+      "mayor": 0,
+      "cumple": false
+    },
+    "I2_movilidad_g3_ambos": {
+      "diferencias": [
+        -0.032,
+        -0.118,
+        -0.037,
+        0.008,
+        0.019,
+        -0.046,
+        -0.014,
+        -0.028,
+        -0.046
+      ],
+      "cumple": false
+    }
+  },
+  "corridas": [
+    {
+      "nombre": "refugio3_seguir",
+      "semilla": 51,
+      "sin_ancestro": false,
+      "excluidos_genoma_lleno": 0.0,
+      "poblacion_final": 151,
+      "n_residente": 0,
+      "n_coordinado": 0,
+      "n_control": 151,
+      "frac_coordinado": 0.0,
+      "movilidad_g3": {
+        "residente": 0.14629604272216898,
+        "coordinado": 0.27278688524590167,
+        "control": 0.1645021645021645
+      },
+      "g3": {
+        "residente": NaN,
+        "coordinado": NaN,
+        "control": 0.0
+      },
+      "alineacion": {
+        "residente": NaN,
+        "coordinado": NaN,
+        "control": NaN
+      }
+    },
+    {
+      "nombre": "refugio3_seguir",
+      "semilla": 52,
+      "sin_ancestro": false,
+      "excluidos_genoma_lleno": 0.0,
+      "poblacion_final": 551,
+      "n_residente": 303,
+      "n_coordinado": 248,
+      "n_control": 0,
+      "frac_coordinado": 1.0,
+      "movilidad_g3": {
+        "residente": 0.16152721556962132,
+        "coordinado": 0.24224447619969372,
+        "control": 0.14387038453515055
+      },
+      "g3": {
+        "residente": 0.05063033905479989,
+        "coordinado": 0.036253803455157614,
+        "control": NaN
+      },
+      "alineacion": {
+        "residente": 0.21029697032915529,
+        "coordinado": 0.21178045005916318,
+        "control": NaN
+      }
+    },
+    {
+      "nombre": "refugio3_seguir",
+      "semilla": 53,
+      "sin_ancestro": false,
+      "excluidos_genoma_lleno": 0.0,
+      "poblacion_final": 544,
+      "n_residente": 0,
+      "n_coordinado": 544,
+      "n_control": 0,
+      "frac_coordinado": 1.0,
+      "movilidad_g3": {
+        "residente": 0.21406399780891952,
+        "coordinado": 0.24481566820276499,
+        "control": 0.2290840415486308
+      },
+      "g3": {
+        "residente": NaN,
+        "coordinado": 0.015350747486581589,
+        "control": NaN
+      },
+      "alineacion": {
+        "residente": NaN,
+        "coordinado": 0.19772426456337505,
+        "control": NaN
+      }
+    },
+    {
+      "nombre": "refugio3_seguir",
+      "semilla": 54,
+      "sin_ancestro": false,
+      "excluidos_genoma_lleno": 0.0,
+      "poblacion_final": 778,
+      "n_residente": 778,
+      "n_coordinado": 0,
+      "n_control": 0,
+      "frac_coordinado": null,
+      "movilidad_g3": {
+        "residente": 0.2098034326216305,
+        "coordinado": 0.2361837861085227,
+        "control": 0.23465006843022929
+      },
+      "g3": {
+        "residente": 0.07169763542435387,
+        "coordinado": NaN,
+        "control": NaN
+      },
+      "alineacion": {
+        "residente": 0.16860913024542482,
+        "coordinado": NaN,
+        "control": NaN
+      }
+    },
+    {
+      "nombre": "refugio3_seguir",
+      "semilla": 55,
+      "sin_ancestro": false,
+      "excluidos_genoma_lleno": 0.0,
+      "poblacion_final": 397,
+      "n_residente": 397,
+      "n_coordinado": 0,
+      "n_control": 0,
+      "frac_coordinado": null,
+      "movilidad_g3": {
+        "residente": 0.20123884593315466,
+        "coordinado": 0.2354934384268476,
+        "control": 0.22001507772206733
+      },
+      "g3": {
+        "residente": 0.1888909350048142,
+        "coordinado": NaN,
+        "control": NaN
+      },
+      "alineacion": {
+        "residente": 0.17393163863123287,
+        "coordinado": NaN,
+        "control": NaN
+      }
+    },
+    {
+      "nombre": "refugio3_seguir",
+      "semilla": 56,
+      "sin_ancestro": false,
+      "excluidos_genoma_lleno": 0.0,
+      "poblacion_final": 587,
+      "n_residente": 0,
+      "n_coordinado": 0,
+      "n_control": 587,
+      "frac_coordinado": 0.0,
+      "movilidad_g3": {
+        "residente": 0.20903303326582623,
+        "coordinado": 0.2640317731748352,
+        "control": 0.2267075168134612
+      },
+      "g3": {
+        "residente": NaN,
+        "coordinado": NaN,
+        "control": 0.16063931514486285
+      },
+      "alineacion": {
+        "residente": NaN,
+        "coordinado": NaN,
+        "control": 0.2231599057339455
+      }
+    },
+    {
+      "nombre": "refugio3_seguir",
+      "semilla": 57,
+      "sin_ancestro": false,
+      "excluidos_genoma_lleno": 0.0,
+      "poblacion_final": 588,
+      "n_residente": 588,
+      "n_coordinado": 0,
+      "n_control": 0,
+      "frac_coordinado": null,
+      "movilidad_g3": {
+        "residente": 0.2216018477082351,
+        "coordinado": 0.3004122766834631,
+        "control": 0.19548237280979522
+      },
+      "g3": {
+        "residente": 0.03536777692071679,
+        "coordinado": NaN,
+        "control": NaN
+      },
+      "alineacion": {
+        "residente": 0.19877119519115014,
+        "coordinado": NaN,
+        "control": NaN
+      }
+    },
+    {
+      "nombre": "refugio3_seguir",
+      "semilla": 58,
+      "sin_ancestro": false,
+      "excluidos_genoma_lleno": 0.0,
+      "poblacion_final": 195,
+      "n_residente": 91,
+      "n_coordinado": 104,
+      "n_control": 0,
+      "frac_coordinado": 1.0,
+      "movilidad_g3": {
+        "residente": 0.2429819048791391,
+        "coordinado": 0.2853761645396838,
+        "control": 0.22477064220183487
+      },
+      "g3": {
+        "residente": 0.1772008271709545,
+        "coordinado": 0.1473606738931868,
+        "control": NaN
+      },
+      "alineacion": {
+        "residente": 0.22288881733605684,
+        "coordinado": 0.26477114454095013,
+        "control": NaN
+      }
+    },
+    {
+      "nombre": "refugio3_seguir",
+      "semilla": 59,
+      "sin_ancestro": false,
+      "excluidos_genoma_lleno": 0.0,
+      "poblacion_final": 683,
+      "n_residente": 0,
+      "n_coordinado": 683,
+      "n_control": 0,
+      "frac_coordinado": 1.0,
+      "movilidad_g3": {
+        "residente": 0.20448643681834525,
+        "coordinado": 0.24751530890320925,
+        "control": 0.23188749308682943
+      },
+      "g3": {
+        "residente": 0.0,
+        "coordinado": 0.007941946329296254,
+        "control": NaN
+      },
+      "alineacion": {
+        "residente": NaN,
+        "coordinado": 0.20743902433291703,
+        "control": NaN
+      }
+    },
+    {
+      "nombre": "refugio3_seguir",
+      "semilla": 60,
+      "sin_ancestro": false,
+      "excluidos_genoma_lleno": 0.0008,
+      "poblacion_final": 635,
+      "n_residente": 633,
+      "n_coordinado": 2,
+      "n_control": 0,
+      "frac_coordinado": 1.0,
+      "movilidad_g3": {
+        "residente": 0.15972373849389213,
+        "coordinado": 0.2330511234125692,
+        "control": 0.16468418626094974
+      },
+      "g3": {
+        "residente": 0.008070805310828447,
+        "coordinado": 0.004818711284394639,
+        "control": NaN
+      },
+      "alineacion": {
+        "residente": 0.19415356908561637,
+        "coordinado": 0.1977064874855729,
+        "control": NaN
+      }
+    },
+    {
+      "nombre": "refugio2_seguir",
+      "semilla": 51,
+      "sin_ancestro": false,
+      "excluidos_genoma_lleno": 0.0,
+      "poblacion_final": 245,
+      "n_residente": 245,
+      "n_coordinado": 0,
+      "n_control": 0,
+      "frac_coordinado": null,
+      "movilidad_g3": {
+        "residente": 0.1417025724702343,
+        "coordinado": 0.24087932647333957,
+        "control": 0.13918017159199236
+      },
+      "g3": {
+        "residente": 0.11969526377052025,
+        "coordinado": NaN,
+        "control": NaN
+      },
+      "alineacion": {
+        "residente": 0.2594218885171287,
+        "coordinado": NaN,
+        "control": NaN
+      }
+    },
+    {
+      "nombre": "refugio2_seguir",
+      "semilla": 52,
+      "sin_ancestro": false,
+      "excluidos_genoma_lleno": 0.0,
+      "poblacion_final": 771,
+      "n_residente": 771,
+      "n_coordinado": 0,
+      "n_control": 0,
+      "frac_coordinado": null,
+      "movilidad_g3": {
+        "residente": 0.1521550816615033,
+        "coordinado": 0.24040612631216657,
+        "control": 0.12460961898813241
+      },
+      "g3": {
+        "residente": 0.021498760709265836,
+        "coordinado": NaN,
+        "control": NaN
+      },
+      "alineacion": {
+        "residente": 0.11023428116454696,
+        "coordinado": NaN,
+        "control": NaN
+      }
+    },
+    {
+      "nombre": "refugio2_seguir",
+      "semilla": 53,
+      "sin_ancestro": false,
+      "excluidos_genoma_lleno": 0.0,
+      "poblacion_final": 929,
+      "n_residente": 900,
+      "n_coordinado": 0,
+      "n_control": 29,
+      "frac_coordinado": 0.0,
+      "movilidad_g3": {
+        "residente": 0.21465151307681773,
+        "coordinado": 0.22963712817318174,
+        "control": 0.20451127819548873
+      },
+      "g3": {
+        "residente": 0.02069040419487311,
+        "coordinado": NaN,
+        "control": 0.02133960241005385
+      },
+      "alineacion": {
+        "residente": 0.06383248845605435,
+        "coordinado": NaN,
+        "control": 0.19600679400142754
+      }
+    },
+    {
+      "nombre": "refugio2_seguir",
+      "semilla": 54,
+      "sin_ancestro": false,
+      "excluidos_genoma_lleno": 0.0,
+      "poblacion_final": 1374,
+      "n_residente": 1374,
+      "n_coordinado": 0,
+      "n_control": 0,
+      "frac_coordinado": null,
+      "movilidad_g3": {
+        "residente": 0.20283102818594287,
+        "coordinado": 0.22288253560338367,
+        "control": 0.19322376478447426
+      },
+      "g3": {
+        "residente": 0.05827285132012179,
+        "coordinado": NaN,
+        "control": 0.0
+      },
+      "alineacion": {
+        "residente": 0.058122033153700264,
+        "coordinado": NaN,
+        "control": NaN
+      }
+    },
+    {
+      "nombre": "refugio2_seguir",
+      "semilla": 55,
+      "sin_ancestro": false,
+      "excluidos_genoma_lleno": 0.0,
+      "poblacion_final": 758,
+      "n_residente": 758,
+      "n_coordinado": 0,
+      "n_control": 0,
+      "frac_coordinado": null,
+      "movilidad_g3": {
+        "residente": 0.16736180623291066,
+        "coordinado": 0.20590193033059684,
+        "control": 0.1864071045768177
+      },
+      "g3": {
+        "residente": 0.09608963629693826,
+        "coordinado": NaN,
+        "control": NaN
+      },
+      "alineacion": {
+        "residente": 0.06451715507560762,
+        "coordinado": NaN,
+        "control": NaN
+      }
+    },
+    {
+      "nombre": "refugio2_seguir",
+      "semilla": 56,
+      "sin_ancestro": false,
+      "excluidos_genoma_lleno": 0.0,
+      "poblacion_final": 1008,
+      "n_residente": 1008,
+      "n_coordinado": 0,
+      "n_control": 0,
+      "frac_coordinado": null,
+      "movilidad_g3": {
+        "residente": 0.19300837296890605,
+        "coordinado": 0.23148831488314883,
+        "control": 0.1986943421493137
+      },
+      "g3": {
+        "residente": 0.04574747406754002,
+        "coordinado": NaN,
+        "control": NaN
+      },
+      "alineacion": {
+        "residente": 0.09993907396522322,
+        "coordinado": NaN,
+        "control": NaN
+      }
+    },
+    {
+      "nombre": "refugio2_seguir",
+      "semilla": 57,
+      "sin_ancestro": false,
+      "excluidos_genoma_lleno": 0.0,
+      "poblacion_final": 715,
+      "n_residente": 715,
+      "n_coordinado": 0,
+      "n_control": 0,
+      "frac_coordinado": null,
+      "movilidad_g3": {
+        "residente": 0.24529780564263323,
+        "coordinado": 0.2812830454705675,
+        "control": 0.2056600350728669
+      },
+      "g3": {
+        "residente": 0.011786614239000607,
+        "coordinado": NaN,
+        "control": NaN
+      },
+      "alineacion": {
+        "residente": 0.08824459234298677,
+        "coordinado": NaN,
+        "control": NaN
+      }
+    },
+    {
+      "nombre": "refugio2_seguir",
+      "semilla": 58,
+      "sin_ancestro": false,
+      "excluidos_genoma_lleno": 0.0,
+      "poblacion_final": 286,
+      "n_residente": 286,
+      "n_coordinado": 0,
+      "n_control": 0,
+      "frac_coordinado": null,
+      "movilidad_g3": {
+        "residente": 0.21829683137722602,
+        "coordinado": 0.2669342762586669,
+        "control": 0.21291774131591945
+      },
+      "g3": {
+        "residente": 0.21568453808469498,
+        "coordinado": 0.12903114319110862,
+        "control": NaN
+      },
+      "alineacion": {
+        "residente": 0.1023656963273392,
+        "coordinado": 0.06736684703542326,
+        "control": NaN
+      }
+    },
+    {
+      "nombre": "refugio2_seguir",
+      "semilla": 59,
+      "sin_ancestro": false,
+      "excluidos_genoma_lleno": 0.0,
+      "poblacion_final": 1025,
+      "n_residente": 0,
+      "n_coordinado": 0,
+      "n_control": 1025,
+      "frac_coordinado": 0.0,
+      "movilidad_g3": {
+        "residente": 0.1795347358380584,
+        "coordinado": 0.2351120597652081,
+        "control": 0.21147320070131714
+      },
+      "g3": {
+        "residente": NaN,
+        "coordinado": NaN,
+        "control": 0.022025033206635295
+      },
+      "alineacion": {
+        "residente": NaN,
+        "coordinado": NaN,
+        "control": 0.09479520840573703
+      }
+    },
+    {
+      "nombre": "refugio2_seguir",
+      "semilla": 60,
+      "sin_ancestro": false,
+      "excluidos_genoma_lleno": 0.0008,
+      "poblacion_final": 1187,
+      "n_residente": 715,
+      "n_coordinado": 0,
+      "n_control": 472,
+      "frac_coordinado": 0.0,
+      "movilidad_g3": {
+        "residente": 0.13439880474029134,
+        "coordinado": 0.19968372627947095,
+        "control": 0.14064366082091898
+      },
+      "g3": {
+        "residente": 0.00276232097649969,
+        "coordinado": NaN,
+        "control": 0.00587499675349527
+      },
+      "alineacion": {
+        "residente": 0.06292979021475385,
+        "coordinado": NaN,
+        "control": 0.05979362964264491
+      }
+    },
+    {
+      "nombre": "refugio3_alinear",
+      "semilla": 51,
+      "sin_ancestro": false,
+      "excluidos_genoma_lleno": 0.0,
+      "poblacion_final": 141,
+      "n_residente": 0,
+      "n_coordinado": 0,
+      "n_control": 141,
+      "frac_coordinado": 0.0,
+      "movilidad_g3": {
+        "residente": 0.15543443917851502,
+        "coordinado": 0.030799475753604193,
+        "control": 0.17185221195916384
+      },
+      "g3": {
+        "residente": NaN,
+        "coordinado": NaN,
+        "control": 0.0
+      },
+      "alineacion": {
+        "residente": NaN,
+        "coordinado": NaN,
+        "control": NaN
+      }
+    },
+    {
+      "nombre": "refugio3_alinear",
+      "semilla": 52,
+      "sin_ancestro": false,
+      "excluidos_genoma_lleno": 0.0,
+      "poblacion_final": 563,
+      "n_residente": 192,
+      "n_coordinado": 0,
+      "n_control": 371,
+      "frac_coordinado": 0.0,
+      "movilidad_g3": {
+        "residente": 0.1450817404275283,
+        "coordinado": 0.04428904428904429,
+        "control": 0.16827667556278497
+      },
+      "g3": {
+        "residente": 0.054561100435142,
+        "coordinado": NaN,
+        "control": 0.04948442044541761
+      },
+      "alineacion": {
+        "residente": 0.2009804871043948,
+        "coordinado": NaN,
+        "control": 0.2059274487306508
+      }
+    },
+    {
+      "nombre": "refugio3_alinear",
+      "semilla": 53,
+      "sin_ancestro": false,
+      "excluidos_genoma_lleno": 0.0,
+      "poblacion_final": 536,
+      "n_residente": 536,
+      "n_coordinado": 0,
+      "n_control": 0,
+      "frac_coordinado": null,
+      "movilidad_g3": {
+        "residente": 0.21809450185920165,
+        "coordinado": null,
+        "control": 0.21481481481481482
+      },
+      "g3": {
+        "residente": 0.04739462071266152,
+        "coordinado": NaN,
+        "control": NaN
+      },
+      "alineacion": {
+        "residente": 0.1936142854676126,
+        "coordinado": NaN,
+        "control": NaN
+      }
+    },
+    {
+      "nombre": "refugio3_alinear",
+      "semilla": 54,
+      "sin_ancestro": false,
+      "excluidos_genoma_lleno": 0.0,
+      "poblacion_final": 893,
+      "n_residente": 893,
+      "n_coordinado": 0,
+      "n_control": 0,
+      "frac_coordinado": null,
+      "movilidad_g3": {
+        "residente": 0.19882957044737107,
+        "coordinado": 0.09610983981693363,
+        "control": 0.2054873925224616
+      },
+      "g3": {
+        "residente": 0.0781580665197292,
+        "coordinado": NaN,
+        "control": NaN
+      },
+      "alineacion": {
+        "residente": 0.1720403807044478,
+        "coordinado": NaN,
+        "control": NaN
+      }
+    },
+    {
+      "nombre": "refugio3_alinear",
+      "semilla": 55,
+      "sin_ancestro": false,
+      "excluidos_genoma_lleno": 0.0,
+      "poblacion_final": 427,
+      "n_residente": 427,
+      "n_coordinado": 0,
+      "n_control": 0,
+      "frac_coordinado": null,
+      "movilidad_g3": {
+        "residente": 0.19994034896419755,
+        "coordinado": 0.17431522227211496,
+        "control": 0.19934157247984227
+      },
+      "g3": {
+        "residente": 0.1921216003564953,
+        "coordinado": NaN,
+        "control": NaN
+      },
+      "alineacion": {
+        "residente": 0.16173234774365816,
+        "coordinado": NaN,
+        "control": NaN
+      }
+    },
+    {
+      "nombre": "refugio3_alinear",
+      "semilla": 56,
+      "sin_ancestro": false,
+      "excluidos_genoma_lleno": 0.0,
+      "poblacion_final": 632,
+      "n_residente": 0,
+      "n_coordinado": 0,
+      "n_control": 632,
+      "frac_coordinado": 0.0,
+      "movilidad_g3": {
+        "residente": 0.20955385076044647,
+        "coordinado": 0.1789069171648164,
+        "control": 0.22970704652790438
+      },
+      "g3": {
+        "residente": NaN,
+        "coordinado": NaN,
+        "control": 0.15401572037020952
+      },
+      "alineacion": {
+        "residente": NaN,
+        "coordinado": NaN,
+        "control": 0.2227395755499446
+      }
+    },
+    {
+      "nombre": "refugio3_alinear",
+      "semilla": 57,
+      "sin_ancestro": false,
+      "excluidos_genoma_lleno": 0.0,
+      "poblacion_final": 516,
+      "n_residente": 516,
+      "n_coordinado": 0,
+      "n_control": 0,
+      "frac_coordinado": null,
+      "movilidad_g3": {
+        "residente": 0.23910541110677463,
+        "coordinado": 0.12024048096192384,
+        "control": 0.1948926167325569
+      },
+      "g3": {
+        "residente": 0.016870126090530763,
+        "coordinado": NaN,
+        "control": NaN
+      },
+      "alineacion": {
+        "residente": 0.1897424250800866,
+        "coordinado": NaN,
+        "control": NaN
+      }
+    },
+    {
+      "nombre": "refugio3_alinear",
+      "semilla": 58,
+      "sin_ancestro": false,
+      "excluidos_genoma_lleno": 0.0,
+      "poblacion_final": 180,
+      "n_residente": 180,
+      "n_coordinado": 0,
+      "n_control": 0,
+      "frac_coordinado": null,
+      "movilidad_g3": {
+        "residente": 0.22607516167205832,
+        "coordinado": 0.1024793388429752,
+        "control": 0.2239555790586991
+      },
+      "g3": {
+        "residente": 0.23494294189807313,
+        "coordinado": NaN,
+        "control": NaN
+      },
+      "alineacion": {
+        "residente": 0.22080496137435643,
+        "coordinado": NaN,
+        "control": NaN
+      }
+    },
+    {
+      "nombre": "refugio3_alinear",
+      "semilla": 59,
+      "sin_ancestro": false,
+      "excluidos_genoma_lleno": 0.0,
+      "poblacion_final": 702,
+      "n_residente": 702,
+      "n_coordinado": 0,
+      "n_control": 0,
+      "frac_coordinado": null,
+      "movilidad_g3": {
+        "residente": 0.21281123917821507,
+        "coordinado": 0.21294363256784968,
+        "control": 0.22237913274630336
+      },
+      "g3": {
+        "residente": 0.01243988678597707,
+        "coordinado": NaN,
+        "control": NaN
+      },
+      "alineacion": {
+        "residente": 0.21341423457004946,
+        "coordinado": NaN,
+        "control": NaN
+      }
+    },
+    {
+      "nombre": "refugio3_alinear",
+      "semilla": 60,
+      "sin_ancestro": false,
+      "excluidos_genoma_lleno": 0.0008,
+      "poblacion_final": 705,
+      "n_residente": 705,
+      "n_coordinado": 0,
+      "n_control": 0,
+      "frac_coordinado": null,
+      "movilidad_g3": {
+        "residente": 0.15955106294468055,
+        "coordinado": 0.06673842841765339,
+        "control": 0.15079990888223027
+      },
+      "g3": {
+        "residente": 0.016763600239544586,
+        "coordinado": NaN,
+        "control": NaN
+      },
+      "alineacion": {
+        "residente": 0.1785442990237983,
+        "coordinado": NaN,
+        "control": NaN
+      }
+    },
+    {
+      "nombre": "refugio2_alinear",
+      "semilla": 51,
+      "sin_ancestro": false,
+      "excluidos_genoma_lleno": 0.0,
+      "poblacion_final": 214,
+      "n_residente": 214,
+      "n_coordinado": 0,
+      "n_control": 0,
+      "frac_coordinado": null,
+      "movilidad_g3": {
+        "residente": 0.15497827821615393,
+        "coordinado": 0.03389830508474576,
+        "control": 0.14485981308411214
+      },
+      "g3": {
+        "residente": 0.032456158252256395,
+        "coordinado": NaN,
+        "control": NaN
+      },
+      "alineacion": {
+        "residente": 0.2747259934090889,
+        "coordinado": NaN,
+        "control": NaN
+      }
+    },
+    {
+      "nombre": "refugio2_alinear",
+      "semilla": 52,
+      "sin_ancestro": false,
+      "excluidos_genoma_lleno": 0.0,
+      "poblacion_final": 777,
+      "n_residente": 210,
+      "n_coordinado": 0,
+      "n_control": 567,
+      "frac_coordinado": 0.0,
+      "movilidad_g3": {
+        "residente": 0.14747948904351438,
+        "coordinado": null,
+        "control": 0.1468566518688243
+      },
+      "g3": {
+        "residente": 0.020370997421672556,
+        "coordinado": NaN,
+        "control": 0.014215993123037665
+      },
+      "alineacion": {
+        "residente": 0.10735069345950324,
+        "coordinado": NaN,
+        "control": 0.09628663473900247
+      }
+    },
+    {
+      "nombre": "refugio2_alinear",
+      "semilla": 53,
+      "sin_ancestro": false,
+      "excluidos_genoma_lleno": 0.0,
+      "poblacion_final": 974,
+      "n_residente": 809,
+      "n_coordinado": 0,
+      "n_control": 165,
+      "frac_coordinado": 0.0,
+      "movilidad_g3": {
+        "residente": 0.1998431233959475,
+        "coordinado": 0.1385099685204617,
+        "control": 0.225825727944372
+      },
+      "g3": {
+        "residente": 0.02901323080998573,
+        "coordinado": NaN,
+        "control": 0.016232893808722514
+      },
+      "alineacion": {
+        "residente": 0.048075780168825764,
+        "coordinado": NaN,
+        "control": 0.08181734635586277
+      }
+    },
+    {
+      "nombre": "refugio2_alinear",
+      "semilla": 54,
+      "sin_ancestro": false,
+      "excluidos_genoma_lleno": 0.0,
+      "poblacion_final": 1334,
+      "n_residente": 1275,
+      "n_coordinado": 0,
+      "n_control": 59,
+      "frac_coordinado": 0.0,
+      "movilidad_g3": {
+        "residente": 0.19392881754119723,
+        "coordinado": 0.09081735620585267,
+        "control": 0.19220094591041442
+      },
+      "g3": {
+        "residente": 0.04111116223164365,
+        "coordinado": NaN,
+        "control": 0.03568213986228278
+      },
+      "alineacion": {
+        "residente": 0.05410983202733628,
+        "coordinado": NaN,
+        "control": 0.06948255494146334
+      }
+    },
+    {
+      "nombre": "refugio2_alinear",
+      "semilla": 55,
+      "sin_ancestro": false,
+      "excluidos_genoma_lleno": 0.0,
+      "poblacion_final": 722,
+      "n_residente": 722,
+      "n_coordinado": 0,
+      "n_control": 0,
+      "frac_coordinado": null,
+      "movilidad_g3": {
+        "residente": 0.17245341805508219,
+        "coordinado": 0.15234199910354101,
+        "control": 0.16648964950602194
+      },
+      "g3": {
+        "residente": 0.09853486244922109,
+        "coordinado": NaN,
+        "control": NaN
+      },
+      "alineacion": {
+        "residente": 0.06872446471954133,
+        "coordinado": NaN,
+        "control": NaN
+      }
+    },
+    {
+      "nombre": "refugio2_alinear",
+      "semilla": 56,
+      "sin_ancestro": false,
+      "excluidos_genoma_lleno": 0.0,
+      "poblacion_final": 952,
+      "n_residente": 952,
+      "n_coordinado": 0,
+      "n_control": 0,
+      "frac_coordinado": null,
+      "movilidad_g3": {
+        "residente": 0.2062108299846131,
+        "coordinado": 0.15895316804407714,
+        "control": 0.18653492129090432
+      },
+      "g3": {
+        "residente": 0.019377592778938132,
+        "coordinado": NaN,
+        "control": NaN
+      },
+      "alineacion": {
+        "residente": 0.09782983692510255,
+        "coordinado": NaN,
+        "control": NaN
+      }
+    },
+    {
+      "nombre": "refugio2_alinear",
+      "semilla": 57,
+      "sin_ancestro": false,
+      "excluidos_genoma_lleno": 0.0,
+      "poblacion_final": 786,
+      "n_residente": 718,
+      "n_coordinado": 0,
+      "n_control": 68,
+      "frac_coordinado": 0.0,
+      "movilidad_g3": {
+        "residente": 0.2218535854708856,
+        "coordinado": 0.07956777996070727,
+        "control": 0.1910735705717713
+      },
+      "g3": {
+        "residente": 0.02138698444438065,
+        "coordinado": NaN,
+        "control": 0.021564582548213754
+      },
+      "alineacion": {
+        "residente": 0.0895282093567203,
+        "coordinado": NaN,
+        "control": 0.061134829475680795
+      }
+    },
+    {
+      "nombre": "refugio2_alinear",
+      "semilla": 58,
+      "sin_ancestro": false,
+      "excluidos_genoma_lleno": 0.0,
+      "poblacion_final": 334,
+      "n_residente": 0,
+      "n_coordinado": 0,
+      "n_control": 334,
+      "frac_coordinado": 0.0,
+      "movilidad_g3": {
+        "residente": 0.22951527360934096,
+        "coordinado": 0.1849033319621555,
+        "control": 0.23321899465533155
+      },
+      "g3": {
+        "residente": 0.2707589798042963,
+        "coordinado": NaN,
+        "control": 0.15430651070567175
+      },
+      "alineacion": {
+        "residente": NaN,
+        "coordinado": NaN,
+        "control": 0.13433514186400727
+      }
+    },
+    {
+      "nombre": "refugio2_alinear",
+      "semilla": 59,
+      "sin_ancestro": false,
+      "excluidos_genoma_lleno": 0.0,
+      "poblacion_final": 1120,
+      "n_residente": 1102,
+      "n_coordinado": 0,
+      "n_control": 18,
+      "frac_coordinado": 0.0,
+      "movilidad_g3": {
+        "residente": 0.19690578668778694,
+        "coordinado": null,
+        "control": 0.19345853289639525
+      },
+      "g3": {
+        "residente": 0.01407829298712275,
+        "coordinado": NaN,
+        "control": 0.013659769668889337
+      },
+      "alineacion": {
+        "residente": 0.07152965731456132,
+        "coordinado": NaN,
+        "control": 0.070813892452744
+      }
+    },
+    {
+      "nombre": "refugio2_alinear",
+      "semilla": 60,
+      "sin_ancestro": false,
+      "excluidos_genoma_lleno": 0.0008,
+      "poblacion_final": 1192,
+      "n_residente": 88,
+      "n_coordinado": 0,
+      "n_control": 1104,
+      "frac_coordinado": 0.0,
+      "movilidad_g3": {
+        "residente": 0.1382620081033434,
+        "coordinado": 0.07618304732189288,
+        "control": 0.13758234519104084
+      },
+      "g3": {
+        "residente": 0.005050376225276603,
+        "coordinado": NaN,
+        "control": 0.0022199772629166946
+      },
+      "alineacion": {
+        "residente": 0.07544037062119013,
+        "coordinado": NaN,
+        "control": 0.04801896881438833
+      }
+    },
+    {
+      "nombre": "refugio3_ambos",
+      "semilla": 51,
+      "sin_ancestro": false,
+      "excluidos_genoma_lleno": 0.0,
+      "poblacion_final": 134,
+      "n_residente": 0,
+      "n_coordinado": 0,
+      "n_control": 134,
+      "frac_coordinado": 0.0,
+      "movilidad_g3": {
+        "residente": 0.10777670216198774,
+        "coordinado": 0.115736885928393,
+        "control": 0.14801279122887162
+      },
+      "g3": {
+        "residente": NaN,
+        "coordinado": NaN,
+        "control": 0.0
+      },
+      "alineacion": {
+        "residente": NaN,
+        "coordinado": NaN,
+        "control": NaN
+      }
+    },
+    {
+      "nombre": "refugio3_ambos",
+      "semilla": 52,
+      "sin_ancestro": false,
+      "excluidos_genoma_lleno": 0.0,
+      "poblacion_final": 524,
+      "n_residente": 0,
+      "n_coordinado": 0,
+      "n_control": 524,
+      "frac_coordinado": 0.0,
+      "movilidad_g3": {
+        "residente": 0.16197859375272816,
+        "coordinado": 0.0391566265060241,
+        "control": 0.15721054047157645
+      },
+      "g3": {
+        "residente": NaN,
+        "coordinado": NaN,
+        "control": 0.04893708007857039
+      },
+      "alineacion": {
+        "residente": NaN,
+        "coordinado": NaN,
+        "control": 0.20370630276381266
+      }
+    },
+    {
+      "nombre": "refugio3_ambos",
+      "semilla": 53,
+      "sin_ancestro": false,
+      "excluidos_genoma_lleno": 0.0,
+      "poblacion_final": 608,
+      "n_residente": 608,
+      "n_coordinado": 0,
+      "n_control": 0,
+      "frac_coordinado": null,
+      "movilidad_g3": {
+        "residente": 0.23181415865000943,
+        "coordinado": null,
+        "control": 0.21786103677272275
+      },
+      "g3": {
+        "residente": 0.03339722475792084,
+        "coordinado": NaN,
+        "control": NaN
+      },
+      "alineacion": {
+        "residente": 0.20718256520223233,
+        "coordinado": NaN,
+        "control": NaN
+      }
+    },
+    {
+      "nombre": "refugio3_ambos",
+      "semilla": 54,
+      "sin_ancestro": false,
+      "excluidos_genoma_lleno": 0.0,
+      "poblacion_final": 885,
+      "n_residente": 885,
+      "n_coordinado": 0,
+      "n_control": 0,
+      "frac_coordinado": null,
+      "movilidad_g3": {
+        "residente": 0.19832569372223935,
+        "coordinado": 0.17531403604587656,
+        "control": 0.21242109549989818
+      },
+      "g3": {
+        "residente": 0.07602503482633323,
+        "coordinado": NaN,
+        "control": NaN
+      },
+      "alineacion": {
+        "residente": 0.16043466257235375,
+        "coordinado": NaN,
+        "control": NaN
+      }
+    },
+    {
+      "nombre": "refugio3_ambos",
+      "semilla": 55,
+      "sin_ancestro": false,
+      "excluidos_genoma_lleno": 0.0,
+      "poblacion_final": 450,
+      "n_residente": 450,
+      "n_coordinado": 0,
+      "n_control": 0,
+      "frac_coordinado": null,
+      "movilidad_g3": {
+        "residente": 0.1965297333986017,
+        "coordinado": 0.21764848317133073,
+        "control": 0.20956227524755983
+      },
+      "g3": {
+        "residente": 0.17735919766889213,
+        "coordinado": NaN,
+        "control": NaN
+      },
+      "alineacion": {
+        "residente": 0.17386155088981797,
+        "coordinado": NaN,
+        "control": NaN
+      }
+    },
+    {
+      "nombre": "refugio3_ambos",
+      "semilla": 56,
+      "sin_ancestro": false,
+      "excluidos_genoma_lleno": 0.0,
+      "poblacion_final": 611,
+      "n_residente": 611,
+      "n_coordinado": 0,
+      "n_control": 0,
+      "frac_coordinado": null,
+      "movilidad_g3": {
+        "residente": 0.20072842387485967,
+        "coordinado": 0.21409921671018275,
+        "control": 0.19537405998142435
+      },
+      "g3": {
+        "residente": 0.10066678136913523,
+        "coordinado": NaN,
+        "control": NaN
+      },
+      "alineacion": {
+        "residente": 0.2537017555104693,
+        "coordinado": NaN,
+        "control": NaN
+      }
+    },
+    {
+      "nombre": "refugio3_ambos",
+      "semilla": 57,
+      "sin_ancestro": false,
+      "excluidos_genoma_lleno": 0.0,
+      "poblacion_final": 548,
+      "n_residente": 548,
+      "n_coordinado": 0,
+      "n_control": 0,
+      "frac_coordinado": null,
+      "movilidad_g3": {
+        "residente": 0.24499788730643998,
+        "coordinado": 0.17797443461160276,
+        "control": 0.22390208783297336
+      },
+      "g3": {
+        "residente": 0.011370759889771822,
+        "coordinado": NaN,
+        "control": NaN
+      },
+      "alineacion": {
+        "residente": 0.1954389036332821,
+        "coordinado": NaN,
+        "control": NaN
+      }
+    },
+    {
+      "nombre": "refugio3_ambos",
+      "semilla": 58,
+      "sin_ancestro": false,
+      "excluidos_genoma_lleno": 0.0,
+      "poblacion_final": 211,
+      "n_residente": 0,
+      "n_coordinado": 0,
+      "n_control": 211,
+      "frac_coordinado": 0.0,
+      "movilidad_g3": {
+        "residente": 0.24032503728040447,
+        "coordinado": 0.237448896156991,
+        "control": 0.25114894056491727
+      },
+      "g3": {
+        "residente": NaN,
+        "coordinado": NaN,
+        "control": 0.11920918121167093
+      },
+      "alineacion": {
+        "residente": NaN,
+        "coordinado": NaN,
+        "control": 0.21161595772063274
+      }
+    },
+    {
+      "nombre": "refugio3_ambos",
+      "semilla": 59,
+      "sin_ancestro": false,
+      "excluidos_genoma_lleno": 0.0,
+      "poblacion_final": 680,
+      "n_residente": 680,
+      "n_coordinado": 0,
+      "n_control": 0,
+      "frac_coordinado": null,
+      "movilidad_g3": {
+        "residente": 0.20742613984330455,
+        "coordinado": 0.1813118811881188,
+        "control": 0.20885611024593775
+      },
+      "g3": {
+        "residente": 0.03273997031931385,
+        "coordinado": NaN,
+        "control": NaN
+      },
+      "alineacion": {
+        "residente": 0.18859056344740854,
+        "coordinado": NaN,
+        "control": NaN
+      }
+    },
+    {
+      "nombre": "refugio3_ambos",
+      "semilla": 60,
+      "sin_ancestro": false,
+      "excluidos_genoma_lleno": 0.0008,
+      "poblacion_final": 642,
+      "n_residente": 523,
+      "n_coordinado": 0,
+      "n_control": 119,
+      "frac_coordinado": 0.0,
+      "movilidad_g3": {
+        "residente": 0.15480129228134365,
+        "coordinado": 0.12267752608806312,
+        "control": 0.16827242524916944
+      },
+      "g3": {
+        "residente": 0.005374864832376291,
+        "coordinado": NaN,
+        "control": 0.004513039513220818
+      },
+      "alineacion": {
+        "residente": 0.20251945994121145,
+        "coordinado": NaN,
+        "control": 0.19485209807069664
+      }
+    },
+    {
+      "nombre": "refugio2_ambos",
+      "semilla": 51,
+      "sin_ancestro": false,
+      "excluidos_genoma_lleno": 0.0,
+      "poblacion_final": 266,
+      "n_residente": 266,
+      "n_coordinado": 0,
+      "n_control": 0,
+      "frac_coordinado": null,
+      "movilidad_g3": {
+        "residente": 0.14383976140141355,
+        "coordinado": 0.11045576407506702,
+        "control": 0.13285272914521112
+      },
+      "g3": {
+        "residente": 0.12300403348918774,
+        "coordinado": NaN,
+        "control": NaN
+      },
+      "alineacion": {
+        "residente": 0.2506181309714579,
+        "coordinado": NaN,
+        "control": NaN
+      }
+    },
+    {
+      "nombre": "refugio2_ambos",
+      "semilla": 52,
+      "sin_ancestro": false,
+      "excluidos_genoma_lleno": 0.0,
+      "poblacion_final": 742,
+      "n_residente": 742,
+      "n_coordinado": 0,
+      "n_control": 0,
+      "frac_coordinado": null,
+      "movilidad_g3": {
+        "residente": 0.1576346334078293,
+        "coordinado": null,
+        "control": 0.14237172952769284
+      },
+      "g3": {
+        "residente": 0.01438474051994406,
+        "coordinado": NaN,
+        "control": NaN
+      },
+      "alineacion": {
+        "residente": 0.09464773384928425,
+        "coordinado": NaN,
+        "control": NaN
+      }
+    },
+    {
+      "nombre": "refugio2_ambos",
+      "semilla": 53,
+      "sin_ancestro": false,
+      "excluidos_genoma_lleno": 0.0,
+      "poblacion_final": 898,
+      "n_residente": 798,
+      "n_coordinado": 0,
+      "n_control": 100,
+      "frac_coordinado": 0.0,
+      "movilidad_g3": {
+        "residente": 0.21638247150573148,
+        "coordinado": 0.15789473684210525,
+        "control": 0.21336401539051578
+      },
+      "g3": {
+        "residente": 0.020129551410031754,
+        "coordinado": NaN,
+        "control": 0.018285114504868718
+      },
+      "alineacion": {
+        "residente": 0.07229724558548227,
+        "coordinado": NaN,
+        "control": 0.09929783121767102
+      }
+    },
+    {
+      "nombre": "refugio2_ambos",
+      "semilla": 54,
+      "sin_ancestro": false,
+      "excluidos_genoma_lleno": 0.0,
+      "poblacion_final": 1315,
+      "n_residente": 1315,
+      "n_coordinado": 0,
+      "n_control": 0,
+      "frac_coordinado": null,
+      "movilidad_g3": {
+        "residente": 0.20047888481972778,
+        "coordinado": 0.18416030534351144,
+        "control": 0.19435342851807208
+      },
+      "g3": {
+        "residente": 0.057837761791272486,
+        "coordinado": NaN,
+        "control": NaN
+      },
+      "alineacion": {
+        "residente": 0.05336772182313515,
+        "coordinado": NaN,
+        "control": NaN
+      }
+    },
+    {
+      "nombre": "refugio2_ambos",
+      "semilla": 55,
+      "sin_ancestro": false,
+      "excluidos_genoma_lleno": 0.0,
+      "poblacion_final": 740,
+      "n_residente": 740,
+      "n_coordinado": 0,
+      "n_control": 0,
+      "frac_coordinado": null,
+      "movilidad_g3": {
+        "residente": 0.16754110100884295,
+        "coordinado": 0.19326001293889314,
+        "control": 0.17389027104884117
+      },
+      "g3": {
+        "residente": 0.09956044716077374,
+        "coordinado": NaN,
+        "control": NaN
+      },
+      "alineacion": {
+        "residente": 0.06838008653538517,
+        "coordinado": NaN,
+        "control": NaN
+      }
+    },
+    {
+      "nombre": "refugio2_ambos",
+      "semilla": 56,
+      "sin_ancestro": false,
+      "excluidos_genoma_lleno": 0.0,
+      "poblacion_final": 1039,
+      "n_residente": 1039,
+      "n_coordinado": 0,
+      "n_control": 0,
+      "frac_coordinado": null,
+      "movilidad_g3": {
+        "residente": 0.18944474916402126,
+        "coordinado": 0.18459796149490373,
+        "control": 0.18480610638127518
+      },
+      "g3": {
+        "residente": 0.04630089406318988,
+        "coordinado": NaN,
+        "control": NaN
+      },
+      "alineacion": {
+        "residente": 0.09845766965654967,
+        "coordinado": NaN,
+        "control": NaN
+      }
+    },
+    {
+      "nombre": "refugio2_ambos",
+      "semilla": 57,
+      "sin_ancestro": false,
+      "excluidos_genoma_lleno": 0.0,
+      "poblacion_final": 755,
+      "n_residente": 755,
+      "n_coordinado": 0,
+      "n_control": 0,
+      "frac_coordinado": null,
+      "movilidad_g3": {
+        "residente": 0.22814700855941336,
+        "coordinado": 0.13744075829383887,
+        "control": 0.19217451523545706
+      },
+      "g3": {
+        "residente": 0.01413162268754992,
+        "coordinado": NaN,
+        "control": NaN
+      },
+      "alineacion": {
+        "residente": 0.07650338545078472,
+        "coordinado": NaN,
+        "control": NaN
+      }
+    },
+    {
+      "nombre": "refugio2_ambos",
+      "semilla": 58,
+      "sin_ancestro": false,
+      "excluidos_genoma_lleno": 0.0,
+      "poblacion_final": 317,
+      "n_residente": 62,
+      "n_coordinado": 0,
+      "n_control": 255,
+      "frac_coordinado": 0.0,
+      "movilidad_g3": {
+        "residente": 0.2150351625384811,
+        "coordinado": 0.19970760233918128,
+        "control": 0.23335019414296407
+      },
+      "g3": {
+        "residente": 0.18204655266506586,
+        "coordinado": NaN,
+        "control": 0.15441469821213544
+      },
+      "alineacion": {
+        "residente": 0.09569750249707967,
+        "coordinado": NaN,
+        "control": 0.11450077942018251
+      }
+    },
+    {
+      "nombre": "refugio2_ambos",
+      "semilla": 59,
+      "sin_ancestro": false,
+      "excluidos_genoma_lleno": 0.0,
+      "poblacion_final": 990,
+      "n_residente": 910,
+      "n_coordinado": 0,
+      "n_control": 80,
+      "frac_coordinado": 0.0,
+      "movilidad_g3": {
+        "residente": 0.19082252551928106,
+        "coordinado": 0.12005856515373353,
+        "control": 0.1964400442361367
+      },
+      "g3": {
+        "residente": 0.018172220104034655,
+        "coordinado": NaN,
+        "control": 0.015400699524257093
+      },
+      "alineacion": {
+        "residente": 0.08994651905034251,
+        "coordinado": NaN,
+        "control": 0.08218390118356278
+      }
+    },
+    {
+      "nombre": "refugio2_ambos",
+      "semilla": 60,
+      "sin_ancestro": false,
+      "excluidos_genoma_lleno": 0.0008,
+      "poblacion_final": 1161,
+      "n_residente": 696,
+      "n_coordinado": 0,
+      "n_control": 465,
+      "frac_coordinado": 0.0,
+      "movilidad_g3": {
+        "residente": 0.13260490236809305,
+        "coordinado": 0.10283018867924529,
+        "control": 0.1315543407897576
+      },
+      "g3": {
+        "residente": 0.0029090514400001277,
+        "coordinado": NaN,
+        "control": 0.0077604178812042315
+      },
+      "alineacion": {
+        "residente": 0.05226745845189138,
+        "coordinado": NaN,
+        "control": 0.07178383052723336
+      }
+    }
+  ]
+}
