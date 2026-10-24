@@ -54,7 +54,14 @@ Con 9/10, el intervalo de confianza binomial aproximado es 55–99,7 %, así que
 
    Por eso la población de `aleatorio` (~950) se parece a la de una población sin depredador. Un control que iguale la mortalidad realizada (muertes al azar en la misma cantidad que en `refugio`) queda pendiente.
 3. **Los enlazados son parientes cercanos.** La distancia de etiqueta entre enlazados es 0,015, contra 0,12 entre pares al azar, y en 9 de 10 semillas la división unida está en ≥ 99 % de la población. La etiqueta muta de forma independiente del resto del genoma, así que esto indica parentesco reciente, no que sean clones.
-4. **Observación exploratoria (1 de 10 semillas):** en la semilla 32, la división unida subió al 50 % (paso 6000) y después cayó al ~1 %, mientras el gen de unirse osciló entre 8 % y 63 % (media 49 % en el último cuarto). La población llegó al 35 % en refugio. Puede ser un camino por **unión activa** en lugar de división unida, pero las métricas no registraban de dónde sale cada enlace. Se agregó un contador y se está verificando.
+4. **Observación exploratoria (1 de 10 semillas), verificada con el origen de los enlaces:** en la semilla 32, los grupos se forman por **unión activa** con vecinos y no por división unida. Se repitió la corrida con un contador del origen de cada enlace (la misma semilla reproduce la trayectoria):
+
+   | Semilla | Enlaces por unión activa (último cuarto) | Por división unida | En refugio (final) |
+   |---|---|---|---|
+   | 31 (típica) | 90 (1,5 %) | 5809 (98,5 %) | 0,96 |
+   | 32 | **7732 (98,6 %)** | 107 (1,4 %) | 0,40 |
+
+   En la 32, la división unida llegó al 50 % hacia el paso 6000 y después se perdió. Hay, entonces, al menos dos rutas evolutivas hacia los grupos en esta física: la habitual (división unida, 9/10) y una por unión activa (1/10), que logra una protección menor (40 % contra 96 %). Para saber con qué frecuencia aparece cada una hacen falta más semillas; también sirve la condición `refugio_sin_division_unida`, que obliga a la segunda.
 5. **Los grupos son mayormente pares** (tamaño medio 1,8 en la rampa, con máximos de 6 a 10 y ~5 % en grupos de 3 o más). Con refugio 2, un grupo más grande no protege más.
 6. **La transición varía entre semillas.** En la rampa, la fracción de enlazados superó el 50 % entre los pasos 6000 y 21 200. Con aparición brusca, entre 2800 y 4600 en 5 de las sobrevivientes; la semilla 19 recién en el 24 400 y la 15 nunca.
 
@@ -64,12 +71,12 @@ Con 9/10, el intervalo de confianza binomial aproximado es 55–99,7 %, así que
 
 ## Pendiente antes de archivar
 1. P4 (dosis), refugio 3 y sin división unida: semillas 21–30, en el equipo local.
-2. Origen de los enlaces en la semilla 32 (en curso).
+2. ~~Origen de los enlaces en la semilla 32~~: verificado (unión activa, 98,6 %).
 3. Más adelante: el control de mortalidad igualada y la robustez a otro valor de rampa (prerregistrados con semillas nuevas).
 
 ## Correcciones respecto de la primera versión de esta bitácora
 - Se afirmaba que el control aleatorio daba "protección de magnitud parecida": es falso (ver la tabla).
-- "Dos caminos evolutivos, como en la biología" se rebajó a observación exploratoria de una semilla, y se quitó la analogía con *Volvox* y *Dictyostelium*.
+- "Dos caminos evolutivos, como en la biología" se rebajó a observación exploratoria de una semilla, y se quitó la analogía con *Volvox* y *Dictyostelium*. Después se verificó directamente con el origen de los enlaces que la semilla 32 usa unión activa.
 - "Grupos clonales" pasó a "parientes cercanos".
 - La rampa se presenta como hipótesis nueva, no como prueba de que P1 fallara solo por las extinciones.
 - Se corrigieron números: la transición con aparición brusca no siempre fue entre los pasos 2800 y 4600; el grupo de 19 era del núcleo, no de la rampa; una extinción ocurrió en el paso 7544, no "justo después" de que apareciera el depredador.
