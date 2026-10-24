@@ -19,36 +19,53 @@ from .dispositivo import a_cpu, modulo
 
 # Primitivas: la "física" fija de las acciones posibles.
 (DESCANSAR, AVANZAR, GIRAR_IZQ, GIRAR_DER, VOLTERETA, COMER, DIVIDIRSE,
- UNIRSE, SOLTARSE, COMPARTIR, DIVIDIRSE_UNIDO, CONJUGAR, SECRETAR) = range(13)
+ UNIRSE, SOLTARSE, COMPARTIR, DIVIDIRSE_UNIDO, CONJUGAR, SECRETAR, SENALAR) = range(14)
 PRIMITIVAS = ["descansar", "avanzar", "girar_izq", "girar_der", "voltereta", "comer", "dividirse",
-              "unirse", "soltarse", "compartir", "dividirse_unido", "conjugar", "secretar"]
+              "unirse", "soltarse", "compartir", "dividirse_unido", "conjugar", "secretar", "senalar"]
 NUM_PRIM = len(PRIMITIVAS)
 PRIM_BASICAS = np.arange(DIVIDIRSE + 1)
 PRIM_ASOCIACION = np.array([UNIRSE, SOLTARSE, COMPARTIR, DIVIDIRSE_UNIDO, CONJUGAR])
 # acciones cuyo valor no se mide en energía propia: no se refuerzan por aprendizaje
 PRIM_SIN_REFUERZO = np.array([DIVIDIRSE, DIVIDIRSE_UNIDO, COMPARTIR, CONJUGAR, SECRETAR])
+# primitivas que no compiten por la acción del paso: sus genes fijan una salida continua (la señal)
+PRIM_NO_ACCION = np.array([SENALAR])
 
 # Sensores locales (los sociales van al final para conservar los índices de la fase 1).
 (S_CONST, S_AQUI, S_FRENTE, S_FRENTE_IZQ, S_FRENTE_DER, S_ENERGIA,
  S_VECINOS, S_BLOQUEADO, S_DELTA_E, S_RUIDO,
- S_ENLACES, S_ENERGIA_SOCIOS, S_SOCIO_FRENTE, S_SIMILITUD_FRENTE, S_COMPLEJO_AQUI) = range(15)
+ S_ENLACES, S_ENERGIA_SOCIOS, S_SOCIO_FRENTE, S_SIMILITUD_FRENTE, S_COMPLEJO_AQUI,
+ S_RUMBO_SOCIOS_SIN, S_RUMBO_SOCIOS_COS, S_EMPUJE_SOCIOS, S_SENAL_SOCIOS, S_SENAL_PROPIA) = range(20)
 SENSORES = ["const", "recurso_aqui", "recurso_frente", "recurso_frente_izq", "recurso_frente_der",
             "energia", "vecinos", "bloqueado", "delta_e", "ruido",
-            "enlaces", "energia_socios", "socio_frente", "similitud_frente", "complejo_aqui"]
+            "enlaces", "energia_socios", "socio_frente", "similitud_frente", "complejo_aqui",
+            "rumbo_socios_sin", "rumbo_socios_cos", "empuje_socios", "senal_socios", "senal_propia"]
+SENS_RUMBO = np.array([S_RUMBO_SOCIOS_SIN, S_RUMBO_SOCIOS_COS, S_EMPUJE_SOCIOS])
+SENS_SENAL = np.array([S_SENAL_SOCIOS, S_SENAL_PROPIA])
 NUM_SENS = len(SENSORES)
 
 CAMPOS = ("activo", "prim", "w", "b", "mu", "sens", "eta", "etiqueta")
 
 
 def primitivas_permitidas(asociacion: bool, conjugacion: bool, bien_publico: bool = False,
-                          division_unida: bool = True) -> np.ndarray:
+                          division_unida: bool = True, senales: bool = False) -> np.ndarray:
     permitidas = list(PRIM_BASICAS)
     if asociacion:
         permitidas += [p for p in PRIM_ASOCIACION
                        if (conjugacion or p != CONJUGAR) and (division_unida or p != DIVIDIRSE_UNIDO)]
     if bien_publico:
         permitidas.append(SECRETAR)
+    if senales:
+        permitidas.append(SENALAR)
     return np.array(permitidas)
+
+
+def compatibilizar(g: dict[str, np.ndarray]) -> dict[str, np.ndarray]:
+    """Completa con pesos nulos los genomas guardados con menos sensores (versiones anteriores)."""
+    faltan = NUM_SENS - g["w"].shape[-1]
+    if faltan > 0:
+        g = dict(g)
+        g["w"] = np.concatenate([g["w"], np.zeros(g["w"].shape[:-1] + (faltan,))], axis=-1)
+    return g
 
 
 def vacio(n: int, genes_max: int, xp=np) -> dict[str, np.ndarray]:

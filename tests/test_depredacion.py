@@ -144,3 +144,34 @@ def test_rampa(cfg):
         colocar(sim, quieto(cfg), [5], [x], E=50)
     sim.paso()
     assert sim.pob.n >= 14
+
+
+def test_escalada_del_refugio(cfg):
+    sim = sim_vacia(_cfg(cfg, refugio=2, refugio_final=4.0, escalada_inicio=10, escalada_pasos=20))
+    for t, esperado in ((0, 2.0), (10, 2.0), (20, 3.0), (30, 4.0), (100, 4.0)):
+        sim.t = t
+        assert np.isclose(sim.refugio_actual(), esperado)
+
+
+def test_sin_escalada_refugio_fijo(cfg):
+    sim = sim_vacia(_cfg(cfg, refugio=3))
+    sim.t = 10_000
+    assert sim.refugio_actual() == 3.0
+
+
+def test_par_vulnerable_tras_la_escalada(cfg):
+    # con refugio 2 un par está a salvo; tras escalar a 3, un ataque lo mata con prob. 1/2
+    sim = sim_vacia(_cfg(cfg, refugio=2, refugio_final=3.0, escalada_inicio=0, escalada_pasos=1))
+    for y in range(0, 20, 2):
+        _fila_en(sim, cfg, y)
+    sim.t = 5
+    sim.paso()
+    assert 0 < sim.pob.n < 20
+
+
+def _fila_en(sim, cfg, y):
+    n0 = sim.pob.n
+    colocar(sim, quieto(cfg), [y], [5], E=50)
+    colocar(sim, quieto(cfg), [y], [6], E=50)
+    p = sim.pob
+    p["socio"][n0, ESTE], p["socio"][n0 + 1, OESTE] = p["id"][n0 + 1], p["id"][n0]

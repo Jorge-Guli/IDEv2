@@ -40,7 +40,7 @@ def guardar_poblacion(sim, ruta: Path) -> None:
 
 def cargar_genomas(ruta: Path) -> dict[str, np.ndarray]:
     with np.load(ruta) as datos:
-        return {k: datos[k].copy() for k in gen.CAMPOS}
+        return gen.compatibilizar({k: datos[k].copy() for k in gen.CAMPOS})
 
 
 def guardar_linaje(sim, ruta: Path) -> None:

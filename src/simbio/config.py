@@ -129,6 +129,20 @@ class DepredacionCfg:
     rampa: int = 0  # pasos en los que la probabilidad de ataque sube linealmente desde 0 (0: de golpe)
     refugio: int = 4  # grupos de este tamaño o mayores no pueden ser comidos
     gradual: bool = True  # bajo el refugio, un ataque mata con prob. 1 − (tamaño − 1)/(refugio − 1)
+    # escalada (fase 3): el refugio sube linealmente de `refugio` a `refugio_final` entre `escalada_inicio`
+    # y `escalada_inicio + escalada_pasos` (un depredador que traga presas cada vez más grandes); 0: sin escalada
+    refugio_final: float = 0.0
+    escalada_inicio: int = 0
+    escalada_pasos: int = 0
+
+
+@dataclass
+class CoordinacionCfg:
+    # fase 3: percepción local para coordinar al grupo; desactivada, los sensores nuevos valen 0
+    rumbo: bool = False  # sensores del rumbo de los enlazados (seno y coseno del ángulo medio) y de su empuje
+    senales: bool = False  # primitiva senalar (no ocupa la acción del paso) y sensores de señal propia y de socios
+    barajar: bool = False  # control: los sensores nuevos reciben los valores de otro organismo al azar
+    costo_senal: float = 0.05  # por unidad de señal emitida y paso
 
 
 @dataclass
@@ -151,6 +165,7 @@ class Config:
     asociacion: AsociacionCfg = field(default_factory=AsociacionCfg)
     bien_publico: BienPublicoCfg = field(default_factory=BienPublicoCfg)
     depredacion: DepredacionCfg = field(default_factory=DepredacionCfg)
+    coordinacion: CoordinacionCfg = field(default_factory=CoordinacionCfg)
     sim: SimCfg = field(default_factory=SimCfg)
 
     def to_dict(self) -> dict[str, Any]:

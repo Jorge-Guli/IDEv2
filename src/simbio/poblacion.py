@@ -25,6 +25,7 @@ ESTADO = {
     "dado": (np.float64, ()),  # energía cedida en la vida
     "recibido": (np.float64, ()),  # energía recibida en la vida
     "recibido_paso": (np.float64, ()),  # energía recibida desde la última decisión
+    "senal": (np.float64, ()),  # señal emitida en el último paso (fase 3)
 }
 
 

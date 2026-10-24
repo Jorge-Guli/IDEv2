@@ -58,8 +58,9 @@ class Simulacion:
         self.costo_accion = xp.asarray(costo)
         self.sin_refuerzo = xp.asarray(gen.PRIM_SIN_REFUERZO)
         self.permitidas = gen.primitivas_permitidas(a.activa, a.conjugacion, cfg.bien_publico.activo,
-                                                    a.division_unida)
+                                                    a.division_unida, cfg.coordinacion.senales)
         self.bloqueadas = xp.asarray(~np.isin(np.arange(gen.NUM_PRIM), self.permitidas))
+        self.no_accion = xp.asarray(np.isin(np.arange(gen.NUM_PRIM), gen.PRIM_NO_ACCION))
         self._reiniciar_contadores()
         self.sembrar(genomas, cepas)
 
@@ -123,7 +124,9 @@ class Simulacion:
         self.cont = {"nacimientos": 0, "muertes": 0, "comido": 0.0, "org_pasos": 0,
                      "compartido": 0.0, "recibido": 0.0, "comido_libre": 0.0,
                      "comido_libre_sec": 0.0, "comido_libre_nosec": 0.0, "depredados": 0,
-                     "depredados_en_refugio": 0, "enlaces_por_union": 0, "enlaces_por_division": 0, "conjugaciones": 0, "enlaces_creados": 0,
+                     "depredados_en_refugio": 0, "enlaces_por_union": 0, "enlaces_por_division": 0,
+                     "grupos_empujan": 0, "grupos_mueven": 0, "grupos3_empujan": 0, "grupos3_mueven": 0,
+                     "grupos_bloqueados": 0, "conjugaciones": 0, "enlaces_creados": 0,
                      "acciones": xp.zeros(gen.NUM_PRIM, dtype=xp.int64)}
 
     def vecinos_enlazados(self, occ: np.ndarray) -> np.ndarray:
@@ -182,7 +185,31 @@ class Simulacion:
         s[:, gen.S_SIMILITUD_FRENTE] = xp.where(hay, 1.0 - dist / xp.sqrt(2.0), 0.0)
         if self.cfg.bien_publico.activo:
             s[:, gen.S_COMPLEJO_AQUI] = ent.C[y, x] / max(self.cfg.bien_publico.capacidad_complejo_max, 1e-12)
+        self._sensar_coordinacion(s, socios, enlazado, n_enl)
         return s
+
+    def _sensar_coordinacion(self, s, socios, enlazado, n_enl) -> None:
+        """Sensores de la fase 3, todos sobre los enlazados (percepción local por contacto): rumbo medio de
+        los socios relativo al propio (seno: hacia qué lado girar; coseno: cuán alineados), fracción de socios
+        que avanzaron en el paso anterior, señal media de los socios y señal propia del paso anterior."""
+        xp, p, c = self.xp, self.pob, self.cfg.coordinacion
+        cols = []
+        hay = xp.maximum(n_enl, 1)
+        sm = xp.maximum(socios, 0)
+        if c.rumbo:
+            d = p["dir"].astype(xp.int64)
+            delta = ((d[sm] - d[:, None] + 4) % 8 - 4) * (np.pi / 4)  # ángulo de cada socio respecto del propio
+            s[:, gen.S_RUMBO_SOCIOS_SIN] = xp.where(enlazado, xp.sin(delta), 0.0).sum(axis=1) / hay
+            s[:, gen.S_RUMBO_SOCIOS_COS] = xp.where(enlazado, xp.cos(delta), 0.0).sum(axis=1) / hay
+            s[:, gen.S_EMPUJE_SOCIOS] = (enlazado & (p["ult_act"][sm] == gen.AVANZAR)).sum(axis=1) / hay
+            cols += list(gen.SENS_RUMBO)
+        if c.senales:
+            s[:, gen.S_SENAL_SOCIOS] = xp.where(enlazado, p["senal"][sm], 0.0).sum(axis=1) / hay
+            s[:, gen.S_SENAL_PROPIA] = p["senal"]
+            cols += list(gen.SENS_SENAL)
+        if c.barajar and cols:  # control: la misma distribución de valores, sin relación con los socios propios
+            cols = xp.asarray(np.array(cols))
+            s[:, cols] = s[xp.asarray(self.rng.permutation(p.n))][:, cols]
 
     def decidir(self, s: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
         """Devuelve la primitiva elegida por cada organismo y la activación de cada gen."""
@@ -194,7 +221,9 @@ class Simulacion:
         expresa = (p["prim"][:, :, None] == xp.arange(gen.NUM_PRIM)) & p["activo"][:, :, None]
         impulso = xp.einsum("ng,nge->ne", a, expresa)
         disponible = expresa.any(axis=1) & ~self.bloqueadas
-        impulso = xp.where(disponible, impulso, -xp.inf)
+        # la señal es una salida continua aparte: sus genes no compiten por la acción del paso
+        p["senal"] = xp.where(disponible[:, gen.SENALAR], xp.clip(impulso[:, gen.SENALAR], 0.0, 1.0), 0.0)
+        impulso = xp.where(disponible & ~self.no_accion, impulso, -xp.inf)
         act = xp.argmax(impulso, axis=1)
         maximo = impulso[xp.arange(p.n), act]
         act = xp.where(maximo > 0.0, act, gen.DESCANSAR).astype(xp.int8)
@@ -354,6 +383,14 @@ class Simulacion:
         m = avanza[i]
         p["y"][i[m]], p["x"][i[m]] = ty[m], tx[m]
 
+    def refugio_actual(self) -> float:
+        """Tamaño de refugio vigente: `refugio`, o la interpolación lineal hacia `refugio_final` si hay escalada."""
+        d = self.cfg.depredacion
+        if d.refugio_final <= 0 or self.t < d.escalada_inicio:
+            return float(d.refugio)
+        f = min(1.0, (self.t - d.escalada_inicio) / d.escalada_pasos) if d.escalada_pasos > 0 else 1.0
+        return d.refugio + f * (d.refugio_final - d.refugio)
+
     def _depredar(self, socios) -> None:
         """Ataques del depredador sobre los vivos (tras pagar los costos del paso). Modo "tamano": el ataque
         mata según el tamaño del grupo conexo de vivos (refugio); "uniforme": siempre mata; "aleatorio":
@@ -373,13 +410,14 @@ class Simulacion:
             soc[(soc >= 0) & ~vivo[np.maximum(soc, 0)]] = -1  # quien muere de hambre en este paso no protege
             lab = componentes(soc)
             tam = np.bincount(lab, minlength=p.n)[lab]
-            if d.gradual and d.refugio > 1:
-                # cuanto más grande el grupo, más difícil de tragar: muerte con prob. 1 − (tam − 1)/(refugio − 1)
-                mata = np.clip(1.0 - (tam - 1) / (d.refugio - 1), 0.0, 1.0)
+            R = self.refugio_actual()
+            if d.gradual and R > 1:
+                # cuanto más grande el grupo, más difícil de tragar: muerte con prob. 1 − (tam − 1)/(R − 1)
+                mata = np.clip(1.0 - (tam - 1) / (R - 1), 0.0, 1.0)
             else:
-                mata = (tam < d.refugio).astype(float)
+                mata = (tam < R).astype(float)
             letal = atacado & (u_letal < mata)
-            self.cont["depredados_en_refugio"] += int((letal & (tam >= d.refugio)).sum())
+            self.cont["depredados_en_refugio"] += int((letal & (tam >= R)).sum())
         elif d.modo == "aleatorio":
             letal = atacado & (u_letal >= d.prob_perdon)
         else:
@@ -410,6 +448,9 @@ class Simulacion:
             empujan = m[a[m] == gen.AVANZAR]
             if empujan.size == 0:
                 continue
+            grande = m.size >= 3
+            self.cont["grupos_empujan"] += 1
+            self.cont["grupos3_empujan"] += grande
             vx, vy = DX[d[empujan]].sum(), DY[d[empujan]].sum()
             if np.hypot(vx, vy) < cfg.fraccion_empuje * m.size:
                 continue
@@ -417,7 +458,10 @@ class Simulacion:
             ny, nx = (y[m] + DY[k]) % H, (x[m] + DX[k]) % W
             destino = ocup[ny, nx]
             if not np.all((destino < 0) | (lab[np.maximum(destino, 0)] == lab[m[0]])):
+                self.cont["grupos_bloqueados"] += 1
                 continue
+            self.cont["grupos_mueven"] += 1
+            self.cont["grupos3_mueven"] += grande
             ocup[y[m], x[m]] = -1
             ocup[ny, nx] = m
             y[m], x[m] = ny, nx
@@ -443,7 +487,8 @@ class Simulacion:
 
             # costos: basal + genoma + acción + enlaces
             p["E"] -= (f.costo_basal + f.costo_por_gen * p["activo"].sum(axis=1) + self.costo_accion[act]
-                       + cfg.asociacion.costo_enlace * (socios >= 0).sum(axis=1))
+                       + cfg.asociacion.costo_enlace * (socios >= 0).sum(axis=1)
+                       + cfg.coordinacion.costo_senal * p["senal"])
 
             # depredación (tras los costos, para no alterar lo que perciben los vecinos en este paso)
             if cfg.depredacion.activa:
@@ -640,9 +685,21 @@ class Simulacion:
             fila["tamano_grupo_max"] = int(tam.max())
             fila["grupos_de_3_o_mas"] = float((tam >= 3).mean())
             if self.cfg.depredacion.activa:
-                fila["frac_en_refugio"] = float((tam >= self.cfg.depredacion.refugio).mean())
+                fila["frac_en_refugio"] = float((tam >= self.refugio_actual()).mean())
+                fila["refugio"] = self.refugio_actual()
                 fila["depredados"] = c["depredados"]
                 fila["depredados_en_refugio"] = c["depredados_en_refugio"]
+            # coordinación (fase 3): alineación del rumbo entre enlazados, éxito del empuje y señal
+            if ii.size:
+                dd = p["dir"].astype(xp.int64)
+                fila["alineacion_enlazados"] = float(xp.cos(((dd[jj] - dd[ii]) % 8) * (np.pi / 4)).mean())
+            else:
+                fila["alineacion_enlazados"] = float("nan")
+            for nombre in ("grupos", "grupos3"):
+                fila[f"exito_empuje_{nombre}"] = (c[f"{nombre}_mueven"] / c[f"{nombre}_empujan"]
+                                                  if c[f"{nombre}_empujan"] else float("nan"))
+            fila["grupos_bloqueados"] = c["grupos_bloqueados"]
+            fila["senal_media"] = float(p["senal"].mean())
             et = p["etiqueta"]
             fila["dist_etiqueta_enlazados"] = float(xp.linalg.norm(et[ii] - et[jj], axis=1).mean()) if ii.size \
                 else float("nan")

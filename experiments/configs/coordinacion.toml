@@ -1,0 +1,22 @@
+# Fase 3: coordinación del grupo. Ecología de la fase 2c con depredador gradual; después de la siembra,
+# el refugio escala de 2 a 3 (un depredador que traga presas cada vez más grandes).
+[mundo]
+alto = 128
+ancho = 128
+
+[asociacion]
+movimiento = "empuje"
+
+[depredacion]
+activa = true
+modo = "tamano"
+prob_ataque = 0.015
+refugio = 2
+inicio = 0
+refugio_final = 3.0
+escalada_inicio = 2000
+escalada_pasos = 30000
+
+[sim]
+poblacion_inicial = 600
+registrar_cada = 200
