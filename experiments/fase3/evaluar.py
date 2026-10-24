@@ -182,7 +182,9 @@ def _invariantes(_):
 def _rendimiento():
     cfg = config.cargar(CONFIG, CONDICIONES["ambos"] + ["mundo.alto=180", "mundo.ancho=180",
                                                          "sim.poblacion_inicial=1500", "sim.registrar_cada=100000",
-                                                         "sim.dispositivo=cpu"])
+                                                         "sim.dispositivo=cpu", "depredacion.inicio=100000"])
+    # sin depredador: desde LUCA, un depredador activo desde el paso 0 extingue la población y se mediría un
+    # mundo vacío (error de la primera evaluación)
     sim = Simulacion(cfg)
     sim.correr(1500)
     n0 = sim.pob.n
@@ -229,7 +231,8 @@ def main():
             "C2_invariantes": {"aprobado": invariantes["violaciones"] == 0 and invariantes["enlaces_observados"] > 0,
                                **invariantes},
             "C3_reproducibilidad": {"aprobado": huellas[0] == huellas[1]},
-            "C4_rendimiento": {"aprobado": rendimiento["pasos_por_segundo"] >= 40, **rendimiento},
+            "C4_rendimiento": {"aprobado": rendimiento["pasos_por_segundo"] >= 40 and rendimiento["poblacion"] >= 1000,
+                               **rendimiento},
         },
         "hipotesis": evaluar_hipotesis(por),
         "exploratorios": resumen,
