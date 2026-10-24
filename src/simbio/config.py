@@ -84,7 +84,9 @@ class AsociacionCfg:
     # "unanime": el grupo avanza solo si todos sus miembros avanzan en la misma dirección;
     # "empuje": el grupo se desplaza en la dirección de la suma de los empujes de sus miembros
     movimiento: str = "unanime"
+    # "fuerza" (fase 3c): se desplaza con probabilidad (suma de empujes unitarios en la dirección elegida) / tamaño^α
     fraccion_empuje: float = 0.5  # en "empuje": |suma de empujes| mínimo, como fracción del tamaño del grupo
+    exponente_arrastre: float = 1.0  # α en "fuerza"
     inerte: bool = False  # control: las primitivas de asociación cuestan pero no tienen efecto
     division_unida: bool = True  # False: la primitiva dividirse unido no existe (solo unirse crea enlaces)
     costo_enlace: float = 0.02  # por enlace y paso, para cada extremo

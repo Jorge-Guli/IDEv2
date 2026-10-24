@@ -349,7 +349,7 @@ class Simulacion:
         xp = self.xp
         p = self.pob
         H, W = self.entorno.alto, self.entorno.ancho
-        if self.cfg.asociacion.movimiento == "empuje" and bool((socios >= 0).any()):
+        if self.cfg.asociacion.movimiento in ("empuje", "fuerza") and bool((socios >= 0).any()):
             # los grupos enlazados se mueven por empuje colectivo; los sueltos, con la regla común
             enlazado = self._mover_grupos(act, occ, socios)
             act = xp.where(enlazado, gen.DESCANSAR, act).astype(xp.int8)
@@ -433,7 +433,8 @@ class Simulacion:
     def _mover_grupos(self, act, occ, socios):
         """Empuje colectivo: cada grupo conexo se desplaza una celda en la dirección (de las 8) más alineada
         con la suma de las orientaciones de sus miembros que eligieron avanzar, si esa suma alcanza
-        `fraccion_empuje` × tamaño y todas las celdas de destino están libres o son del propio grupo.
+        `fraccion_empuje` × tamaño (modo "empuje") o con probabilidad fuerza/tamaño^α (modo "fuerza"), y si todas
+        las celdas de destino están libres o son del propio grupo.
         Los grupos se procesan en orden aleatorio. Devuelve la máscara de organismos enlazados."""
         xp, p, cfg = self.xp, self.pob, self.cfg.asociacion
         H, W = self.entorno.alto, self.entorno.ancho
@@ -458,9 +459,19 @@ class Simulacion:
         hay = n_emp > 0
         self.cont["grupos_empujan"] += int(hay.sum())
         self.cont["grupos3_empujan"] += int((hay & (tam >= 3)).sum())
-        candidato = hay & (np.hypot(vx, vy) >= cfg.fraccion_empuje * tam)
         norma = np.hypot(DX, DY)
-        kg = np.argmax((DX[None, :] * vx[:, None] + DY[None, :] * vy[:, None]) / norma[None, :], axis=1)
+        if cfg.movimiento == "fuerza":
+            # fuerza neta sobre arrastre: cada empuje es un vector unitario (sin ventaja diagonal); el grupo se
+            # desplaza con probabilidad (fuerza en la dirección elegida) / tamaño^α, sin umbral
+            vx = np.bincount(gi, weights=emp * (DX / norma)[d[idx]], minlength=n_g)
+            vy = np.bincount(gi, weights=emp * (DY / norma)[d[idx]], minlength=n_g)
+            kg = np.argmax((DX[None, :] * vx[:, None] + DY[None, :] * vy[:, None]) / norma[None, :], axis=1)
+            proyeccion = (vx * DX[kg] + vy * DY[kg]) / norma[kg]
+            prob = np.minimum(1.0, proyeccion / tam ** cfg.exponente_arrastre)
+            candidato = hay & (self.rng.random(n_g) < prob)
+        else:
+            candidato = hay & (np.hypot(vx, vy) >= cfg.fraccion_empuje * tam)
+            kg = np.argmax((DX[None, :] * vx[:, None] + DY[None, :] * vy[:, None]) / norma[None, :], axis=1)
         # camino rápido exacto (mismo resultado que procesar todo en orden aleatorio):
         # - bloqueado fijo: alguna celda de destino la ocupa alguien que no se moverá en esta etapa
         #   (un suelto o un grupo que no alcanza el umbral);
