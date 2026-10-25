@@ -7,7 +7,7 @@ import numpy as np
 from . import dispositivo as dev
 from . import genoma as gen
 from .config import Config
-from .entorno import Entorno
+from .entorno import Entorno, generar_parches
 from .poblacion import Poblacion
 
 # Las 8 orientaciones: N, NE, E, SE, S, SO, O, NO. La opuesta de k es (k + 4) % 8.
@@ -39,11 +39,15 @@ class Simulacion:
                                                cfg.sim.umbral_gpu_celdas)
         xp = self.xp
         self.DY, self.DX, self.OPUESTA = xp.asarray(DY), xp.asarray(DX), xp.asarray(OPUESTA)
-        # spawn(3) conserva los dos primeros flujos de spawn(2): las corridas anteriores no cambian
-        semilla_entorno, semilla_sim, semilla_dep = np.random.SeedSequence(cfg.sim.semilla).spawn(3)
+        # spawn(4) conserva los primeros flujos de spawn(2) y spawn(3): las corridas anteriores no cambian
+        semilla_entorno, semilla_sim, semilla_dep, semilla_est = np.random.SeedSequence(cfg.sim.semilla).spawn(4)
         self.rng = np.random.default_rng(semilla_sim)
         self.rng_dep = np.random.default_rng(semilla_dep)  # depredador: mismos sorteos en todos los modos
+        self.rng_est = np.random.default_rng(semilla_est)  # estaciones: mapa de tipos y pistas (fase 7)
         self.entorno = Entorno(cfg.mundo, np.random.default_rng(semilla_entorno), xp, cfg.bien_publico)
+        if cfg.estaciones.activa:  # tipo de comida de cada celda: +1 (A) o −1 (B), en parches
+            campo = generar_parches(cfg.mundo.alto, cfg.mundo.ancho, cfg.estaciones.escala_parche, 1.0, self.rng_est)
+            self.tipo = xp.asarray(np.where(campo > np.median(campo), 1.0, -1.0))
         self.pob = Poblacion(cfg.herencia.genes_max, xp)
         self.t = 0
         self.sig_id = 0
@@ -129,7 +133,7 @@ class Simulacion:
                      "comido_libre_sec": 0.0, "comido_libre_nosec": 0.0, "depredados": 0,
                      "depredados_en_refugio": 0, "enlaces_por_union": 0, "enlaces_por_division": 0,
                      "grupos_empujan": 0, "grupos_mueven": 0, "grupos3_empujan": 0, "grupos3_mueven": 0,
-                     "grupos_bloqueados": 0, "difundido": 0.0, "conjugaciones": 0, "enlaces_creados": 0,
+                     "grupos_bloqueados": 0, "difundido": 0.0, "comida_buena": 0.0, "comida_mala": 0.0, "conjugaciones": 0, "enlaces_creados": 0,
                      "acciones": xp.zeros(gen.NUM_PRIM, dtype=xp.int64)}
 
     def vecinos_enlazados(self, occ: np.ndarray) -> np.ndarray:
@@ -192,6 +196,11 @@ class Simulacion:
         if self.cfg.memoria.activa:
             s[:, gen.S_MEMORIA_A] = p["memoria"][:, 0]
             s[:, gen.S_MEMORIA_B] = p["memoria"][:, 1]
+        e = self.cfg.estaciones
+        if e.activa:
+            s[:, gen.S_TIPO_AQUI] = self.tipo[y, x]
+            ve = xp.asarray(self.rng_est.random(p.n)) < e.p_pista
+            s[:, gen.S_PISTA] = xp.where(ve, self.estacion(), 0.0)
         return s
 
     def _sensar_coordinacion(self, s, socios, enlazado, n_enl) -> None:
@@ -410,6 +419,10 @@ class Simulacion:
         f = self.cfg.fisica
         return self.xp.minimum(f.maquinaria_max, (uso / f.maquinaria_ref) ** f.maquinaria_gamma)
 
+    def estacion(self) -> float:
+        """Estación vigente (fase 7): +1 nutre el tipo A, −1 nutre el tipo B."""
+        return 1.0 if (self.t // self.cfg.estaciones.periodo) % 2 == 0 else -1.0
+
     def refugio_actual(self) -> float:
         """Tamaño de refugio vigente: `refugio`, o la interpolación lineal hacia `refugio_final` si hay escalada."""
         d = self.cfg.depredacion
@@ -621,6 +634,11 @@ class Simulacion:
                 self.cont["comido_libre"] += float(libre.sum())
                 self.cont["comido_libre_sec"] += float(libre[secretor].sum())
                 self.cont["comido_libre_nosec"] += float(libre[~secretor].sum())
+            if cfg.estaciones.activa:  # fase 7: la comida del tipo fuera de estación es tóxica
+                buena = self.tipo[yi, xi] * self.estacion() > 0
+                rinde = rinde * xp.where(buena, 1.0, -cfg.estaciones.castigo)
+                self.cont["comida_buena"] += float(toma[buena].sum())
+                self.cont["comida_mala"] += float(toma[~buena].sum())
             p["E"][i] += toma * rinde
             self.cont["comido"] += float(toma.sum())
 
@@ -861,6 +879,14 @@ class Simulacion:
                                                   if c[f"{nombre}_empujan"] else float("nan"))
             fila["grupos_bloqueados"] = c["grupos_bloqueados"]
             fila.update(self._especializacion(lab, tam))
+            if self.cfg.estaciones.activa:
+                tot = c["comida_buena"] + c["comida_mala"]
+                fila["acierto_comida"] = c["comida_buena"] / tot if tot > 0 else float("nan")
+                fila["estacion"] = self.estacion()
+                if self.cfg.memoria.activa:  # ¿la memoria sigue a la estación? (+1: la codifica en un sentido)
+                    mem = dev.a_cpu(p["memoria"])
+                    al = [float(((2 * mem[:, k] - 1) * self.estacion()).mean()) for k in range(2)]
+                    fila["memoria_alineada_a"], fila["memoria_alineada_b"] = al
             fila["senal_media"] = float(p["senal"].mean())
             et = p["etiqueta"]
             fila["dist_etiqueta_enlazados"] = float(xp.linalg.norm(et[ii] - et[jj], axis=1).mean()) if ii.size \

@@ -174,6 +174,18 @@ class MemoriaCfg:
 
 
 @dataclass
+class EstacionesCfg:
+    # fase 7, memoria de contexto: dos tipos de comida (parches A y B); una estación oculta, que se alterna cada
+    # `periodo` pasos, decide cuál nutre y cuál es tóxica (energía = −castigo × lo comido); una pista de la
+    # estación se percibe en cada paso con probabilidad `p_pista`
+    activa: bool = False
+    periodo: int = 2000
+    castigo: float = 1.0
+    p_pista: float = 0.01
+    escala_parche: float = 10.0
+
+
+@dataclass
 class SimCfg:
     semilla: int = 0
     pasos: int = 5000
@@ -195,6 +207,7 @@ class Config:
     depredacion: DepredacionCfg = field(default_factory=DepredacionCfg)
     coordinacion: CoordinacionCfg = field(default_factory=CoordinacionCfg)
     memoria: MemoriaCfg = field(default_factory=MemoriaCfg)
+    estaciones: EstacionesCfg = field(default_factory=EstacionesCfg)
     sim: SimCfg = field(default_factory=SimCfg)
 
     def to_dict(self) -> dict[str, Any]:

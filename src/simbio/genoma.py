@@ -37,13 +37,14 @@ PRIM_NO_ACCION = np.array([SENALAR, MEMORIA_A, MEMORIA_B])
  S_VECINOS, S_BLOQUEADO, S_DELTA_E, S_RUIDO,
  S_ENLACES, S_ENERGIA_SOCIOS, S_SOCIO_FRENTE, S_SIMILITUD_FRENTE, S_COMPLEJO_AQUI,
  S_RUMBO_SOCIOS_SIN, S_RUMBO_SOCIOS_COS, S_EMPUJE_SOCIOS, S_SENAL_SOCIOS, S_SENAL_PROPIA,
- S_MEMORIA_A, S_MEMORIA_B) = range(22)
+ S_MEMORIA_A, S_MEMORIA_B, S_TIPO_AQUI, S_PISTA) = range(24)
 SENSORES = ["const", "recurso_aqui", "recurso_frente", "recurso_frente_izq", "recurso_frente_der",
             "energia", "vecinos", "bloqueado", "delta_e", "ruido",
             "enlaces", "energia_socios", "socio_frente", "similitud_frente", "complejo_aqui",
             "rumbo_socios_sin", "rumbo_socios_cos", "empuje_socios", "senal_socios", "senal_propia",
-            "memoria_a", "memoria_b"]
+            "memoria_a", "memoria_b", "tipo_aqui", "pista"]
 SENS_MEMORIA = np.array([S_MEMORIA_A, S_MEMORIA_B])
+SENS_ESTACIONES = np.array([S_TIPO_AQUI, S_PISTA])
 SENS_RUMBO = np.array([S_RUMBO_SOCIOS_SIN, S_RUMBO_SOCIOS_COS, S_EMPUJE_SOCIOS])
 SENS_SENAL = np.array([S_SENAL_SOCIOS, S_SENAL_PROPIA])
 NUM_SENS = len(SENSORES)
