@@ -37,3 +37,6 @@ La teoría sobre las transiciones a la multicelularidad (Michod 2006; Rueffler e
 | **Retornos crecientes a la especialización:** un especialista rinde más que dos generalistas a medias | **No:** en esta física, el rendimiento de cada acción no depende de cuánto se la practique |
 
 La fase 5 agrega esa condición: la eficiencia de comer y de empujar mejora con el uso reciente, como la maquinaria celular que se construye con la práctica (enzimas, flagelos).
+
+## Actualización (fase 5, exploración)
+Agregar retornos crecientes (maquinaria por uso) y energía compartida (puentes citoplasmáticos) **no produjo división del trabajo** en los pilotos. El aprendizaje individual, guiado por la energía propia, corre a todos hacia la tarea que paga al individuo (comer), y los organismos no tienen un estado interno estable que permita "tipos celulares". El próximo peldaño probablemente pide un genoma con **memoria interna** (paso C) y más tiempo evolutivo.
