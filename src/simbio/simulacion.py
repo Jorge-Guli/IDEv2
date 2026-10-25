@@ -199,8 +199,10 @@ class Simulacion:
         e = self.cfg.estaciones
         if e.activa:
             s[:, gen.S_TIPO_AQUI] = self.tipo[y, x]
-            ve = xp.asarray(self.rng_est.random(p.n)) < e.p_pista
-            s[:, gen.S_PISTA] = xp.where(ve, self.estacion(), 0.0)
+            u = self.rng_est.random((2, p.n))
+            ve = xp.asarray(u[0] < e.p_pista)
+            valor = self.estacion() if e.pista_informativa else xp.asarray(np.where(u[1] < 0.5, 1.0, -1.0))
+            s[:, gen.S_PISTA] = xp.where(ve, valor, 0.0)
         return s
 
     def _sensar_coordinacion(self, s, socios, enlazado, n_enl) -> None:

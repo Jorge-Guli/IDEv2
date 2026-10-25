@@ -187,6 +187,7 @@ class EstacionesCfg:
     # "diferido": da energía como la buena, pero deja un veneno de (1 + castigo) × lo comido que se descuenta
     # a razón de `tasa_veneno` por paso (mismo saldo neto, sin aviso inmediato)
     toxicidad: str = "inmediato"
+    pista_informativa: bool = True  # False (control): la pista es +1 o −1 al azar, sin relación con la estación
     tasa_veneno: float = 0.05
 
 
