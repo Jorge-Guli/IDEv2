@@ -25,7 +25,9 @@ Experimento de vida artificial. Organismos simples, que empiezan casi como una b
 
 **Fase 3d — ablación y sensibilidad: hecha (2026-10-24).** La percepción del rumbo de los socios actúa en vida: sin ella, las mismas poblaciones forman menos grupos y sostienen menos organismos. La alineación es heredada, el efecto vale para varios valores del arrastre y las señales arbitrarias nunca se usaron ([bitácora](docs/bitacora/2026-10-24-fase3d-evaluacion.md)).
 
-**Próximo: fase 4 — el colectivo como individuo** (reproducción del grupo, especialización y dependencia).
+**Fase 4a — restricción flagelar: cerrada (2026-10-25).** Si dividirse impide moverse un tiempo, como en *Volvox*, la evolución deja grupos más grandes y miembros que no se reproducen aunque podrían. Es un cambio heredable, que se ve en un jardín común. Todavía no es división del trabajo: los no reproductores no hacen otra cosa útil ([bitácora](docs/bitacora/2026-10-25-fase4b-evaluacion.md)).
+
+**Próximo: fase 4c** — modelo nulo en todas las poblaciones, control de costo privado de reproducirse y réplica.
 
 ## Uso
 

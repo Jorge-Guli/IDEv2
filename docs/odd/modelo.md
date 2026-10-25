@@ -1,6 +1,6 @@
 # Descripción del modelo (protocolo ODD)
 
-> Versión vigente: **fase 3c, cerrada el 2026-10-24**. El cuerpo describe la fase 1 (evolución básica); las fases siguientes se agregan como anexos al final. Este documento sigue el protocolo ODD (*Overview, Design concepts, Details*; Grimm et al. 2006, 2020) y se actualiza al cerrar cada fase. Los valores por defecto están en `src/simbio/config.py`.
+> Versión vigente: **fase 4a, cerrada el 2026-10-25**. El cuerpo describe la fase 1 (evolución básica); las fases siguientes se agregan como anexos al final. Este documento sigue el protocolo ODD (*Overview, Design concepts, Details*; Grimm et al. 2006, 2020) y se actualiza al cerrar cada fase. Los valores por defecto están en `src/simbio/config.py`.
 
 ## 1. Visión general
 
@@ -103,3 +103,8 @@ Detalle en `openspec/specs/coordinacion/spec.md`. Cambia la forma del genoma (14
 
 - **Modo `asociacion.movimiento = "fuerza"`.** Cada empuje es un vector unitario. El grupo se desplaza en la dirección más alineada con la suma, con probabilidad min(1, proyección de la suma sobre esa dirección / tamaño^α), si el destino está libre. **Regla adoptada a partir de esta fase: α = 0,5** (`asociacion.exponente_arrastre`), el arrastre de una colonia plana. Con α = 1 no se sostienen ni los pares.
 - El modo "empuje" (umbral) sigue disponible sin cambios, para reproducir las fases anteriores.
+
+## Anexo: fase 4a (restricción flagelar), cerrada el 2026-10-25
+
+- **`fisica.refractario_division` = T** (0 por defecto): tras una división lograda, progenitor e hijo quedan T pasos sin poder elegir avanzar; el grupo puede arrastrarlos. Control `refractario_modo = "aleatorio"`: períodos de T pasos sorteados con probabilidad 2 × divisiones del paso / población.
+- **Contadores de vida por organismo:** avances y divisiones. Métricas de especialización en grupos de 3 o más (concentración reproductiva, correlación avanzar/dividirse, fracción que nunca se dividió). Esta última mide hojas por construcción: se usa con un modelo nulo.

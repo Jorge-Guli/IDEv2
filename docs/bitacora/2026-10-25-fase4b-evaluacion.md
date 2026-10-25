@@ -30,10 +30,35 @@ Las poblaciones evolucionadas en la fase 4a corrieron sin mutación en dos ambie
 2. **La correlación negativa de la fase 4a era mecánica:** en el jardín común, los genomas r20 no la muestran más que los otros.
 3. El control r20a (la misma inmovilidad, al azar) no produce nada de esto: lo que seleccionó estos cambios es que la inmovilidad estuviera **ligada a reproducirse**.
 
+## Revisión científica
+Revisión independiente (subagente `revisor-cientifico`), con verificaciones ejecutadas:
+- **Implementación correcta y determinista.** El control aleatorio no tiene efectos colaterales que sesguen. Su ocupación refractaria no es idéntica: en la 4a fue algo mayor en r20a (0,32 contra 0,28) en 8 de 10 semillas, un sesgo conservador para G4.
+- **"Nunca se dividió" es una métrica de hojas.** Los enlaces nacen casi solo de dividirse unido, así que quien nunca se dividió tiene, por construcción, un solo socio: `nunca_dividio_interior` vale 0 en las 60 corridas. **G3 no controla la posición**, y G2 y G3 no son evidencia independiente. La frase "G3 reduce el efecto de la posición" era errónea.
+- **Prueba de sobredispersión, a favor de la conclusión, pero con una sola población evolucionada** (piloto 401):
+  - modelo nulo: reparto de las divisiones de cada grupo con tasa igual para todos (pesos por edad), a igual tamaño de grupo;
+  - genomas sin y r20a: coinciden con el nulo; genomas r20: 1,5 a 2 veces más miembros sin dividirse que el nulo;
+  - no es espacio ni energía: quienes nunca se dividieron tenían celdas libres y energía, pero ~50 % nunca intentó dividirse;
+  - en toda la vida, el 30–33 % de los miembros de grupos con genomas r20 mueren sin haberse dividido, contra el 9–11 % con sin y r20a.
+- **No hay complementariedad funcional:** quienes no se reproducen no empujan más (tasa de avanzar 0,285 contra 0,271). Es **supresión reproductiva dependiente del contexto**, no división del trabajo.
+- **El control r20a no aísla "ligada a la inmovilidad".** En r20, dividirse tiene un costo privado para quien se divide; en r20a, el costo se reparte. Hace falta un control con un costo privado equivalente sin inmovilidad.
+- **Estadística:** con 8 semillas, p = 0,0039 es el mínimo posible (las 8 con el mismo signo). Las 4 comparaciones comparten poblaciones: la evidencia equivale a "8 de 8 semillas", no a 4 réplicas independientes.
+- **G4 no replica el hallazgo de la 4a:** usa las mismas poblaciones donde se descubrió. Hacen falta semillas nuevas.
+
+## Lo que se afirma
+- La evolución bajo la restricción flagelar, frente al control aleatorio, dejó **cambios heredables**:
+  - más tendencia a formar grupos de 3 o más;
+  - menor propensión a dividirse;
+  - en una población analizada con modelo nulo, **un sesgo reproductivo dentro de los grupos**: miembros que no se dividen aunque tienen espacio y energía, más de lo que daría el azar con tasas iguales.
+- La correlación negativa de la 4a era mecánica.
+
 ## Lo que todavía no se puede afirmar
-- **Que sea división del trabajo en sentido estricto**, con roles diferenciados dentro del grupo. Dos explicaciones son compatibles con los datos:
-  - (a) diferenciación: algunos miembros se reproducen y otros no;
-  - (b) que los grupos sean más grandes y apretados, de modo que más miembros quedan sin espacio para dividirse.
-  
-  G3 (solo miembros de borde) reduce el efecto de la posición, pero no lo elimina: un miembro de borde puede estar rodeado por vecinos sin enlace. Para distinguirlas hace falta medir si las divisiones dentro de cada grupo están más concentradas de lo que daría el azar con tasas iguales (sobredispersión), a igual tamaño de grupo.
+- **"División del trabajo" o "miembros somáticos":** los no reproductores no hacen otra cosa útil para el grupo.
+- **Que la clave sea la ligadura con la inmovilidad** y no cualquier costo privado de reproducirse.
+- **Que el sesgo reproductivo sea general:** el análisis con modelo nulo cubre una sola población.
 - **Que exista dependencia:** no se midió si los miembros no reproductores sobreviven solos.
+
+## Decisión
+Fase 4c ([prerregistro](2026-10-25-fase4c-prerregistro.md)):
+- el análisis con modelo nulo sobre las 10 poblaciones de la 4a;
+- un control de costo privado de dividirse sin inmovilidad;
+- réplica con semillas nuevas.

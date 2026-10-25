@@ -40,7 +40,11 @@ CONDICIONES = {
     "r10": ["fisica.refractario_division=10"],
     "r20": ["fisica.refractario_division=20"],
     "r20a": ["fisica.refractario_division=20", 'fisica.refractario_modo="aleatorio"'],
+    # fase 4c: costo privado de dividirse, sin inmovilidad (costo_division por defecto: 2)
+    "c6": ["fisica.costo_division=6.0"],
+    "c12": ["fisica.costo_division=12.0"],
 }
+CONDICIONES_4A = ["sin", "r10", "r20", "r20a"]
 METRICAS = ["poblacion", "grupos_de_3_o_mas", "frac_enlazados", "concentracion_reproductiva", "corr_avanzar_dividir",
             "frac_nunca_dividio", "frac_refractarios", "alineacion_enlazados", "exito_empuje_grupos3"]
 
@@ -121,7 +125,7 @@ def main():
     t0 = time.time()
     with Pool(args.procesos) as pool:
         ancestros = pool.map(_ancestro, [(str(args.salida), s) for s in semillas])
-        rs = pool.map(_correr, [(str(args.salida), n, s, args.pasos) for n in CONDICIONES for s in semillas])
+        rs = pool.map(_correr, [(str(args.salida), n, s, args.pasos) for n in CONDICIONES_4A for s in semillas])
     por = {}
     for r in rs:
         por.setdefault(r["nombre"], []).append(r)

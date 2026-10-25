@@ -104,3 +104,10 @@ Cuando se corren las tres percepciones con α = 0,5, el script SHALL calcular la
 #### Scenario: Réplica
 - **WHEN** se ejecuta la evaluación de la fase 3c con `fuerza05_base`, `fuerza05_ambos` y `fuerza05_barajado`
 - **THEN** el informe incluye R1, R2 y R3
+
+### Requirement: Métricas de especialización
+Cada registro SHALL incluir, para los grupos de 3 o más y los miembros con edad ≥ 100: la concentración reproductiva (fracción de las divisiones del grupo hecha por su tercio más reproductivo), la correlación media entre las tasas de avanzar y de dividirse, la fracción de miembros que nunca se dividieron y la fracción de la población en período refractario.
+
+#### Scenario: Registro
+- **WHEN** termina un intervalo de registro
+- **THEN** las métricas de especialización están en el historial

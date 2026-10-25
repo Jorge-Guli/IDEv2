@@ -45,7 +45,7 @@ def test_sin_refractario_nada_cambia(cfg):
     assert (sim.pob["refractario"] == 0).all()
 
 
-def test_control_aleatorio_misma_frecuencia(cfg):
+def test_control_aleatorio_desligado_de_dividirse(cfg):
     cfg.fisica.refractario_division = 10
     cfg.fisica.refractario_modo = "aleatorio"
     cfg.sim.poblacion_inicial = 300

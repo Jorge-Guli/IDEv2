@@ -31,3 +31,11 @@ Prerregistro: [`2026-10-24-fase4-prerregistro.md`](2026-10-24-fase4-prerregistro
 - Fracción en grupos de 3 o más: 0,57 con r20, contra 0,36 en el control y 0,26 sin restricción. r20 supera al control en 9 de 10 semillas.
 - En la semilla 102, cuyo ancestro no tenía grupos, aparecieron desde cero (0,65); en las otras condiciones de esa semilla, no.
 - Coincide con el argumento de *Volvox*: si dividirse inmoviliza, estar en un grupo que te arrastra amortigua el costo, y el grupo pasa a rendir más. Como no estaba prerregistrado, se prueba en la fase 4b.
+
+## Cierre (tras la fase 4b y su revisión)
+Ver [fase 4b](2026-10-25-fase4b-evaluacion.md). Lo que queda de la 4a:
+- E1 era mecánica.
+- E2 refleja, al menos en parte, un cambio heredable: menor propensión a dividirse y sesgo reproductivo dentro de los grupos.
+- El aumento de grupos es heredable en estas poblaciones.
+
+Las preguntas abiertas pasan a la [fase 4c](2026-10-25-fase4c-prerregistro.md).
