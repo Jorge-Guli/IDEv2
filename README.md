@@ -27,7 +27,9 @@ Experimento de vida artificial. Organismos simples, que empiezan casi como una b
 
 **Fase 4a — restricción flagelar: cerrada (2026-10-25).** Si dividirse impide moverse un tiempo, como en *Volvox*, la evolución deja grupos más grandes y miembros que no se reproducen aunque podrían. Es un cambio heredable, que se ve en un jardín común. Todavía no es división del trabajo: los no reproductores no hacen otra cosa útil ([bitácora](docs/bitacora/2026-10-25-fase4b-evaluacion.md)).
 
-**Próximo: fase 4c** — modelo nulo en todas las poblaciones, control de costo privado de reproducirse y réplica.
+**Fase 4c — réplica y controles: hecha (2026-10-25).** Con 20 poblaciones, el "sesgo reproductivo" visto en una sola resultó no generalizarse: lo que se selecciona es dividirse menos. La restricción favorece los grupos (replicado con semillas nuevas), pero no aparece la división del trabajo ([bitácora](docs/bitacora/2026-10-25-fase4c-evaluacion.md)).
+
+**Próximo: fase 5** — retornos crecientes a la especialización y energía compartida dentro del grupo.
 
 ## Uso
 
