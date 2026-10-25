@@ -29,7 +29,9 @@ Experimento de vida artificial. Organismos simples, que empiezan casi como una b
 
 **Fase 4c — réplica y controles: hecha (2026-10-25).** Con 20 poblaciones, el "sesgo reproductivo" visto en una sola resultó no generalizarse: lo que se selecciona es dividirse menos. La restricción favorece los grupos (replicado con semillas nuevas), pero no aparece la división del trabajo ([bitácora](docs/bitacora/2026-10-25-fase4c-evaluacion.md)).
 
-**Próximo: fase 5** — retornos crecientes a la especialización y energía compartida dentro del grupo.
+**Fases 5 y 6 — especialización y memoria: cerradas (2026-10-25).** Con retornos crecientes, energía compartida y una memoria interna heredable, no apareció división del trabajo, y la memoria nunca se usó en hasta 2750 generaciones: en este mundo una estrategia reactiva alcanza ([síntesis](docs/03-sintesis.md)).
+
+**Próximo: fase 7 — un mundo que exija memoria y anticipación.**
 
 ## Uso
 

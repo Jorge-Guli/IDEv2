@@ -40,3 +40,6 @@ La fase 5 agrega esa condición: la eficiencia de comer y de empujar mejora con 
 
 ## Actualización (fase 5, exploración)
 Agregar retornos crecientes (maquinaria por uso) y energía compartida (puentes citoplasmáticos) **no produjo división del trabajo** en los pilotos. El aprendizaje individual, guiado por la energía propia, corre a todos hacia la tarea que paga al individuo (comer), y los organismos no tienen un estado interno estable que permita "tipos celulares". El próximo peldaño probablemente pide un genoma con **memoria interna** (paso C) y más tiempo evolutivo.
+
+## Actualización (fase 6)
+Una memoria interna heredable, capaz de formar interruptores biestables, **no se usó en ~1000–2750 generaciones**. En este mundo una estrategia reactiva alcanza: nada recompensa recordar. La lección es que **la cognición evoluciona cuando el mundo la exige**. El proyecto cambia de eje hacia mundos donde recordar y anticipar paguen (fase 7), que además es el camino más directo hacia la pregunta de fondo sobre la inteligencia.

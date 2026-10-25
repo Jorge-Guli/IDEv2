@@ -6,7 +6,7 @@
 
 ## 2. Experimentos
 - [x] 2.1 Pilotos (semillas 501 y 601) y prerregistro
-- [ ] 2.2 `experiments/fase6/largo.py`: semillas 131–135, 150 000 pasos, en el equipo local; revisar y registrar
+- [x] 2.2 `experiments/fase6/largo.py`: semillas 131–135, 150 000 pasos, en el equipo local; revisar y registrar
 
 ## Workflow follow-up
 - Archivar `fase-6-memoria`.
