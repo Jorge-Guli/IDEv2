@@ -128,7 +128,7 @@ class Simulacion:
                      "comido_libre_sec": 0.0, "comido_libre_nosec": 0.0, "depredados": 0,
                      "depredados_en_refugio": 0, "enlaces_por_union": 0, "enlaces_por_division": 0,
                      "grupos_empujan": 0, "grupos_mueven": 0, "grupos3_empujan": 0, "grupos3_mueven": 0,
-                     "grupos_bloqueados": 0, "conjugaciones": 0, "enlaces_creados": 0,
+                     "grupos_bloqueados": 0, "difundido": 0.0, "conjugaciones": 0, "enlaces_creados": 0,
                      "acciones": xp.zeros(gen.NUM_PRIM, dtype=xp.int64)}
 
     def vecinos_enlazados(self, occ: np.ndarray) -> np.ndarray:
@@ -614,6 +614,16 @@ class Simulacion:
                 self.cont["comido_libre_nosec"] += float(libre[~secretor].sum())
             p["E"][i] += toma
             self.cont["comido"] += float(toma.sum())
+
+            # puentes citoplasmáticos (fase 5): la energía se difunde por los enlaces, sin decisión del genoma
+            kappa = cfg.asociacion.difusion_energia
+            if kappa > 0 and not cfg.asociacion.inerte:
+                hay = socios >= 0
+                E = p["E"]
+                flujo = kappa * xp.where(hay, E[xp.maximum(socios, 0)] - E[:, None], 0.0).sum(axis=1) / 8.0
+                p["E"] = E + flujo
+                p["recibido_paso"] += flujo  # no es resultado de la acción propia: no entra al aprendizaje
+                self.cont["difundido"] += float(xp.abs(flujo).sum()) / 2.0
 
             # secretar enzima (después de comer, en la propia celda)
             bp = cfg.bien_publico

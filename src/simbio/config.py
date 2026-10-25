@@ -107,6 +107,9 @@ class AsociacionCfg:
     fraccion_compartir: float = 0.2
     eficiencia_compartir: float = 0.9
     costo_conjugar: float = 0.5
+    # fase 5, puentes citoplasmáticos: cada paso, la energía se difunde por los enlaces (se conserva):
+    # ΔE_i = κ · Σ_socios (E_j − E_i) / 8. κ = 0: sin difusión
+    difusion_energia: float = 0.0
 
 
 @dataclass

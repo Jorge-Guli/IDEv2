@@ -57,3 +57,23 @@ def test_el_hijo_hereda_la_maquinaria(cfg):
     sim.pob["uso_comer"][:] = 0.8
     sim.paso()
     assert sim.pob.n == 2 and np.allclose(sim.pob["uso_comer"], 0.8 * (1 - cfg.fisica.maquinaria_memoria))
+
+
+def test_puentes_citoplasmaticos_conservan_y_igualan(cfg):
+    from .test_asociacion import ESTE, OESTE
+    cfg.asociacion.difusion_energia = 0.5
+    cfg.mundo.capacidad_max = 0.0
+    cfg.fisica.costo_basal = 0.0
+    cfg.fisica.costo_por_gen = 0.0
+    cfg.asociacion.costo_enlace = 0.0
+    sim = sim_vacia(cfg)
+    quieto = genoma_con(cfg, [(gen.DESCANSAR, 5.0, {})])
+    colocar(sim, quieto, [5], [5], E=80)
+    colocar(sim, quieto, [5], [6], E=20)
+    colocar(sim, quieto, [9], [9], E=30)  # suelto: no recibe nada
+    p = sim.pob
+    p["socio"][0, ESTE], p["socio"][1, OESTE] = p["id"][1], p["id"][0]
+    sim.paso()
+    E = sim.pob["E"]
+    assert np.isclose(E[0] + E[1], 100.0) and np.isclose(E[2], 30.0)
+    assert np.isclose(E[0], 80 - 0.5 * 60 / 8)
