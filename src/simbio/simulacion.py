@@ -578,6 +578,12 @@ class Simulacion:
             p["ult_s"], p["ult_a"], p["ult_act"] = s, a, act
             p["E_prev"] = p["E"].copy()
 
+            # veneno diferido (fase 7): se descuenta de a poco
+            if cfg.estaciones.activa and cfg.estaciones.toxicidad == "diferido":
+                dosis = cfg.estaciones.tasa_veneno * p["veneno"]
+                p["veneno"] -= dosis
+                p["E"] -= dosis
+
             # costos: basal + genoma + acción + enlaces
             p["E"] -= (f.costo_basal + f.costo_por_gen * p["activo"].sum(axis=1) + self.costo_accion[act]
                        + cfg.asociacion.costo_enlace * (socios >= 0).sum(axis=1)
@@ -636,7 +642,10 @@ class Simulacion:
                 self.cont["comido_libre_nosec"] += float(libre[~secretor].sum())
             if cfg.estaciones.activa:  # fase 7: la comida del tipo fuera de estación es tóxica
                 buena = self.tipo[yi, xi] * self.estacion() > 0
-                rinde = rinde * xp.where(buena, 1.0, -cfg.estaciones.castigo)
+                if cfg.estaciones.toxicidad == "diferido":
+                    p["veneno"][i] += xp.where(buena, 0.0, (1.0 + cfg.estaciones.castigo) * toma * rinde)
+                else:
+                    rinde = rinde * xp.where(buena, 1.0, -cfg.estaciones.castigo)
                 self.cont["comida_buena"] += float(toma[buena].sum())
                 self.cont["comida_mala"] += float(toma[~buena].sum())
             p["E"][i] += toma * rinde

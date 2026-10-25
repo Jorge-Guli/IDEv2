@@ -32,6 +32,7 @@ ESTADO = {
     "uso_comer": (np.float64, ()),  # promedio móvil del uso de comer (fase 5)
     "uso_avanzar": (np.float64, ()),  # promedio móvil del uso de avanzar (fase 5)
     "memoria": (np.float64, (2,)),  # memoria interna (paso C)
+    "veneno": (np.float64, ()),  # veneno pendiente de descontar (fase 7, toxicidad diferida)
 }
 
 

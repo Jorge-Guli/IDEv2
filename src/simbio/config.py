@@ -183,6 +183,11 @@ class EstacionesCfg:
     castigo: float = 1.0
     p_pista: float = 0.01
     escala_parche: float = 10.0
+    # "inmediato": la comida tóxica resta castigo × lo comido al instante (detectable con el sensor de ΔE);
+    # "diferido": da energía como la buena, pero deja un veneno de (1 + castigo) × lo comido que se descuenta
+    # a razón de `tasa_veneno` por paso (mismo saldo neto, sin aviso inmediato)
+    toxicidad: str = "inmediato"
+    tasa_veneno: float = 0.05
 
 
 @dataclass

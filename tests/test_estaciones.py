@@ -53,3 +53,18 @@ def test_desactivadas(cfg):
     colocar(sim, genoma_con(cfg, [(gen.DESCANSAR, 5.0, {})]), [5], [5], E=50)
     occ = sim.ocupacion()
     assert not sim.sensar(occ, sim.validar_enlaces(occ))[0, gen.SENS_ESTACIONES].any()
+
+
+def test_toxicidad_diferida(cfg):
+    _cfg(cfg)
+    cfg.estaciones.toxicidad = "diferido"
+    cfg.estaciones.castigo = 0.5
+    sim = sim_vacia(cfg)
+    sim.entorno.K_base[:] = 10.0
+    sim.entorno.R[:] = 10.0
+    come = genoma_con(cfg, [(gen.COMER, 5.0, {})])
+    yb = np.argwhere(sim.tipo < 0)[0]
+    colocar(sim, come, [yb[0]], [yb[1]], E=50)
+    sim.paso()  # come tóxica: gana energía al instante, pero queda veneno
+    p = sim.pob
+    assert p["E"][0] > 50 and np.isclose(p["veneno"][0], 1.5 * cfg.fisica.toma_max)
