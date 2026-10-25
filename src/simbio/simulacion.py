@@ -95,6 +95,8 @@ class Simulacion:
         d["dir"] = xp.asarray(self.rng.integers(0, 8, n).astype(np.int8))
         d["E"], d["E_prev"] = E.copy(), E.copy()
         d["estres"] = estres.copy()
+        d["uso_comer"][:] = self.cfg.fisica.maquinaria_ref  # maquinaria de un generalista (fase 5)
+        d["uso_avanzar"][:] = self.cfg.fisica.maquinaria_ref
         d["id"] = xp.arange(self.sig_id, self.sig_id + n)
         self.sig_id += n
         d["padre"] = padre
@@ -357,6 +359,12 @@ class Simulacion:
             act = xp.where(enlazado, gen.DESCANSAR, act).astype(xp.int8)
             occ = self.ocupacion(vivos)
         i = xp.flatnonzero(act == gen.AVANZAR)
+        if self.cfg.fisica.maquinaria_gamma > 0 and i.size:
+            # maquinaria por uso: un suelto avanza con probabilidad min(1, eficiencia)
+            ok = xp.asarray(self.rng.random(int(i.size))) < self.eficiencia(p["uso_avanzar"][i])
+            act = act.copy()
+            act[i[~ok]] = gen.DESCANSAR
+            i = i[ok]
         if i.size == 0:
             return
         d = p["dir"].astype(xp.int64)
@@ -389,6 +397,11 @@ class Simulacion:
             p["E"][i[frenado]] += self.cfg.fisica.costo_avanzar
         m = avanza[i]
         p["y"][i[m]], p["x"][i[m]] = ty[m], tx[m]
+
+    def eficiencia(self, uso):
+        """Maquinaria por uso (fase 5): eficiencia de una acción según su uso reciente."""
+        f = self.cfg.fisica
+        return self.xp.minimum(f.maquinaria_max, (uso / f.maquinaria_ref) ** f.maquinaria_gamma)
 
     def refugio_actual(self) -> float:
         """Tamaño de refugio vigente: `refugio`, o la interpolación lineal hacia `refugio_final` si hay escalada."""
@@ -465,6 +478,8 @@ class Simulacion:
         if cfg.movimiento == "fuerza":
             # fuerza neta sobre arrastre: cada empuje es un vector unitario (sin ventaja diagonal); el grupo se
             # desplaza con probabilidad (fuerza en la dirección elegida) / tamaño^α, sin umbral
+            if self.cfg.fisica.maquinaria_gamma > 0:  # cada empuje pesa según la maquinaria de quien empuja
+                emp = emp * dev.a_cpu(self.eficiencia(p["uso_avanzar"]))[idx]
             vx = np.bincount(gi, weights=emp * (DX / norma)[d[idx]], minlength=n_g)
             vy = np.bincount(gi, weights=emp * (DY / norma)[d[idx]], minlength=n_g)
             kg = np.argmax((DX[None, :] * vx[:, None] + DY[None, :] * vy[:, None]) / norma[None, :], axis=1)
@@ -557,6 +572,10 @@ class Simulacion:
             vivos = p["E"] > 0.0
             self.cont["acciones"] += xp.bincount(act[vivos], minlength=gen.NUM_PRIM)
             p["n_avances"] += (act == gen.AVANZAR) & vivos
+            # uso reciente (se registra siempre, también para medir roles en el control γ = 0)
+            r = f.maquinaria_memoria
+            p["uso_comer"] += r * ((act == gen.COMER) - p["uso_comer"])
+            p["uso_avanzar"] += r * ((act == gen.AVANZAR) - p["uso_avanzar"])
             p["refractario"] = xp.maximum(p["refractario"] - 1, 0).astype(xp.int16)
             self.cont["org_pasos"] += int(vivos.sum())
             if not vivos.all():
@@ -580,7 +599,8 @@ class Simulacion:
             # comer
             i = xp.flatnonzero(act == gen.COMER)
             yi, xi = p["y"][i], p["x"][i]
-            toma = xp.minimum(xp.minimum(ent.comestible()[yi, xi], f.toma_max),
+            toma_max = f.toma_max * self.eficiencia(p["uso_comer"][i]) if f.maquinaria_gamma > 0 else f.toma_max
+            toma = xp.minimum(xp.minimum(ent.comestible()[yi, xi], toma_max),
                               xp.maximum(f.energia_max - p["E"][i], 0.0))
             del_simple = xp.minimum(toma, ent.R[yi, xi])  # primero el recurso simple, después el libre
             ent.R[yi, xi] -= del_simple
@@ -658,6 +678,8 @@ class Simulacion:
                     self.cont["enlaces_por_division"] += int(unido.sum())
                     self.cont["nacimientos"] += padres.size
                     p["n_divisiones"][padres] += 1
+                    nuevos["uso_comer"] = p["uso_comer"][padres].copy()  # el hijo hereda la maquinaria
+                    nuevos["uso_avanzar"] = p["uso_avanzar"][padres].copy()
                     T = f.refractario_division
                     if T > 0 and f.refractario_modo == "division":
                         p["refractario"][padres] = T
@@ -734,7 +756,13 @@ class Simulacion:
             if d.std() > 0 and a.std() > 0:
                 corr.append(float(np.corrcoef(d, a)[0, 1]))
         media = lambda v: float(np.mean(v)) if v else float("nan")  # noqa: E731
-        return {"concentracion_reproductiva": media(conc), "corr_avanzar_dividir": media(corr),
+        # roles (fase 5): índice (uso_comer − uso_avanzar) / (uso_comer + uso_avanzar), dispersión dentro de los
+        # grupos de 3 o más (media de los desvíos por grupo) y en toda la población
+        uc, ua = dev.a_cpu(p["uso_comer"]), dev.a_cpu(p["uso_avanzar"])
+        rol = (uc - ua) / np.maximum(uc + ua, 1e-9)
+        disp = [float(rol[(tam >= 3) & (lab == g)].std()) for g in np.unique(lab[tam >= 3])]
+        extra = {"dispersion_roles_grupos": media(disp), "dispersion_roles_poblacion": float(rol.std()) if rol.size else float("nan")}
+        return {**extra, "concentracion_reproductiva": media(conc), "corr_avanzar_dividir": media(corr),
                 "frac_nunca_dividio": media(nunca), "frac_refractarios": float((dev.a_cpu(p["refractario"]) > 0).mean())}
 
     def medir(self) -> dict[str, float]:

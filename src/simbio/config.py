@@ -42,6 +42,12 @@ class FisicaCfg:
     # "division": el período lo dispara la división; "aleatorio" (control): lo dispara un sorteo con la misma
     # frecuencia por organismo que las divisiones del paso, sin relación con dividirse
     refractario_modo: str = "division"
+    # fase 5, maquinaria por uso: cada organismo lleva un promedio móvil del uso de comer y de avanzar (k); la
+    # eficiencia de cada acción es min(maquinaria_max, (k / maquinaria_ref)^γ). γ = 0: sin efecto (física anterior)
+    maquinaria_gamma: float = 0.0
+    maquinaria_memoria: float = 0.05  # peso del paso actual en el promedio móvil del uso
+    maquinaria_ref: float = 0.35  # uso de referencia (eficiencia 1); ~ el de un generalista
+    maquinaria_max: float = 2.5
 
 
 @dataclass
