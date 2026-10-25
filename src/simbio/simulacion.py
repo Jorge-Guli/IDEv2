@@ -58,7 +58,7 @@ class Simulacion:
         self.costo_accion = xp.asarray(costo)
         self.sin_refuerzo = xp.asarray(gen.PRIM_SIN_REFUERZO)
         self.permitidas = gen.primitivas_permitidas(a.activa, a.conjugacion, cfg.bien_publico.activo,
-                                                    a.division_unida, cfg.coordinacion.senales)
+                                                    a.division_unida, cfg.coordinacion.senales, cfg.memoria.activa)
         self.bloqueadas = xp.asarray(~np.isin(np.arange(gen.NUM_PRIM), self.permitidas))
         self.no_accion = xp.asarray(np.isin(np.arange(gen.NUM_PRIM), gen.PRIM_NO_ACCION))
         self._reiniciar_contadores()
@@ -95,6 +95,7 @@ class Simulacion:
         d["dir"] = xp.asarray(self.rng.integers(0, 8, n).astype(np.int8))
         d["E"], d["E_prev"] = E.copy(), E.copy()
         d["estres"] = estres.copy()
+        d["memoria"][:] = self.cfg.memoria.inicial
         d["uso_comer"][:] = self.cfg.fisica.maquinaria_ref  # maquinaria de un generalista (fase 5)
         d["uso_avanzar"][:] = self.cfg.fisica.maquinaria_ref
         d["id"] = xp.arange(self.sig_id, self.sig_id + n)
@@ -188,6 +189,9 @@ class Simulacion:
         if self.cfg.bien_publico.activo:
             s[:, gen.S_COMPLEJO_AQUI] = ent.C[y, x] / max(self.cfg.bien_publico.capacidad_complejo_max, 1e-12)
         self._sensar_coordinacion(s, socios, enlazado, n_enl)
+        if self.cfg.memoria.activa:
+            s[:, gen.S_MEMORIA_A] = p["memoria"][:, 0]
+            s[:, gen.S_MEMORIA_B] = p["memoria"][:, 1]
         return s
 
     def _sensar_coordinacion(self, s, socios, enlazado, n_enl) -> None:
@@ -230,6 +234,9 @@ class Simulacion:
         disponible = expresa.any(axis=1) & ~self.bloqueadas
         # la señal es una salida continua aparte: sus genes no compiten por la acción del paso
         p["senal"] = xp.where(disponible[:, gen.SENALAR], xp.clip(impulso[:, gen.SENALAR], 0.0, 1.0), 0.0)
+        if self.cfg.memoria.activa:  # memoria interna: los genes de memoria la suben o bajan
+            dm = xp.where(disponible[:, gen.PRIM_MEMORIA], impulso[:, gen.PRIM_MEMORIA], 0.0)
+            p["memoria"] = xp.clip(p["memoria"] + self.cfg.memoria.tasa * dm, 0.0, 1.0)
         impulso = xp.where(disponible & ~self.no_accion, impulso, -xp.inf)
         # restricción flagelar: quien está en período refractario no puede avanzar (elige otra acción)
         impulso[:, gen.AVANZAR] = xp.where(p["refractario"] > 0, -xp.inf, impulso[:, gen.AVANZAR])
@@ -691,6 +698,7 @@ class Simulacion:
                     self.cont["enlaces_por_division"] += int(unido.sum())
                     self.cont["nacimientos"] += padres.size
                     p["n_divisiones"][padres] += 1
+                    nuevos["memoria"] = p["memoria"][padres].copy()  # memoria epigenética
                     nuevos["uso_comer"] = p["uso_comer"][padres].copy()  # el hijo hereda la maquinaria
                     nuevos["uso_avanzar"] = p["uso_avanzar"][padres].copy()
                     T = f.refractario_division
@@ -775,6 +783,15 @@ class Simulacion:
         rol = (uc - ua) / np.maximum(uc + ua, 1e-9)
         disp = [float(rol[(tam >= 3) & (lab == g)].std()) for g in np.unique(lab[tam >= 3])]
         extra = {"dispersion_roles_grupos": media(disp), "dispersion_roles_poblacion": float(rol.std()) if rol.size else float("nan")}
+        if self.cfg.memoria.activa:
+            mem = dev.a_cpu(p["memoria"])
+            dm = [float(mem[(tam >= 3) & (lab == g)].std(axis=0).mean()) for g in np.unique(lab[tam >= 3])]
+            extra["memoria_media"] = float(mem.mean()) if mem.size else float("nan")
+            extra["dispersion_memoria_grupos"] = media(dm)
+            # ¿la memoria se asocia al rol? correlación entre memoria A y el índice de rol, en grupos ≥ 3
+            m = tam >= 3
+            extra["corr_memoria_rol"] = (float(np.corrcoef(mem[m, 0], rol[m])[0, 1])
+                                         if m.sum() > 10 and mem[m, 0].std() > 0 and rol[m].std() > 0 else float("nan"))
         return {**extra, "concentracion_reproductiva": media(conc), "corr_avanzar_dividir": media(corr),
                 "frac_nunca_dividio": media(nunca), "frac_refractarios": float((dev.a_cpu(p["refractario"]) > 0).mean())}
 

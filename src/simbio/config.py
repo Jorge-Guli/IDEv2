@@ -165,6 +165,15 @@ class CoordinacionCfg:
 
 
 @dataclass
+class MemoriaCfg:
+    # paso C: memoria interna persistente (2 variables en [0, 1]) que el genoma escribe con las primitivas
+    # memoria_a y memoria_b (no ocupan la acción) y lee con dos sensores; el hijo la hereda
+    activa: bool = False
+    tasa: float = 0.1  # m ← clip(m + tasa · impulso, 0, 1)
+    inicial: float = 0.0
+
+
+@dataclass
 class SimCfg:
     semilla: int = 0
     pasos: int = 5000
@@ -185,6 +194,7 @@ class Config:
     bien_publico: BienPublicoCfg = field(default_factory=BienPublicoCfg)
     depredacion: DepredacionCfg = field(default_factory=DepredacionCfg)
     coordinacion: CoordinacionCfg = field(default_factory=CoordinacionCfg)
+    memoria: MemoriaCfg = field(default_factory=MemoriaCfg)
     sim: SimCfg = field(default_factory=SimCfg)
 
     def to_dict(self) -> dict[str, Any]:

@@ -31,6 +31,7 @@ ESTADO = {
     "n_divisiones": (np.int32, ()),  # divisiones logradas en la vida (fase 4)
     "uso_comer": (np.float64, ()),  # promedio móvil del uso de comer (fase 5)
     "uso_avanzar": (np.float64, ()),  # promedio móvil del uso de avanzar (fase 5)
+    "memoria": (np.float64, (2,)),  # memoria interna (paso C)
 }
 
 
