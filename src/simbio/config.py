@@ -111,6 +111,8 @@ class AsociacionCfg:
     # fase 5, puentes citoplasmáticos: cada paso, la energía se difunde por los enlaces (se conserva):
     # ΔE_i = κ · Σ_socios (E_j − E_i) / 8. κ = 0: sin difusión
     difusion_energia: float = 0.0
+    # si la energía recibida por los puentes cuenta para el aprendizaje (recompensa en parte compartida con el grupo)
+    difusion_aprende: bool = False
 
 
 @dataclass

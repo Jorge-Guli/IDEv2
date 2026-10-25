@@ -624,7 +624,8 @@ class Simulacion:
                 E = p["E"]
                 flujo = kappa * xp.where(hay, E[xp.maximum(socios, 0)] - E[:, None], 0.0).sum(axis=1) / 8.0
                 p["E"] = E + flujo
-                p["recibido_paso"] += flujo  # no es resultado de la acción propia: no entra al aprendizaje
+                if not cfg.asociacion.difusion_aprende:
+                    p["recibido_paso"] += flujo  # no es resultado de la acción propia: no entra al aprendizaje
                 self.cont["difundido"] += float(xp.abs(flujo).sum()) / 2.0
 
             # secretar enzima (después de comer, en la propia celda)
