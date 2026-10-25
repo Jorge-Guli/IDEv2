@@ -24,10 +24,12 @@ def test_especialista_come_mas(cfg):
     E0 = sim.pob["E"].copy()
     sim.paso()
     ganado = sim.pob["E"] - E0
-    # el uso se actualiza antes de comer: el paso actual cuenta
+    # el uso se actualiza antes de comer: el paso actual cuenta; ambos toman toma_max de recurso, pero el
+    # especialista saca más energía de cada unidad
     r, k0 = cfg.fisica.maquinaria_memoria, cfg.fisica.maquinaria_ref
     ef = [min(2.5, ((0.7 + r * 0.3) / k0) ** 2), ((k0 + r * (1 - k0)) / k0) ** 2]
     assert np.isclose(ganado[0] - ganado[1], cfg.fisica.toma_max * (ef[0] - ef[1]))
+    assert np.isclose(sim.entorno.R[5, 5], sim.entorno.R[5, 10])
 
 
 def test_sin_uso_no_avanza(cfg):

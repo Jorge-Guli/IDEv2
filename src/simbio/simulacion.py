@@ -599,9 +599,11 @@ class Simulacion:
             # comer
             i = xp.flatnonzero(act == gen.COMER)
             yi, xi = p["y"][i], p["x"][i]
-            toma_max = f.toma_max * self.eficiencia(p["uso_comer"][i]) if f.maquinaria_gamma > 0 else f.toma_max
-            toma = xp.minimum(xp.minimum(ent.comestible()[yi, xi], toma_max),
-                              xp.maximum(f.energia_max - p["E"][i], 0.0))
+            # maquinaria por uso (fase 5): el rendimiento (energía por unidad de recurso) depende del uso reciente;
+            # con γ = 0 el rendimiento es 1 y todo queda como antes
+            rinde = self.eficiencia(p["uso_comer"][i]) if f.maquinaria_gamma > 0 else 1.0
+            toma = xp.minimum(xp.minimum(ent.comestible()[yi, xi], f.toma_max),
+                              xp.maximum(f.energia_max - p["E"][i], 0.0) / rinde)
             del_simple = xp.minimum(toma, ent.R[yi, xi])  # primero el recurso simple, después el libre
             ent.R[yi, xi] -= del_simple
             if cfg.bien_publico.activo:
@@ -612,7 +614,7 @@ class Simulacion:
                 self.cont["comido_libre"] += float(libre.sum())
                 self.cont["comido_libre_sec"] += float(libre[secretor].sum())
                 self.cont["comido_libre_nosec"] += float(libre[~secretor].sum())
-            p["E"][i] += toma
+            p["E"][i] += toma * rinde
             self.cont["comido"] += float(toma.sum())
 
             # puentes citoplasmáticos (fase 5): la energía se difunde por los enlaces, sin decisión del genoma
