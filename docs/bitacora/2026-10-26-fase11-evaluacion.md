@@ -34,7 +34,18 @@ Prerregistro: [2026-10-26-fase11-prerregistro.md](2026-10-26-fase11-prerregistro
   - condición de expresión por gen;
   - modulación del receptor químico;
   - decisión estocástica.
-- **Lo que limita ya no es el mundo ni la representación, sino la evolucionabilidad del genoma:** la tanh por gen satura, y las mutaciones de peso son chicas (σ = 0,3).
+- **Lo que limita ya no es el mundo ni la representación.** La hipótesis de una saturación general de los genes no se confirmó en la medición posterior (ver abajo). El límite parece ser que el segundo peldaño exige varias piezas que solo pagan juntas.
+
+## Medición de evolucionabilidad (posterior a la corrida, exploratoria)
+**Qué se midió:** en qué fracción de las decisiones cambia la acción elegida tras una mutación puntual de peso o de sesgo de un gen al azar. Situaciones reales tomadas a los 1000 pasos de una corrida sin mutación; 20 repeticiones.
+
+| Origen | σ = 0,3 (la de la simulación) | σ = 3 |
+|---|---|---|
+| LUCA | 0,14 % | 8,0 % |
+| Fase 10, población 188 | 1,5 % | 9,9 % |
+| Fase 11, `a_mod` 183 | 1,7 % | 11,3 % |
+
+**Las poblaciones evolucionadas no son menos evolucionables que LUCA en esta medida global:** una mutación cambia más decisiones, no menos. **La hipótesis de la saturación como límite general no se sostiene así como está.** Puede valer para las decisiones específicas que harían falta (irse de la comida que no coincide con la memoria), pero eso queda por medir. La explicación más simple que sigue en pie es la de las piezas neutras o costosas: un gen nuevo, la condición y un peso grande sobre el tipo de comida, que solo pagan juntas.
 
 ## Decisión
 Pendiente de la revisión científica independiente de las fases 9–11 (en curso). Las opciones que se evalúan para la fase 12:
