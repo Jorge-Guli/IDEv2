@@ -62,9 +62,13 @@ def genomas_iniciales(cfg, semilla):
 
 def _correr(tarea):
     salida, nombre, semilla, pasos = tarea
-    cfg = config.cargar(fase7.CONFIG, BASE + CONDICIONES[nombre])
+    return correr_condicion(salida, nombre, semilla, pasos, BASE + CONDICIONES[nombre], nombre in SEMBRADAS)
+
+
+def correr_condicion(salida, nombre, semilla, pasos, ajustes, sembrada):
+    cfg = config.cargar(fase7.CONFIG, ajustes)
     cfg.sim.semilla, cfg.sim.pasos = semilla, pasos
-    g = genomas_iniciales(cfg, semilla) if nombre in SEMBRADAS else None
+    g = genomas_iniciales(cfg, semilla) if sembrada else None
     sim = corrida.correr(cfg, Path(salida) / nombre / f"semilla_{semilla}", genomas=g, imagenes=False)
     h = sim.historial
     res = {"nombre": nombre, "semilla": semilla, "extinta": sim.pob.n == 0,

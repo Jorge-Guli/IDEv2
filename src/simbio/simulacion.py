@@ -200,7 +200,7 @@ class Simulacion:
         if e.activa:
             s[:, gen.S_TIPO_AQUI] = self.tipo[y, x]
             u = self.rng_est.random((2, p.n))
-            ve = xp.asarray(u[0] < e.p_pista)
+            ve = xp.asarray(u[0] < self.p_pista())
             valor = self.estacion() if e.pista_informativa else xp.asarray(np.where(u[1] < 0.5, 1.0, -1.0))
             s[:, gen.S_PISTA] = xp.where(ve, valor, 0.0)
         return s
@@ -251,6 +251,8 @@ class Simulacion:
         p["senal"] = xp.where(disponible[:, gen.SENALAR], xp.clip(impulso[:, gen.SENALAR], 0.0, 1.0), 0.0)
         if self.cfg.memoria.activa:  # memoria interna: los genes de memoria la suben o bajan
             dm = xp.where(disponible[:, gen.PRIM_MEMORIA], impulso[:, gen.PRIM_MEMORIA], 0.0)
+            if self.cfg.memoria.umbral > 0:  # cerrojo (fase 10): los impulsos chicos no mueven la memoria
+                dm = xp.where(xp.abs(dm) > self.cfg.memoria.umbral, dm, 0.0)
             p["memoria"] = xp.clip(p["memoria"] + self.cfg.memoria.tasa * dm, 0.0, 1.0)
         impulso = xp.where(disponible & ~self.no_accion, impulso, -xp.inf)
         # restricción flagelar: quien está en período refractario no puede avanzar (elige otra acción)
@@ -428,6 +430,14 @@ class Simulacion:
     def estacion(self) -> float:
         """Estación vigente (fase 7): +1 nutre el tipo A, −1 nutre el tipo B."""
         return 1.0 if (self.t // self.cfg.estaciones.periodo) % 2 == 0 else -1.0
+
+    def p_pista(self) -> float:
+        """Probabilidad vigente de percibir la pista (fase 10: rampa desde `p_pista_inicial`)."""
+        e = self.cfg.estaciones
+        if e.rampa_pista <= 0:
+            return e.p_pista
+        f = min(1.0, self.t / e.rampa_pista)
+        return e.p_pista_inicial + f * (e.p_pista - e.p_pista_inicial)
 
     def factor_toxicidad(self) -> float:
         """Fracción de la toxicidad plena vigente (fase 9: rampa desde 0)."""

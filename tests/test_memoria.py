@@ -62,3 +62,26 @@ def test_desactivada(cfg):
     colocar(sim, genoma_con(cfg, [(gen.MEMORIA_A, 0.5, {}), (gen.DESCANSAR, 5.0, {})]), [5], [5], E=50)
     sim.decidir(_sensar(sim))
     assert sim.pob["memoria"][0, 0] == 0.0 and not _sensar(sim)[0, gen.SENS_MEMORIA].any()
+
+
+def test_cerrojo_ignora_impulsos_chicos(cfg):
+    """Fase 10: con umbral, un sesgo chico no mueve la memoria; uno grande sí."""
+    cfg.memoria.activa = True
+    cfg.memoria.umbral = 0.5
+    sim = sim_vacia(cfg)
+    colocar(sim, genoma_con(cfg, [(gen.MEMORIA_A, 0.2, {}), (gen.COMER, 5.0, {})]), [5], [5], E=50)
+    colocar(sim, genoma_con(cfg, [(gen.MEMORIA_A, 2.0, {}), (gen.COMER, 5.0, {})]), [9], [9], E=50)
+    sim.decidir(_sensar(sim))
+    assert sim.pob["memoria"][0, 0] == 0.0
+    assert np.isclose(sim.pob["memoria"][1, 0], cfg.memoria.tasa * np.tanh(2.0))
+
+
+def test_rampa_de_la_pista(cfg):
+    cfg.estaciones.activa = True
+    cfg.estaciones.p_pista, cfg.estaciones.p_pista_inicial, cfg.estaciones.rampa_pista = 0.01, 0.21, 100
+    sim = sim_vacia(cfg)
+    assert np.isclose(sim.p_pista(), 0.21)
+    sim.t = 50
+    assert np.isclose(sim.p_pista(), 0.11)
+    sim.t = 500
+    assert np.isclose(sim.p_pista(), 0.01)

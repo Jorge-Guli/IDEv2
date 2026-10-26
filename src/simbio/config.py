@@ -172,6 +172,9 @@ class MemoriaCfg:
     activa: bool = False
     tasa: float = 0.1  # m ← clip(m + tasa · impulso, 0, 1)
     inicial: float = 0.0
+    # fase 10, memoria tipo cerrojo: solo cambia ante impulsos de magnitud mayor que `umbral` (zona muerta);
+    # 0 = sin umbral. Un gen de memoria con un sesgo chico deja de borrar lo recordado
+    umbral: float = 0.0
 
 
 @dataclass
@@ -194,6 +197,10 @@ class EstacionesCfg:
     # pleno en `rampa_toxicidad` pasos; 0 = plena desde el inicio. Evita el colapso inicial de LUCA, que come de
     # todo y acumula veneno diferido
     rampa_toxicidad: int = 0
+    # fase 10, currículo de la pista: la probabilidad baja linealmente de `p_pista_inicial` a `p_pista` en
+    # `rampa_pista` pasos (0 = sin rampa)
+    p_pista_inicial: float = 0.0
+    rampa_pista: int = 0
 
 
 @dataclass
