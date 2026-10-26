@@ -32,7 +32,9 @@ Experimento de vida artificial. Organismos simples, que empiezan casi como una b
 
 **Fases 5 y 6 — especialización y memoria: cerradas (2026-10-25).** Con retornos crecientes, energía compartida y una memoria interna heredable, no apareció división del trabajo, y la memoria nunca se usó en hasta 2750 generaciones: en este mundo una estrategia reactiva alcanza ([síntesis](docs/03-sintesis.md)).
 
-**Próximo: fase 7 — un mundo que exija memoria y anticipación.**
+**Fases 7 a 9 — un mundo que exige memoria: cerradas (2026-10-26).** Con estaciones ocultas, una pista intermitente y toxicidad diferida, la memoria no evolucionó en ~1000–3000 generaciones, ni en un mosaico donde es la única forma de pasar del azar (fase 8) ni con genes cuya expresión depende de la memoria (fase 9). Un módulo de memoria armado a mano gana siempre: el camino existe, pero su primer peldaño no se premia ([fase 9](docs/bitacora/2026-10-26-fase9-evaluacion.md), [estado del arte](docs/05-estado-del-arte.md)).
+
+**En curso: fase 10 — peldaños para la memoria** (memoria tipo cerrojo, rampa de la pista y utilidad directa del estado interno).
 
 ## Uso
 

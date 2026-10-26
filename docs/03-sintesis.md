@@ -49,3 +49,8 @@ Una memoria interna heredable, capaz de formar interruptores biestables, **no se
 - **Fase 8.** En un mundo de mosaico donde la memoria es la única forma de pasar del azar, y donde paga mucho (verificado con competencias), **la memoria no evolucionó en ~3000 generaciones**.
 
 **Lección: el cuello de botella ya no es el mundo, sino el genoma.** Las innovaciones que exigen combinar informaciones (sincronizar, diferenciarse, recordar y usar lo recordado) requieren varios genes coordinados, y la mutación al azar no cruza ese valle. La biología resolvió esto con la **regulación**: genes que se expresan según el estado de la célula. Es el próximo cambio del modelo (fase 9).
+
+## Actualización (fase 9)
+Con **genes que se expresan según la memoria**, la regla "en la estación A comé A" cabe en genes simples, pero la memoria **siguió sin evolucionar** (~1800 generaciones, 8 semillas), aun sembrando el gen de memoria. El mapa de pasos intermedios muestra un camino gradual (memoria → avanzar condicionado → comer condicionado) cuyo primer paso no da ventaja y además se borra por deriva. Es lo que mostraron Lenski y colegas en Avida (2003): una función compleja evoluciona solo si sus peldaños también se premian. Los genes condicionados sí se difundieron, como interruptores heredables.
+
+**Lección:** no alcanza con que el premio final exista y la regla sea representable; **cada peldaño necesita su propio premio**. La fase 10 busca ese primer peldaño.

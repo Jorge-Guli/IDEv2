@@ -108,3 +108,30 @@ Detalle en `openspec/specs/coordinacion/spec.md`. Cambia la forma del genoma (14
 
 - **`fisica.refractario_division` = T** (0 por defecto): tras una división lograda, progenitor e hijo quedan T pasos sin poder elegir avanzar; el grupo puede arrastrarlos. Control `refractario_modo = "aleatorio"`: períodos de T pasos sorteados con probabilidad 2 × divisiones del paso / población.
 - **Contadores de vida por organismo:** avances y divisiones. Métricas de especialización en grupos de 3 o más (concentración reproductiva, correlación avanzar/dividirse, fracción que nunca se dividió). Esta última mide hojas por construcción: se usa con un modelo nulo.
+
+## Anexo: fase 4c (modelo nulo, control de costo privado), hecha el 2026-10-25
+- Sin cambios de física. Control `fisica.costo_division` (costo privado de dividirse, sin inmovilidad).
+
+## Anexo: fase 5 (retornos crecientes, energía compartida), explorada el 2026-10-25
+- **Maquinaria por uso** (`fisica.maquinaria_gamma`, `maquinaria_memoria`, `maquinaria_ref`, `maquinaria_max`): el rendimiento de comer y el éxito de avanzar crecen con el uso reciente de esa acción (media móvil por organismo); 0 = apagada.
+- **Puentes citoplasmáticos** (`asociacion.difusion_energia` = κ): la energía se difunde por los enlaces a razón de κ·(diferencia)/8 por paso, sin decisión del genoma; `difusion_aprende` decide si entra en la señal de aprendizaje.
+
+## Anexo: fase 6 (memoria interna), cerrada el 2026-10-25
+- **Memoria** (`memoria.activa`): dos variables en [0, 1] por organismo. Las escriben las primitivas MEMORIA_A y MEMORIA_B (no ocupan la acción): m ← clip(m + tasa·impulso). Se leen con dos sensores y el hijo las hereda.
+- Señal (SENALAR) y memoria son salidas continuas que no compiten con la acción del paso.
+
+## Anexo: fases 7 y 8 (estaciones, pista, toxicidad diferida), cerradas el 2026-10-26
+- **Estaciones** (`estaciones.activa`): cada celda tiene un tipo de comida (+1 o −1, en parches de escala `escala_parche`; 1,0 = mosaico fino de la fase 8). Una estación oculta se alterna cada `periodo` pasos y decide qué tipo nutre.
+- **Toxicidad** (`toxicidad`):
+  - "inmediato": la comida fuera de estación resta castigo × lo comido;
+  - "diferido": nutre como la buena, pero deja un veneno de (1 + castigo) × lo comido, que se descuenta a razón de `tasa_veneno` por paso; al dividirse, el veneno se reparte.
+- **Sensores:** tipo de comida aquí, y una pista de la estación con probabilidad `p_pista` por paso (`pista_informativa = false`: valor al azar, como control). La pista se sortea con un generador propio, para no alterar el resto de la simulación.
+
+## Anexo: fase 9 (regulación condicionada), cerrada el 2026-10-26
+- **Condición de expresión por gen** (`cond`, 5 valores): siempre, o solo si la memoria A (o B) está por encima o por debajo de 0,5. Con la memoria apagada no actúa.
+- **Mutación de la condición** (`herencia.k_condicion`): solo si la memoria está permitida. Los genes duplicados copian su condición; los nuevos nacen con condición 0. Los genomas guardados antes de esta fase se cargan con condición 0.
+- **Rampa de toxicidad** (`estaciones.rampa_toxicidad`): la toxicidad crece linealmente de 0 a su valor pleno.
+
+## Anexo: fase 10 (peldaños para la memoria), en curso
+- **Memoria tipo cerrojo** (`memoria.umbral`): los impulsos de memoria de magnitud ≤ umbral no la cambian.
+- **Rampa de la pista** (`estaciones.p_pista_inicial`, `rampa_pista`): la probabilidad de la pista baja linealmente desde el valor inicial.
