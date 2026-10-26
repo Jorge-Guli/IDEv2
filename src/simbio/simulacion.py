@@ -728,6 +728,9 @@ class Simulacion:
                     self.cont["nacimientos"] += padres.size
                     p["n_divisiones"][padres] += 1
                     nuevos["memoria"] = p["memoria"][padres].copy()  # memoria epigenética
+                    # el veneno pendiente se reparte como la energía (antes el hijo nacía limpio: una laguna)
+                    p["veneno"][padres] = p["veneno"][padres] / 2.0
+                    nuevos["veneno"] = p["veneno"][padres].copy()
                     nuevos["uso_comer"] = p["uso_comer"][padres].copy()  # el hijo hereda la maquinaria
                     nuevos["uso_avanzar"] = p["uso_avanzar"][padres].copy()
                     T = f.refractario_division

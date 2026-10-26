@@ -68,3 +68,15 @@ def test_toxicidad_diferida(cfg):
     sim.paso()  # come tóxica: gana energía al instante, pero queda veneno
     p = sim.pob
     assert p["E"][0] > 50 and np.isclose(p["veneno"][0], 1.5 * cfg.fisica.toma_max)
+
+
+def test_el_veneno_se_reparte_al_dividirse(cfg):
+    _cfg(cfg)
+    cfg.estaciones.toxicidad = "diferido"
+    cfg.mundo.capacidad_max = 0.0
+    sim = sim_vacia(cfg)
+    colocar(sim, genoma_con(cfg, [(gen.DIVIDIRSE, 5.0, {})]), [5], [5], E=90)
+    sim.pob["veneno"][:] = 10.0
+    sim.paso()
+    v = sim.pob["veneno"]
+    assert sim.pob.n == 2 and np.allclose(v, 10.0 * (1 - cfg.estaciones.tasa_veneno) / 2)
