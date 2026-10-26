@@ -80,3 +80,25 @@ def test_el_veneno_se_reparte_al_dividirse(cfg):
     sim.paso()
     v = sim.pob["veneno"]
     assert sim.pob.n == 2 and np.allclose(v, 10.0 * (1 - cfg.estaciones.tasa_veneno) / 2)
+
+
+def test_rampa_de_toxicidad(cfg):
+    """Fase 9: al inicio de la rampa la comida fuera de estación nutre como la buena; al final, castiga."""
+    cfg = _cfg(cfg)
+    cfg.estaciones.rampa_toxicidad = 100
+    sim = sim_vacia(cfg)
+    assert sim.factor_toxicidad() == 0.0
+    sim.t = 50
+    assert sim.factor_toxicidad() == 0.5
+    sim.t = 200
+    assert sim.factor_toxicidad() == 1.0
+    sim = sim_vacia(cfg)
+    sim.entorno.K_base[:] = 10.0
+    sim.entorno.R[:] = 10.0
+    come = genoma_con(cfg, [(gen.COMER, 5.0, {})])
+    ya, yb = np.argwhere(sim.tipo > 0)[0], np.argwhere(sim.tipo < 0)[0]
+    colocar(sim, come, [ya[0]], [ya[1]], E=50)
+    colocar(sim, come, [yb[0]], [yb[1]], E=50)
+    sim.paso()
+    E = sim.pob["E"]
+    assert abs(float(E[0] - E[1])) < 1e-9  # t = 0: sin toxicidad

@@ -1,7 +1,7 @@
 """Fase 9: ¿evoluciona la regulación condicionada (genes que se expresan según la memoria)?
 
 Mundo mosaico de la fase 8 (dos tipos de comida mezclados finamente, estación oculta cada 2000 pasos, toxicidad
-diferida, pista con probabilidad 0,01). Sin aprendizaje. En el piloto desde LUCA puro (100 000 pasos) la memoria no
+diferida que crece desde 0 en los primeros 30 000 pasos, pista con probabilidad 0,01). Sin aprendizaje. En el piloto desde LUCA puro (100 000 pasos) la memoria no
 apareció: el gen de memoria cuesta y no sirve sin genes condicionados, y viceversa. Para separar los dos pasos, la
 población arranca con LUCA más un gen de memoria ya conectado a la pista (memoria A = 1 en la estación A, 0 en la
 B); lo que tiene que evolucionar es usarla. Condiciones:
@@ -35,7 +35,10 @@ fase7 = importlib.util.module_from_spec(_spec)
 sys.modules["evaluar_fase7"] = fase7
 _spec.loader.exec_module(fase7)
 
-BASE = fase7.MUNDOS["mosaico"] + ["memoria.activa=true", "aprendizaje.activo=false"]
+# rampa de toxicidad (30 000 pasos): sin ella, LUCA (sembrado o no) colapsa a unas decenas en los primeros
+# 1000 pasos y se extingue en la mitad de las semillas del piloto
+BASE = fase7.MUNDOS["mosaico"] + ["memoria.activa=true", "aprendizaje.activo=false",
+                                  "estaciones.rampa_toxicidad=30000"]
 CONDICIONES = {
     "sem_info": [],
     "sem_ruido": ["estaciones.pista_informativa=false"],

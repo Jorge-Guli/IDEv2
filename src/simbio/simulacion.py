@@ -429,6 +429,11 @@ class Simulacion:
         """Estación vigente (fase 7): +1 nutre el tipo A, −1 nutre el tipo B."""
         return 1.0 if (self.t // self.cfg.estaciones.periodo) % 2 == 0 else -1.0
 
+    def factor_toxicidad(self) -> float:
+        """Fracción de la toxicidad plena vigente (fase 9: rampa desde 0)."""
+        r = self.cfg.estaciones.rampa_toxicidad
+        return min(1.0, self.t / r) if r > 0 else 1.0
+
     def refugio_actual(self) -> float:
         """Tamaño de refugio vigente: `refugio`, o la interpolación lineal hacia `refugio_final` si hay escalada."""
         d = self.cfg.depredacion
@@ -648,10 +653,11 @@ class Simulacion:
                 self.cont["comido_libre_nosec"] += float(libre[~secretor].sum())
             if cfg.estaciones.activa:  # fase 7: la comida del tipo fuera de estación es tóxica
                 buena = self.tipo[yi, xi] * self.estacion() > 0
+                tox = (1.0 + cfg.estaciones.castigo) * self.factor_toxicidad()
                 if cfg.estaciones.toxicidad == "diferido":
-                    p["veneno"][i] += xp.where(buena, 0.0, (1.0 + cfg.estaciones.castigo) * toma * rinde)
+                    p["veneno"][i] += xp.where(buena, 0.0, tox * toma * rinde)
                 else:
-                    rinde = rinde * xp.where(buena, 1.0, -cfg.estaciones.castigo)
+                    rinde = rinde * xp.where(buena, 1.0, 1.0 - tox)
                 self.cont["comida_buena"] += float(toma[buena].sum())
                 self.cont["comida_mala"] += float(toma[~buena].sum())
             p["E"][i] += toma * rinde

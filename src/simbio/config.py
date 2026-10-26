@@ -190,6 +190,10 @@ class EstacionesCfg:
     toxicidad: str = "inmediato"
     pista_informativa: bool = True  # False (control): la pista es +1 o −1 al azar, sin relación con la estación
     tasa_veneno: float = 0.05
+    # fase 9: la toxicidad crece linealmente de 0 (la comida fuera de estación nutre como la buena) a su valor
+    # pleno en `rampa_toxicidad` pasos; 0 = plena desde el inicio. Evita el colapso inicial de LUCA, que come de
+    # todo y acumula veneno diferido
+    rampa_toxicidad: int = 0
 
 
 @dataclass
