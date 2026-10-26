@@ -132,6 +132,20 @@ Detalle en `openspec/specs/coordinacion/spec.md`. Cambia la forma del genoma (14
 - **Mutación de la condición** (`herencia.k_condicion`): solo si la memoria está permitida. Los genes duplicados copian su condición; los nuevos nacen con condición 0. Los genomas guardados antes de esta fase se cargan con condición 0.
 - **Rampa de toxicidad** (`estaciones.rampa_toxicidad`): la toxicidad crece linealmente de 0 a su valor pleno.
 
-## Anexo: fase 10 (peldaños para la memoria), en curso
+## Anexo: fase 10 (peldaños para la memoria), cerrada el 2026-10-26
 - **Memoria tipo cerrojo** (`memoria.umbral`): los impulsos de memoria de magnitud ≤ umbral no la cambian.
 - **Rampa de la pista** (`estaciones.p_pista_inicial`, `rampa_pista`): la probabilidad de la pista baja linealmente desde el valor inicial.
+- **Digestión inducible** (`estaciones.induccion`, `inercia_digestion`):
+  - un estado digestivo d por organismo (inicial 0,5, heredado al dividirse) sigue a la memoria A: d ← d + (m_A − d)/inercia;
+  - lo absorbido de la comida de tipo t (nutrientes y veneno) se multiplica por 1 + induccion·(2d − 1)·t, y la energía se recorta a E_max.
+- **Métrica de seguimiento:** covarianza normalizada entre (2m − 1) y la estación. La versión prerregistrada tiene aliasing de muestreo (máximo ≈ 0,5); la corregida descarta los primeros 250 pasos de cada estación.
+
+## Anexo: fase 11 (modulación y decisión estocástica), cerrada el 2026-10-26
+- **Modulación** (`herencia.modulacion`):
+  - condiciones 5 y 6: la memoria A o B cambia el signo de la respuesta del gen a los receptores químicos (`gen.SENS_MODULABLES` = tipo de comida): z = b + w·s + (2m − 2)·w_q·s_q;
+  - con la modulación apagada, la condición muta solo entre 0 y 4;
+  - **efecto lateral:** con la memoria en 0,5, la modulación anula el receptor.
+- **Decisión** (`fisica.decision`):
+  - "argmax" (por defecto): el impulso mayor; descansar si ninguno es positivo;
+  - "softmax": la acción se sortea con probabilidad ∝ exp(impulso/`temperatura`), con descansar siempre disponible con impulso ≥ 0. Truco de Gumbel con el azar de la CPU.
+- **Memoria inicial** (`memoria.inicial`): solo se aplica a los fundadores; los hijos heredan la memoria del progenitor.

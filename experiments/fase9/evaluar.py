@@ -83,6 +83,9 @@ def correr_condicion(salida, nombre, semilla, pasos, ajustes, sembrada):
         res[f"poblacion_{parte}"] = media(f("poblacion"))
         seg = [fase7.fase_seguimiento(f(f"memoria_alineada_{c}"), f("estacion")) for c in "ab"]
         res[f"seguimiento_{parte}"] = max(seg, key=lambda v: abs(v) if v == v else -1.0)
+        per = sim.cfg.estaciones.periodo  # versión sin el aliasing de muestreo (ver fase_seguimiento)
+        seg_c = [fase7.fase_seguimiento(f(f"memoria_alineada_{c}"), f("estacion"), f("t"), per) for c in "ab"]
+        res[f"seguimiento_corregido_{parte}"] = max(seg_c, key=lambda v: abs(v) if v == v else -1.0)
         res[f"genes_memoria_{parte}"] = media(f("tiene_memoria_a") + f("tiene_memoria_b"))
         res[f"con_gen_condicionado_{parte}"] = media(f("con_gen_condicionado"))
     return res

@@ -701,6 +701,8 @@ class Simulacion:
                 self.cont["comida_buena"] += float(toma[buena].sum())
                 self.cont["comida_mala"] += float(toma[~buena].sum())
             p["E"][i] += toma * rinde
+            if cfg.estaciones.induccion > 0:  # la inducción puede subir el rendimiento después de fijar la toma
+                p["E"][i] = xp.minimum(p["E"][i], f.energia_max)
             self.cont["comido"] += float(toma.sum())
 
             # puentes citoplasmáticos (fase 5): la energía se difunde por los enlaces, sin decisión del genoma

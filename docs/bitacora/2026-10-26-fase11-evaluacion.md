@@ -47,8 +47,23 @@ Prerregistro: [2026-10-26-fase11-prerregistro.md](2026-10-26-fase11-prerregistro
 
 **Las poblaciones evolucionadas no son menos evolucionables que LUCA en esta medida global:** una mutación cambia más decisiones, no menos. **La hipótesis de la saturación como límite general no se sostiene así como está.** Puede valer para las decisiones específicas que harían falta (irse de la comida que no coincide con la memoria), pero eso queda por medir. La explicación más simple que sigue en pie es la de las piezas neutras o costosas: un gen nuevo, la condición y un peso grande sobre el tipo de comida, que solo pagan juntas.
 
+## Revisión científica independiente (fases 9–11)
+- **Implementación:** la modulación, la puerta de condiciones y el softmax están bien implementados; el determinismo, verificado.
+- **Explicación alternativa del negativo, no considerada antes: colapso de la tasa de mutación.**
+  - En las poblaciones de partida, μ había bajado de 0,02 a 0,0005–0,002. La tasa efectiva en esta fase fue de 0,0003–0,002, entre 10 y 60 veces menos que al inicio de la fase 10.
+  - Con esa oferta mutacional, que aparezca un gen nuevo de avanzar y reciba además la condición de modulación antes de perderse es prácticamente imposible en una corrida.
+  - **La selección, en un mundo estable, baja la tasa de mutación** (principio de reducción). Esto puede explicar también parte de los estancamientos de fases anteriores.
+- **Efectos laterales de la memoria inicial 0,5:**
+  - la condición 6 (modulación por la memoria B, que nadie escribe) multiplica el peso del receptor por 0;
+  - las condiciones 3 y 4 quedan fijas (siempre apagada y siempre encendida);
+  - un linaje que pierde el gen de memoria hereda la memoria congelada, con la digestión sesgada.
+- **Seguimiento corregido** (sin el aliasing de muestreo): 0,89–0,999 en 21 de 23 corridas; `a_sin_mod` 186 perdió la memoria.
+
 ## Decisión
-Pendiente de la revisión científica independiente de las fases 9–11 (en curso). Las opciones que se evalúan para la fase 12:
+- **La saturación de los genes queda descartada como explicación general** (medición de evolucionabilidad), y el colapso de μ pasa al frente. Prueba barata, antes de cambiar la arquitectura: repetir la parte A con μ reiniciado a 0,02, o fijo. **Es la próxima corrida corta.**
+- La línea principal del proyecto pasa al **universo vivo** ([`docs/06-universo-vivo.md`](../06-universo-vivo.md)). Allí el ambiente cambia siempre, así que la presión para mantener la tasa de mutación y la innovación no desaparece.
+
+Las opciones que quedan para el genoma:
 - **Medir la evolucionabilidad directamente:** qué fracción de mutaciones al azar cambia la conducta, en LUCA y en poblaciones evolucionadas. Así se cuantifica la saturación antes de cambiar el genoma.
 - **Una regla de impulso menos saturable:** por ejemplo, la tanh sobre la suma de los genes de cada primitiva, en lugar de una tanh por gen. Sería una decisión de modelo nueva, con sus controles.
 - **Mutaciones de peso con colas largas:** saltos grandes ocasionales.

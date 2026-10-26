@@ -10,14 +10,15 @@ Las acciones que tiene y usa cada organismo salen de su genoma: genes-regla que 
 
 ## Estado (2026-10-26)
 
-**Fase en curso: 11, modulación por el estado interno.** En la fase 10 apareció la primera memoria evolucionada del proyecto, pero todavía no se usa para decidir; ahora se busca que la memoria pueda cambiar cómo un gen responde a lo que percibe.
+**Próxima fase: 12, universo vivo.** Un universo que corre sin parar, alimentado con datos reales, con una interfaz para estimularlo, organismos que se comen entre sí y varios universos conectados ([diseño](docs/06-universo-vivo.md)).
 
 ### Lo que encontramos hasta ahora
 - **La evolución básica funciona.** Los organismos se adaptan y la evolución inventa conductas nuevas (el giro, fase 1).
 - **La asociación evoluciona sola cuando protege.** Con un depredador que solo come organismos sueltos y aparece de a poco, 18 de 20 poblaciones terminan viviendo en grupos de parientes (fase 2c). Poder asociarse, por sí solo, no alcanza (fase 2).
 - **Los grupos se coordinan si moverse juntos es físicamente posible.** Percibir el rumbo de los socios aumenta los grupos de 3 o más (réplica con 20 semillas, p ≈ 0,002, fases 3c y 3d).
 - **No apareció la división del trabajo.** Ni con restricción flagelar, ni con retornos crecientes, ni con energía compartida (fases 4 y 5).
-- **La memoria evoluciona cuando su primer peldaño se premia.** Con una digestión que se prepara según lo recordado, la memoria de una pista intermitente se sostiene ~1750 generaciones y acierta la estación en el 99–100 % de los organismos (fase 10). Todavía no se usa para decidir qué comer.
+- **La memoria se sostiene cuando su primer peldaño se premia.** Con una digestión que se prepara según lo recordado, un gen de memoria sembrado se retiene miles de generaciones y coincide con la estación en el 96–99,6 % de los organismos (fases 10 y 11). No evolucionó desde LUCA y todavía no se usa para decidir qué comer.
+- **En un mundo fijo, la evolución apaga su propia capacidad de innovar.** La tasa de mutación cae de 0,02 a ~0,0006. Por eso el siguiente paso es un universo que no deje de cambiar.
 - **Sin peldaños, la memoria no evoluciona.**
   - Aun en un mundo donde recordar es la única forma de pasar del azar y un módulo de memoria armado a mano gana siempre, la memoria no apareció en ~3000 generaciones (fases 6 a 9), ni siquiera con genes cuya expresión depende de la memoria.
   - El camino existe, pero su primer paso no se premia: lo mismo que mostraron Lenski y colegas en Avida (2003).
@@ -36,8 +37,9 @@ Las acciones que tiene y usa cada organismo salen de su genoma: genes-regla que 
 | 6 | Memoria interna | ✅ Nunca se usa (una estrategia reactiva alcanza) | [evaluación](docs/bitacora/2026-10-25-fase6-evaluacion.md) |
 | 7–8 | Mundo con estaciones ocultas y pista | ✅ Atajos; la memoria no evoluciona aunque sea esencial | [7](docs/bitacora/2026-10-26-fase7-evaluacion.md), [8](docs/bitacora/2026-10-26-fase8-evaluacion.md) |
 | 9 | Genes condicionados a la memoria | ✅ La memoria sigue sin evolucionar; falta el primer peldaño | [evaluación](docs/bitacora/2026-10-26-fase9-evaluacion.md) |
-| 10 | Peldaños para la memoria | ✅ **Primera memoria evolucionada** (6/7 contra 0/8 sin peldaño); no se usa para la conducta | [evaluación](docs/bitacora/2026-10-26-fase10-evaluacion.md) |
-| 11 | Modulación por el estado interno | ▶ En curso | [hoja de ruta](docs/02-hoja-de-ruta.md) |
+| 10 | Peldaños para la memoria | ✅ Memoria sembrada **sostenida por selección** (6/8 contra 0/8 sin peldaño); no se usa para decidir | [evaluación](docs/bitacora/2026-10-26-fase10-evaluacion.md) |
+| 11 | Modulación por el estado interno | ✅ La memoria no se recluta; la tasa de mutación había colapsado | [evaluación](docs/bitacora/2026-10-26-fase11-evaluacion.md) |
+| 12 | Universo vivo | ▶ Siguiente | [diseño](docs/06-universo-vivo.md) |
 
 Detalle, decisiones y próximos pasos: **[hoja de ruta viva](docs/02-hoja-de-ruta.md)** y **[síntesis](docs/03-sintesis.md)**.
 
@@ -48,6 +50,7 @@ Detalle, decisiones y próximos pasos: **[hoja de ruta viva](docs/02-hoja-de-rut
 - Síntesis de resultados: [`docs/03-sintesis.md`](docs/03-sintesis.md)
 - Visión a largo plazo y salvaguardas: [`docs/04-vision.md`](docs/04-vision.md)
 - Estado del arte (Avida, Symbulation, MABE, JaxLife): [`docs/05-estado-del-arte.md`](docs/05-estado-del-arte.md)
+- Universo vivo (evolución constante, estimulada por la realidad): [`docs/06-universo-vivo.md`](docs/06-universo-vivo.md)
 - Modelo vigente (protocolo ODD): [`docs/odd/modelo.md`](docs/odd/modelo.md)
 - Bitácora de experimentos: [`docs/bitacora/`](docs/bitacora/)
 - Especificaciones por fase (OpenSpec): [`openspec/`](openspec/)
@@ -56,7 +59,7 @@ Detalle, decisiones y próximos pasos: **[hoja de ruta viva](docs/02-hoja-de-rut
 
 ```bash
 pip install -e ".[dev]"
-python -m pytest -q          # 155 pasan; 3 se omiten sin GPU NVIDIA con CuPy
+python -m pytest -q          # 158 pasan; 3 se omiten sin GPU NVIDIA con CuPy
 
 # una corrida (genera métricas, población, linaje, imágenes)
 python -m simbio correr experiments/configs/base.toml --salida runs/demo --semilla 1 --pasos 20000

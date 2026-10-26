@@ -50,11 +50,18 @@ CONDICIONES = {
 }
 
 
-def fase_seguimiento(alineada, estacion):
-    """Covarianza entre la memoria media (2m − 1) y la estación en la ventana. `memoria_alineada` es
-    (2m − 1)·estación; su media sola da ±1 para una memoria fija si la ventana cubre una sola estación (sesgo
-    corregido en la fase 9). Con estaciones equilibradas vale ≈ +1 si la memoria las sigue y 0 si no."""
+def fase_seguimiento(alineada, estacion, t=None, periodo=None, margen=250):
+    """Covarianza normalizada entre la memoria media (2m − 1) y la estación en la ventana: cov((2m − 1), e) / var(e).
+    `memoria_alineada` es (2m − 1)·estación.
+
+    Sin `t` es la métrica prerregistrada en las fases 9–11. Con `registrar_cada` = 500 y estaciones de 2000 pasos,
+    una de cada cuatro muestras cae en el primer paso de la estación nueva, cuando la memoria todavía es la anterior
+    (aliasing de muestreo). Por eso una memoria perfecta da ≈ 0,5, y no 1. Con `t` y `periodo` se descartan las
+    muestras de los primeros `margen` pasos de cada estación (corrección posterior a la revisión de las fases 9–11):
+    una memoria perfecta da ≈ 1 y una que no sigue a la estación, 0."""
     ok = ~(np.isnan(alineada) | np.isnan(estacion))
+    if t is not None and periodo:
+        ok &= (np.asarray(t) % periodo) >= margen
     if ok.sum() < 4 or np.var(estacion[ok]) < 0.1:
         return float("nan")
     c, e = alineada[ok] * estacion[ok], estacion[ok]

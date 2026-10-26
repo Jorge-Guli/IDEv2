@@ -85,6 +85,10 @@ def resumen(sim, nombre, semilla, pasos):
         res[f"poblacion_{parte}"] = media(f("poblacion"))
         res[f"seguimiento_{parte}"] = max([fase9.fase7.fase_seguimiento(f(f"memoria_alineada_{c}"), f("estacion"))
                                            for c in "ab"], key=lambda v: abs(v) if v == v else -1.0)
+        per = sim.cfg.estaciones.periodo  # versión sin el aliasing de muestreo (ver fase_seguimiento)
+        res[f"seguimiento_corregido_{parte}"] = max(
+            [fase9.fase7.fase_seguimiento(f(f"memoria_alineada_{c}"), f("estacion"), f("t"), per) for c in "ab"],
+            key=lambda v: abs(v) if v == v else -1.0)
         res[f"con_gen_condicionado_{parte}"] = media(f("con_gen_condicionado"))
     return res
 

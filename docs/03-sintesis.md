@@ -56,6 +56,11 @@ Con **genes que se expresan según la memoria**, la regla "en la estación A com
 **Lección:** no alcanza con que el premio final exista y la regla sea representable; **cada peldaño necesita su propio premio**. La fase 10 busca ese primer peldaño.
 
 ## Actualización (fase 10)
-**Primera memoria evolucionada.** Cuando el primer peldaño tiene premio propio (una digestión que se prepara según la memoria, con inercia para que solo sirva una memoria sostenida), la memoria de la pista se sostiene ~1750 generaciones y acierta la estación en el 99–100 % de los organismos. Sin ese peldaño, se pierde siempre. Antes hubo que bloquear un atajo: "recordar" el tipo de comida de la celda.
+**Primera memoria sostenida por selección** (redacción corregida tras la revisión independiente). Un gen de memoria sembrado se retiene, y no se pierde como en la fase 9, cuando el primer peldaño tiene premio propio (una digestión que se prepara según la memoria, con inercia para que solo sirva una memoria sostenida), la memoria de la pista se retiene ~1350–2000 generaciones en 6 de 8 semillas y coincide con la estación en el 96–99,6 % de los organismos. Sin ese peldaño, se pierde siempre. No evolucionó desde LUCA. Antes hubo que bloquear un atajo: "recordar" el tipo de comida de la celda.
 
 La memoria **no se recluta para la conducta**. Encender o apagar un gen (±1) no alcanza para torcer decisiones que los genes evolucionados ya saturan; el organismo queda indeciso y da vueltas. **Lección:** cada peldaño necesita premio propio y, además, **magnitud suficiente** para cambiar lo que el organismo ya hace. El próximo cambio (fase 11) es la modulación: que la memoria cambie el signo de las entradas de un gen, como un neuromodulador.
+
+## Actualización (fase 11 y revisión independiente)
+Con modulación por la memoria y con decisión estocástica, la memoria se mantiene, pero **no se recluta para decidir**. La revisión independiente encontró por qué podría ser: **la tasa de mutación había colapsado** de 0,02 a ~0,0006. En un mundo estable, la selección favorece copiarse con menos errores, y el sistema deja de explorar.
+
+**Lección:** un mundo fijo no solo deja de presionar, sino que **apaga la capacidad de innovar**. Es el argumento científico para el universo vivo ([06-universo-vivo.md](06-universo-vivo.md)): un ambiente que cambia siempre, con datos reales y con otros organismos que evolucionan.

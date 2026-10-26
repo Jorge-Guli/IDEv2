@@ -2,6 +2,23 @@
 
 Prerregistro: [2026-10-26-fase10-prerregistro.md](2026-10-26-fase10-prerregistro.md). Informe: `resultados/fase10/informe.json`. Series y poblaciones finales de `sem_induccion` en `resultados/fase10/`.
 
+> **Corrección tras la revisión científica independiente (2026-10-26).** La revisión verificó que los datos son reales, que se reproducen con el código actual, que las pruebas y reglas se aplicaron como estaban prerregistradas, y que no hay errores en la implementación. Pero la redacción de esta evaluación exageraba. Lo que se sostiene:
+>
+> *"Con digestión inducible y memoria tipo cerrojo, un gen de memoria **sembrado** (pista → memoria A) se retiene, o se recupera tras caer durante la rampa de toxicidad, durante ~1350–2000 generaciones en **6 de 8** semillas. Sin inducción se pierde en 8 de 8 (P5: 7/7 pares, p = 0,008). La memoria coincide con la estación en el 96–99,6 % de los organismos a mitad de estación (seguimiento corregido 0,93–0,99). No se demostró que dependa de la pista frente a un control sin información (P2 no cumplida), no evoluciona desde LUCA (P6 negativo) y no se usa para decidir (P3 y P4 negativos). Es **retención por selección** de un estado interno con valor metabólico, no evolución de novo de una memoria."*
+>
+> Correcciones puntuales:
+> - **"Primera memoria evolucionada" → "primera memoria sostenida por selección".** El gen estaba sembrado y conservó sus pesos (~20 sobre la pista). La persistencia entre pistas la dan la física (el cerrojo) y la herencia de la memoria; el gen solo conecta pista → cerrojo. No hubo condición de inducción sin cerrojo.
+> - **No se "sostiene" de forma continua.** Durante la rampa de toxicidad, la frecuencia del gen cae (mínimos de 0,04 a 0,43 según la semilla) y se vuelve a extender después: es una barrida selectiva desde un remanente.
+> - **"6 de 7" → "6 de 8".** La 185 se extinguió después de perder el gen, y la 182 evolucionó el atajo.
+> - **"99–100 %" vale solo para la población 188.** Para las 6, el rango es ~96,5–99,6 %. "Menos de 250 pasos" es simplemente 1/p_pista: la memoria es la última pista vista (68 % correcta a los 100 pasos, 95 % a los 200).
+> - **Métrica de seguimiento:**
+>   - el ~0,5 es aliasing de muestreo (`registrar_cada` = 500, estaciones de 2000): una de cada cuatro muestras cae en el primer paso de la estación nueva;
+>   - corregida (descartando los primeros 250 pasos de cada estación; `fase_seguimiento` con `t`), da 0,93–0,99 en `sem_induccion`, ~0 en `sem_cerrojo`, y 0,15–0,20 en el atajo y en `ruido_induccion`. Los scripts reportan ahora las dos versiones.
+> - **El control `ruido_induccion` tiene información y extinciones.** El sensor del tipo de comida da una señal débil de la estación (la población se reparte por tipos), y un gen que escribe la pista aleatoria neutraliza la digestión. P2 queda **no cumplida**.
+> - **El acierto de `sem_induccion` es menor que el de `sem_cerrojo`** (7 de 7 pares) con una población un 75 % mayor. Comparar el acierto entre físicas distintas confunde densidad y conducta, así que "descarta que la inducción sustituya a la conducta" es débil.
+> - **Energía por encima del máximo con inducción:** como mucho ~1 % sobre E_max. Ya está corregido en el código (recorte); el efecto sobre los resultados es despreciable.
+> - **Reproducibilidad:** los scripts de las competencias y diagnósticos de esta fase están ahora en `experiments/fase10/` (`competencia_atajo.py`, `duelo_pista_tipo.py`, `segundo_peldano.py`, `diagnostico_modulo.py`).
+
 ## Corrida
 `experiments/fase10/evaluar.py`, 300 000 pasos, semillas 181–188, 4 condiciones (48 minutos en la PC del autor).
 
@@ -27,7 +44,7 @@ Casi todas ocurrieron entre los pasos 25 000 y 38 000.
 
 ## Lectura
 
-### 1. Primera memoria evolucionada del proyecto
+### 1. Primera memoria sostenida por selección (ver la corrección arriba)
 Con un primer peldaño premiado (digestión inducible), el gen de memoria sembrado se sostiene ~1750 generaciones y codifica la estación en 6 de 7 poblaciones.
 
 **Genomas finales:** peso mediano de ~19–20 sobre la pista y ~0 sobre el tipo de comida. Es memoria de la pista, no el atajo.
@@ -64,7 +81,7 @@ Al terminar la rampa de toxicidad (paso 30 000), las poblaciones sin memoria de 
 Para próximas versiones: que un estado digestivo sin información sea neutro en cada estación (por ejemplo, que la inducción actúe solo cuando la memoria está lejos de 0,5, con la memoria inicial en 0,5).
 
 ## Qué queda establecido
-1. **Memoria funcional evolucionada y sostenida**, cuando el primer peldaño se premia (P1 y P5; P2 en la dirección esperada).
+1. **Memoria funcional sostenida por selección** cuando el primer peldaño se premia (P1 y P5). El gen estaba sembrado: no evolucionó desde LUCA (P6), y P2 no se cumplió.
 2. **La evolución vuelve a buscar atajos** (escribir la memoria con el tipo de comida), y hay que bloquearlos con física y verificarlos con duelos directos.
 3. **El reclutamiento de la memoria para la conducta** choca con un valle de magnitud: un gen condicionado no alcanza para torcer decisiones que los genes evolucionados ya saturan.
 
