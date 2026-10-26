@@ -663,6 +663,11 @@ class Simulacion:
                 self.cont["comido_libre_nosec"] += float(libre[~secretor].sum())
             if cfg.estaciones.activa:  # fase 7: la comida del tipo fuera de estación es tóxica
                 buena = self.tipo[yi, xi] * self.estacion() > 0
+                ind = cfg.estaciones.induccion
+                if ind > 0 and cfg.memoria.activa:
+                    # digestión inducible (fase 10): la memoria A prepara la digestión de un tipo (alta: A,
+                    # baja: B); se absorbe más (nutrientes y veneno) del tipo preparado y menos del otro
+                    rinde = rinde * (1.0 + ind * (2.0 * p["memoria"][i, 0] - 1.0) * self.tipo[yi, xi])
                 tox = (1.0 + cfg.estaciones.castigo) * self.factor_toxicidad()
                 if cfg.estaciones.toxicidad == "diferido":
                     p["veneno"][i] += xp.where(buena, 0.0, tox * toma * rinde)

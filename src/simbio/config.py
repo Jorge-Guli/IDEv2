@@ -201,6 +201,10 @@ class EstacionesCfg:
     # `rampa_pista` pasos (0 = sin rampa)
     p_pista_inicial: float = 0.0
     rampa_pista: int = 0
+    # fase 10, digestión inducible: lo absorbido de la comida de tipo t se multiplica por 1 + induccion·(2m_A − 1)·t
+    # (nutrientes y veneno). Una memoria que sigue a la estación rinde más en ambos tipos: el primer peldaño
+    # tiene premio propio. 0 = apagada
+    induccion: float = 0.0
 
 
 @dataclass

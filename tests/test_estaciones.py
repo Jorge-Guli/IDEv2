@@ -102,3 +102,21 @@ def test_rampa_de_toxicidad(cfg):
     sim.paso()
     E = sim.pob["E"]
     assert abs(float(E[0] - E[1])) < 1e-9  # t = 0: sin toxicidad
+
+
+def test_digestion_inducible(cfg):
+    """Fase 10: con la memoria A alta se absorbe más del tipo A; con la memoria baja, menos."""
+    cfg = _cfg(cfg, p_pista=0.0)
+    cfg.memoria.activa = True
+    cfg.estaciones.induccion = 0.5
+    sim = sim_vacia(cfg)
+    sim.entorno.K_base[:] = 10.0
+    sim.entorno.R[:] = 10.0
+    come = genoma_con(cfg, [(gen.COMER, 5.0, {})])
+    ya = np.argwhere(sim.tipo > 0)
+    colocar(sim, come, [ya[0][0]], [ya[0][1]], E=50)
+    colocar(sim, come, [ya[1][0]], [ya[1][1]], E=50)
+    sim.pob["memoria"][:, 0] = [1.0, 0.0]
+    sim.paso()
+    E = sim.pob["E"]
+    assert E[0] > E[1]
