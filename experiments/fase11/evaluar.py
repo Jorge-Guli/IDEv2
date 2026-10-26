@@ -53,10 +53,10 @@ POBLACIONES_A = [181, 183, 184, 186, 187, 188]
 
 
 def _correr_a(tarea):
-    salida, nombre, pob, pasos = tarea
+    salida, nombre, pob, pasos, extra = tarea
     g = persistencia.cargar_genomas(RAIZ / "resultados" / "fase10" / f"sem_induccion_semilla_{pob}.npz")
     idx = np.random.default_rng(pob).integers(0, len(g["mu"]), 600)
-    cfg = config.cargar(fase9.fase7.CONFIG, MUNDO + CONDICIONES_A[nombre] + ["estaciones.rampa_toxicidad=0"])
+    cfg = config.cargar(fase9.fase7.CONFIG, MUNDO + CONDICIONES_A[nombre] + ["estaciones.rampa_toxicidad=0"] + list(extra))
     cfg.sim.semilla, cfg.sim.pasos = pob, pasos
     sim = corrida.correr(cfg, Path(salida) / nombre / f"semilla_{pob}", genomas={k: v[idx] for k, v in g.items()},
                          imagenes=False)
@@ -64,8 +64,8 @@ def _correr_a(tarea):
 
 
 def _correr_b(tarea):
-    salida, nombre, semilla, pasos = tarea
-    return fase9.correr_condicion(salida, nombre, semilla, pasos, MUNDO + CONDICIONES_B[nombre], True)
+    salida, nombre, semilla, pasos, extra = tarea
+    return fase9.correr_condicion(salida, nombre, semilla, pasos, MUNDO + CONDICIONES_B[nombre] + list(extra), True)
 
 
 def resumen(sim, nombre, semilla, pasos):
@@ -121,6 +121,7 @@ def main():
     ap.add_argument("--semilla-inicial", type=int, default=191)
     ap.add_argument("--partes", nargs="*", default=["A", "B"])
     ap.add_argument("--poblaciones", type=int, nargs="*", default=POBLACIONES_A)
+    ap.add_argument("--extra", nargs="*", default=[], help="ajustes seccion.clave=valor para todas las condiciones")
     args = ap.parse_args()
     args.salida.mkdir(parents=True, exist_ok=True)
     semillas = list(range(args.semilla_inicial, args.semilla_inicial + args.semillas))
@@ -128,12 +129,12 @@ def main():
     rs = []
     with Pool(args.procesos) as pool:
         if "A" in args.partes:
-            rs += pool.map(_correr_a, [(str(args.salida), n, p, args.pasos_a) for n in CONDICIONES_A
+            rs += pool.map(_correr_a, [(str(args.salida), n, p, args.pasos_a, tuple(args.extra)) for n in CONDICIONES_A
                                        for p in args.poblaciones])
         if "B" in args.partes:
-            rs += pool.map(_correr_b, [(str(args.salida), n, s, args.pasos_b) for n in CONDICIONES_B for s in semillas])
+            rs += pool.map(_correr_b, [(str(args.salida), n, s, args.pasos_b, tuple(args.extra)) for n in CONDICIONES_B for s in semillas])
     informe = {"parametros": {"pasos_a": args.pasos_a, "pasos_b": args.pasos_b, "semillas": semillas,
-                              "poblaciones": args.poblaciones, "minutos": round((time.time() - t0) / 60, 1)},
+                              "poblaciones": args.poblaciones, "extra": args.extra, "minutos": round((time.time() - t0) / 60, 1)},
                "hipotesis": hipotesis(rs), "corridas": rs}
     (args.salida / "informe.json").write_text(json.dumps(informe, indent=2, ensure_ascii=False), encoding="utf-8")
     print(json.dumps(informe["hipotesis"], indent=2, ensure_ascii=False))
