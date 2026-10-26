@@ -43,3 +43,9 @@ Agregar retornos crecientes (maquinaria por uso) y energía compartida (puentes 
 
 ## Actualización (fase 6)
 Una memoria interna heredable, capaz de formar interruptores biestables, **no se usó en ~1000–2750 generaciones**. En este mundo una estrategia reactiva alcanza: nada recompensa recordar. La lección es que **la cognición evoluciona cuando el mundo la exige**. El proyecto cambia de eje hacia mundos donde recordar y anticipar paguen (fase 7), que además es el camino más directo hacia la pregunta de fondo sobre la inteligencia.
+
+## Actualización (fases 7 y 8)
+- **Fase 7.** En un mundo con estaciones ocultas y una pista intermitente, los organismos resolvieron la tarea con atajos (aprender en vida, probar y retirarse, selección espacial), sin memoria.
+- **Fase 8.** En un mundo de mosaico donde la memoria es la única forma de pasar del azar, y donde paga mucho (verificado con competencias), **la memoria no evolucionó en ~3000 generaciones**.
+
+**Lección: el cuello de botella ya no es el mundo, sino el genoma.** Las innovaciones que exigen combinar informaciones (sincronizar, diferenciarse, recordar y usar lo recordado) requieren varios genes coordinados, y la mutación al azar no cruza ese valle. La biología resolvió esto con la **regulación**: genes que se expresan según el estado de la célula. Es el próximo cambio del modelo (fase 9).
