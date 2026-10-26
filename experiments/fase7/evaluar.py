@@ -61,12 +61,14 @@ def _correr(tarea):
     for parte, (a, b) in (("final", (0.75, 1.0)), ("medio", (0.25, 0.5))):
         filas = [r for r in h if a * pasos <= r["t"] <= b * pasos]
         f = lambda k: np.array([r.get(k, np.nan) for r in filas], dtype=float)  # noqa: E731
-        res[f"acierto_{parte}"] = float(np.nanmean(f("acierto_comida")))
-        res[f"poblacion_{parte}"] = float(np.nanmean(f("poblacion")))
-        seg = [float(np.nanmean(f(f"memoria_alineada_{c}"))) if f"memoria_alineada_{c}" in h[-1] else 0.0
-               for c in "ab"]
-        res[f"seguimiento_{parte}"] = max(seg, key=abs)  # memoria que sigue a la estación (signo constante)
-        res[f"genes_memoria_{parte}"] = float(np.nanmean(f("tiene_memoria_a") + f("tiene_memoria_b")))
+
+        def media(v):  # sin avisos cuando no hay datos (corrida extinta antes de la ventana)
+            return float(np.nanmean(v)) if v.size and not np.isnan(v).all() else float("nan")
+        res[f"acierto_{parte}"] = media(f("acierto_comida"))
+        res[f"poblacion_{parte}"] = media(f("poblacion"))
+        seg = [media(f(f"memoria_alineada_{c}")) if f"memoria_alineada_{c}" in h[-1] else 0.0 for c in "ab"]
+        res[f"seguimiento_{parte}"] = max(seg, key=lambda v: abs(v) if v == v else -1.0)  # memoria que sigue a la estación (signo constante)
+        res[f"genes_memoria_{parte}"] = media(f("tiene_memoria_a") + f("tiene_memoria_b"))
     return res
 
 
