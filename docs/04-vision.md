@@ -24,6 +24,7 @@ Que **pueda replicarse**, como cualquier vida, también fuera de lo digital.
 1. **Compañero de vida.** Cuando nace una persona, nace también una instancia de LUCA, identificada a partir de su ADN, que crece con ella en un dispositivo. Cuando el hardware se renueva, la población se muda al dispositivo nuevo y abandona el anterior. Puede adaptarse a casi cualquier hardware.
 2. **Drones o robots autónomos** que optimizan trabajos.
 3. **Manifestación física:** cada agente sería una unidad física (en el extremo, un nanobot) que se asocia y evoluciona como en lo digital.
+4. **Intervención médica sin simbiosis.** Un enjambre de microrrobots entra al cuerpo, destapa una arteria o elimina cálculos renales, repara lo necesario y sale.
 
 ### ADN humano
 El autor considera que el ADN humano contiene mucha información que puede ser usada. Lo plantea como ejemplo y para el futuro, no como algo para hacer hoy.
@@ -36,7 +37,8 @@ Una "cápsula LUCA" de nanobots autorreplicantes que entre en simbiosis con el i
 - **Lo que ya existe:**
   - el simulador no depende del hardware, y el genoma es solo datos: una población se guarda en una máquina y se despierta en otra (escenario 1);
   - la robótica evolutiva y la de enjambre evolucionan en simulación y transfieren a robots reales; las reglas de coordinación por percepción local de las fases 3 a 3d son del tipo que usan los enjambres (escenario 2);
-  - robots modulares que se ensamblan solos y *xenobots* (escenario 3, el más lejano).
+  - robots modulares que se ensamblan solos y *xenobots* (escenario 3, el más lejano);
+  - microrrobots magnéticos guiados desde afuera que disuelven coágulos en animales, enjambres de micropartículas guiadas por campos y ultrasonido contra cálculos, y microrrobots biodegradables (escenario 4). Dentro del cuerpo no hay control central: el trabajo tiene que salir de reglas locales y coordinación de grupo, como en las fases 3 a 3d. **Es la aplicación más cercana y la más compatible con las salvaguardas:** las reglas del enjambre se evolucionan en simulación, y al cuerpo entra un diseño fijo, sin replicación, controlable desde afuera y con salida o degradación garantizada.
 - **La tensión central: replicación y libertad frente a ayudar.** La evolución no optimiza "ayudar a la humanidad", sino "dejar más copias". Una vida que se replica y evoluciona sola en el mundo real, si su éxito no depende del bienestar humano, tiene más probabilidades de competir que de elevar: especies invasoras, parásitos. La forma que la biología conoce de alinear intereses es la **simbiosis**: que el éxito evolutivo de esa vida dependa del de su humano, como en la domesticación o las mitocondrias. Por eso la simbiosis no sería una opción entre otras, sino el mecanismo que hace posible el objetivo de "ayudar a evolucionar".
 - **ADN humano.**
   - Es cierto que contiene muchísima información: salud, predisposiciones, ascendencia.
