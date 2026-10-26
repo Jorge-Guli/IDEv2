@@ -53,6 +53,9 @@ CAMPOS = ("activo", "prim", "w", "b", "mu", "sens", "eta", "etiqueta", "cond")
 # condición de expresión de cada gen (fase 9): 0 siempre; 1/2 solo si la memoria A está alta/baja (> 0,5 o ≤ 0,5);
 # 3/4 ídem con la memoria B. Solo actúa con la memoria activa
 NUM_COND = 5
+# fase 11: condiciones de modulación (la memoria A o B cambia el signo del aporte de los sensores del gen)
+COND_MODULA_A, COND_MODULA_B = 5, 6
+NUM_COND_MODULACION = 7
 
 
 def primitivas_permitidas(asociacion: bool, conjugacion: bool, bien_publico: bool = False,
@@ -170,7 +173,8 @@ def mutar(g: dict[str, np.ndarray], m: np.ndarray, cfg: HerenciaCfg,
     # cambio de condición de expresión (fase 9): solo si la memoria existe en este mundo
     if MEMORIA_A in permitidas:
         mask_c = (A(rng.random((n, G))) < cfg.k_condicion * mm) & activo
-        g["cond"][mask_c] = A(rng.integers(0, NUM_COND, int(mask_c.sum())).astype(np.int8))
+        tope = NUM_COND_MODULACION if cfg.modulacion else NUM_COND
+        g["cond"][mask_c] = A(rng.integers(0, tope, int(mask_c.sum())).astype(np.int8))
 
     # eliminación
     mask_del = (A(rng.random((n, G))) < cfg.k_eliminacion * mm) & activo

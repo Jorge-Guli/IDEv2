@@ -59,6 +59,7 @@ class HerenciaCfg:
     sigma_peso: float = 0.3
     k_primitiva: float = 0.3
     k_condicion: float = 0.3  # fase 9: prob. de cambiar la condición de expresión de un gen = k_condicion · m
+    modulacion: bool = False  # fase 11: la condición también puede ser "entrada modulada por la memoria A/B"
     k_duplicacion: float = 0.5
     k_eliminacion: float = 0.5
     k_gen_nuevo: float = 0.2

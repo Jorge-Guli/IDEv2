@@ -239,11 +239,20 @@ class Simulacion:
         xp = self.xp
         p = self.pob
         w = p["w"] + p["P"]
-        z = xp.einsum("ngs,ns->ng", w, s) + p["b"] + p["p"]
+        ws = xp.einsum("ngs,ns->ng", w, s)
+        if self.cfg.memoria.activa and self.cfg.herencia.modulacion:
+            # modulación (fase 11): en los genes con condición 5 o 6, la memoria A o B cambia el signo del
+            # aporte de los sensores, z = b + (2m − 1)·w·s (el sesgo no se modula)
+            signo = 2.0 * p["memoria"] - 1.0
+            mod = xp.where(p["cond"] == gen.COND_MODULA_A, signo[:, 0:1],
+                           xp.where(p["cond"] == gen.COND_MODULA_B, signo[:, 1:2], 1.0))
+            ws = ws * mod
+        z = ws + p["b"] + p["p"]
         a = xp.tanh(z) * p["activo"]
         if self.cfg.memoria.activa:  # regulación (fase 9): cada gen se expresa según su condición
             alta = p["memoria"] > 0.5
-            puerta = xp.stack([xp.ones_like(alta[:, 0]), alta[:, 0], ~alta[:, 0], alta[:, 1], ~alta[:, 1]], axis=1)
+            uno = xp.ones_like(alta[:, 0])
+            puerta = xp.stack([uno, alta[:, 0], ~alta[:, 0], alta[:, 1], ~alta[:, 1], uno, uno], axis=1)
             a = a * xp.take_along_axis(puerta, p["cond"].astype(xp.int64), axis=1)
         expresa = (p["prim"][:, :, None] == xp.arange(gen.NUM_PRIM)) & p["activo"][:, :, None]
         impulso = xp.einsum("ng,nge->ne", a, expresa)

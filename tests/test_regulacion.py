@@ -53,3 +53,30 @@ def test_genomas_sin_condicion_se_completan(tmp_path):
     del g["cond"]
     np.savez(tmp_path / "p.npz", **g)
     assert not cargar_genomas(tmp_path / "p.npz")["cond"].any()
+
+
+def test_gen_modulado_por_la_memoria(cfg):
+    """Fase 11: con la condición 5, la memoria A cambia el signo del aporte de los sensores del gen."""
+    cfg.memoria.activa = True
+    cfg.herencia.modulacion = True
+    sim = sim_vacia(cfg)
+    g = genoma_con(cfg, [(gen.COMER, 0.0, {gen.S_ENERGIA: 5.0}), (gen.DESCANSAR, 0.5, {})])
+    g["cond"][0, 0] = gen.COND_MODULA_A
+    colocar(sim, g, [5], [5], E=50)
+    colocar(sim, g, [9], [9], E=50)
+    sim.pob["memoria"][:, 0] = [1.0, 0.0]
+    act, a = sim.decidir(_sensar(sim))
+    assert a[0, 0] > 0 > a[1, 0]
+    assert list(act) == [gen.COMER, gen.DESCANSAR]
+
+
+def test_la_modulacion_muta_solo_si_esta_permitida():
+    cfg = HerenciaCfg(k_condicion=1.0)
+    rng = np.random.default_rng(0)
+    con = gen.primitivas_permitidas(True, True, memoria=True)
+    h = gen.repetir(gen.luca(cfg), 200)
+    gen.mutar(h, np.full(200, 0.2), cfg, rng, con)
+    assert h["cond"].max() < gen.NUM_COND
+    cfg.modulacion = True
+    gen.mutar(h, np.full(200, 0.2), cfg, rng, con)
+    assert h["cond"].max() >= gen.COND_MODULA_A
