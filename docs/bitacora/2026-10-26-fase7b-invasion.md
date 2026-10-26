@@ -28,3 +28,16 @@ Rediseñar el mundo para que recordar pague. Condiciones a verificar con una pru
 - comida suficiente del tipo bueno (por ejemplo, un tipo abundante cada vez);
 - un costo del error grande frente al de buscar;
 - que la información no se pueda obtener de otra forma.
+
+## Competencias desde cero (fase 7c, `experiments/fase7/luca_memoria.py`)
+Para evitar que los genes del mutante choquen con los de residentes evolucionados, se compitió con genomas coherentes. Todos los competidores tienen el mismo costo genético; sin mutación ni aprendizaje; 4 semillas, castigos 0,5 y 2,0.
+
+| Competencia | Resultado |
+|---|---|
+| **LUCA + módulo de memoria** contra LUCA (mitad y mitad) | LUCA desaparece antes del paso 1000 en **8/8** |
+| LUCA + módulo de memoria contra **poblaciones evolucionadas sin memoria** (piloto de la fase 7) | el LUCA con memoria desaparece antes del paso 2000 en **8/8** |
+
+## Lectura
+- **El mundo sí premia la memoria**, cuando el organismo la usa de forma coherente: recordar la pista, no comer lo que no corresponde e ir a buscar el otro tipo.
+- **Pero el premio es chico** frente a todo lo que la evolución mejora sin memoria: buscar comida, moverse, reproducirse, aprovechar la selección espacial. Una población evolucionada sin memoria le gana con holgura a un LUCA con memoria.
+- Por eso la selección no "tira" hacia la memoria: hay mejoras más baratas y más grandes disponibles. Para que la memoria evolucione, el mundo tiene que hacerla **esencial**, es decir, que sin ella no se pueda prosperar, y no un extra marginal.

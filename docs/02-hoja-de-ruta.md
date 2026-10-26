@@ -20,7 +20,9 @@ Este documento es **el camino que sigue el proyecto, en orden**, con el porqué 
 | 5 | Retornos crecientes a la especialización y energía compartida | ⏸ explorada | **Sin división del trabajo** en ninguna combinación (pilotos): la maquinaria por uso corre a todos hacia comer. El diagnóstico apunta a un conflicto entre niveles (el aprendizaje individual premia comer), a la falta de estados internos estables y a poco tiempo evolutivo (~250 generaciones) ([exploración](bitacora/2026-10-25-fase5-exploracion.md)) |
 | 6 | Memoria interna (paso C) y corridas largas (paso D) | ✅ cerrada | **La memoria nunca se usó** en 940–2750 generaciones; sin diferenciación. En corridas largas, con retornos crecientes, los grupos se pierden en 3 de 5 semillas. Una estrategia reactiva alcanza en este mundo ([bitácora](bitacora/2026-10-25-fase6-evaluacion.md)) |
 | 7 | Un mundo que exija memoria (estaciones, pista, toxicidad diferida) | ✅ cerrada | **La memoria de la pista no evolucionó** (~1000 generaciones). Los organismos encontraron atajos: aprender en vida, probar y retirarse, selección espacial. Para usar la pista hace falta una regla no lineal que el genoma no encuentra. En el control, la memoria se fijó integrando experiencia (2/6) ([exploración](bitacora/2026-10-25-fase7-exploracion.md), [resultados](bitacora/2026-10-26-fase7-evaluacion.md)) |
-| 8 | Regulación genética: genes reguladores (capa oculta) | ▶ siguiente | Que la combinación de entradas quede a un paso de mutación |
+| 7b | ¿El mundo de la fase 7 premia la memoria? (invasión y competencias) | ✅ hecha | Sí, pero poco: un LUCA con memoria le gana a LUCA (8/8), y una población evolucionada sin memoria le gana a él (8/8). La memoria es un extra marginal, no algo esencial ([bitácora](bitacora/2026-10-26-fase7b-invasion.md)) |
+| 8 | Un mundo donde la memoria sea esencial | ▶ siguiente | Rediseño verificado con competencias antes de cualquier corrida larga |
+| U | **Universos abiertos** (propuesta del usuario) | idea | (a) entradas del mundo real, solo lectura y grabadas (clima, hora, carga del equipo); (b) archipiélago de universos en distintos dispositivos, intercambiando genomas (modelo de islas con migración); (c) sustrato real dentro de un contenedor Docker aislado (organismos-programa, como *Tierra*) |
 
 ## El camino, en orden
 
@@ -87,3 +89,4 @@ Este documento es **el camino que sigue el proyecto, en orden**, con el porqué 
 | 2026-10-25 | No prerregistrar la física de la fase 5 tal cual; proponer el paso C (estado interno) | Los pilotos no muestran señal y el diagnóstico apunta a límites del modelo |
 | 2026-10-25 | Cambiar de eje: un mundo que exija memoria (fase 7) | La fase 6 mostró que la memoria no se usa si el mundo no la recompensa; la división del trabajo no apareció con todos los ingredientes teóricos |
 | 2026-10-26 | Ampliar la regulación genética (fase 8) | La fase 7 y las fases 3b, 5 y 6 apuntan al mismo límite: el genoma no combina entradas de forma no lineal con facilidad |
+| 2026-10-26 | Anotar la línea "universos abiertos" | Propuesta del usuario: universos distintos por dispositivo, conectados o no, con entradas reales y un sustrato en Docker |
