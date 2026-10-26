@@ -69,6 +69,7 @@ def _correr(tarea):
         seg = [media(f(f"memoria_alineada_{c}")) if f"memoria_alineada_{c}" in h[-1] else 0.0 for c in "ab"]
         res[f"seguimiento_{parte}"] = max(seg, key=lambda v: abs(v) if v == v else -1.0)  # memoria que sigue a la estación (signo constante)
         res[f"genes_memoria_{parte}"] = media(f("tiene_memoria_a") + f("tiene_memoria_b"))
+        res[f"con_gen_condicionado_{parte}"] = media(f("con_gen_condicionado"))  # fase 9
     return res
 
 
