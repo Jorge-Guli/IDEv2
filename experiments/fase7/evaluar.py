@@ -50,6 +50,17 @@ CONDICIONES = {
 }
 
 
+def fase_seguimiento(alineada, estacion):
+    """Covarianza entre la memoria media (2m − 1) y la estación en la ventana. `memoria_alineada` es
+    (2m − 1)·estación; su media sola da ±1 para una memoria fija si la ventana cubre una sola estación (sesgo
+    corregido en la fase 9). Con estaciones equilibradas vale ≈ +1 si la memoria las sigue y 0 si no."""
+    ok = ~(np.isnan(alineada) | np.isnan(estacion))
+    if ok.sum() < 4 or np.var(estacion[ok]) < 0.1:
+        return float("nan")
+    c, e = alineada[ok] * estacion[ok], estacion[ok]
+    return float(np.mean(c * e) - np.mean(c) * np.mean(e)) / float(np.var(e))
+
+
 def _correr(tarea):
     salida, nombre, semilla, pasos, mundo = tarea
     cfg = config.cargar(CONFIG, MUNDOS[mundo] + CONDICIONES[nombre])
@@ -66,7 +77,8 @@ def _correr(tarea):
             return float(np.nanmean(v)) if v.size and not np.isnan(v).all() else float("nan")
         res[f"acierto_{parte}"] = media(f("acierto_comida"))
         res[f"poblacion_{parte}"] = media(f("poblacion"))
-        seg = [media(f(f"memoria_alineada_{c}")) if f"memoria_alineada_{c}" in h[-1] else 0.0 for c in "ab"]
+        seg = [fase_seguimiento(f(f"memoria_alineada_{c}"), f("estacion")) if f"memoria_alineada_{c}" in h[-1]
+               else 0.0 for c in "ab"]
         res[f"seguimiento_{parte}"] = max(seg, key=lambda v: abs(v) if v == v else -1.0)  # memoria que sigue a la estación (signo constante)
         res[f"genes_memoria_{parte}"] = media(f("tiene_memoria_a") + f("tiene_memoria_b"))
         res[f"con_gen_condicionado_{parte}"] = media(f("con_gen_condicionado"))  # fase 9
