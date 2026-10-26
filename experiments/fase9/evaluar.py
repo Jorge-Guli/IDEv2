@@ -11,7 +11,7 @@ B); lo que tiene que evolucionar es usarla. Condiciones:
     luca_info       LUCA puro, pista informativa, regulación posible (¿aparece todo desde cero?)
 
 Uso:
-    python experiments/fase9/evaluar.py --salida runs/fase9 [--procesos 8] [--pasos 300000] [--semillas 6]
+    python experiments/fase9/evaluar.py --salida runs/fase9 [--procesos 8] [--pasos 300000] [--semillas 8]
         [--semilla-inicial 171]
 """
 
@@ -112,7 +112,7 @@ def main():
     ap.add_argument("--salida", type=Path, default=RAIZ / "runs" / "fase9")
     ap.add_argument("--procesos", type=int, default=4)
     ap.add_argument("--pasos", type=int, default=300000)
-    ap.add_argument("--semillas", type=int, default=6)
+    ap.add_argument("--semillas", type=int, default=8)
     ap.add_argument("--semilla-inicial", type=int, default=171)
     ap.add_argument("--condiciones", nargs="*", default=list(CONDICIONES))
     args = ap.parse_args()
