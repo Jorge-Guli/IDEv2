@@ -201,10 +201,14 @@ class EstacionesCfg:
     # `rampa_pista` pasos (0 = sin rampa)
     p_pista_inicial: float = 0.0
     rampa_pista: int = 0
-    # fase 10, digestión inducible: lo absorbido de la comida de tipo t se multiplica por 1 + induccion·(2m_A − 1)·t
+    # fase 10, digestión inducible: lo absorbido de la comida de tipo t se multiplica por 1 + induccion·(2d − 1)·t,
+    # con d el estado digestivo
     # (nutrientes y veneno). Una memoria que sigue a la estación rinde más en ambos tipos: el primer peldaño
     # tiene premio propio. 0 = apagada
     induccion: float = 0.0
+    # el estado digestivo sigue a la memoria A con esta inercia (pasos): d ← d + (m_A − d) / inercia. Bloquea el
+    # atajo de escribir la memoria con el tipo de comida de la celda (en el piloto sin inercia, eso ganaba)
+    inercia_digestion: int = 100
 
 
 @dataclass

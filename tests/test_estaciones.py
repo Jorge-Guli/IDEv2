@@ -117,6 +117,19 @@ def test_digestion_inducible(cfg):
     colocar(sim, come, [ya[0][0]], [ya[0][1]], E=50)
     colocar(sim, come, [ya[1][0]], [ya[1][1]], E=50)
     sim.pob["memoria"][:, 0] = [1.0, 0.0]
+    sim.pob["digestion"][:] = [1.0, 0.0]
     sim.paso()
     E = sim.pob["E"]
     assert E[0] > E[1]
+
+
+def test_la_digestion_sigue_lenta_a_la_memoria(cfg):
+    cfg = _cfg(cfg, p_pista=0.0)
+    cfg.memoria.activa = True
+    cfg.estaciones.induccion, cfg.estaciones.inercia_digestion = 0.5, 10
+    sim = sim_vacia(cfg)
+    colocar(sim, genoma_con(cfg, [(gen.DESCANSAR, 5.0, {})]), [5], [5], E=50)
+    assert sim.pob["digestion"][0] == 0.5
+    sim.pob["memoria"][0, 0] = 1.0
+    sim.paso()
+    assert np.isclose(sim.pob["digestion"][0], 0.55)

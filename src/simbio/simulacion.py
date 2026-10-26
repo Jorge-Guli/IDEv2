@@ -100,6 +100,7 @@ class Simulacion:
         d["E"], d["E_prev"] = E.copy(), E.copy()
         d["estres"] = estres.copy()
         d["memoria"][:] = self.cfg.memoria.inicial
+        d["digestion"][:] = 0.5  # neutro: digiere igual los dos tipos
         d["uso_comer"][:] = self.cfg.fisica.maquinaria_ref  # maquinaria de un generalista (fase 5)
         d["uso_avanzar"][:] = self.cfg.fisica.maquinaria_ref
         d["id"] = xp.arange(self.sig_id, self.sig_id + n)
@@ -624,6 +625,10 @@ class Simulacion:
             p["uso_comer"] += r * ((act == gen.COMER) - p["uso_comer"])
             p["uso_avanzar"] += r * ((act == gen.AVANZAR) - p["uso_avanzar"])
             p["refractario"] = xp.maximum(p["refractario"] - 1, 0).astype(xp.int16)
+            if cfg.estaciones.induccion > 0 and cfg.memoria.activa:
+                # las enzimas siguen a la memoria A con inercia: una memoria que cambia de celda en celda se
+                # promedia y no prepara nada; solo una sostenida (como la estación) da ventaja
+                p["digestion"] += (p["memoria"][:, 0] - p["digestion"]) / max(cfg.estaciones.inercia_digestion, 1)
             self.cont["org_pasos"] += int(vivos.sum())
             if not vivos.all():
                 self.cont["muertes"] += int((~vivos).sum())
@@ -665,9 +670,9 @@ class Simulacion:
                 buena = self.tipo[yi, xi] * self.estacion() > 0
                 ind = cfg.estaciones.induccion
                 if ind > 0 and cfg.memoria.activa:
-                    # digestión inducible (fase 10): la memoria A prepara la digestión de un tipo (alta: A,
-                    # baja: B); se absorbe más (nutrientes y veneno) del tipo preparado y menos del otro
-                    rinde = rinde * (1.0 + ind * (2.0 * p["memoria"][i, 0] - 1.0) * self.tipo[yi, xi])
+                    # digestión inducible (fase 10): el estado digestivo (que sigue a la memoria A) prepara un
+                    # tipo (alto: A, bajo: B); se absorbe más (nutrientes y veneno) del preparado y menos del otro
+                    rinde = rinde * (1.0 + ind * (2.0 * p["digestion"][i] - 1.0) * self.tipo[yi, xi])
                 tox = (1.0 + cfg.estaciones.castigo) * self.factor_toxicidad()
                 if cfg.estaciones.toxicidad == "diferido":
                     p["veneno"][i] += xp.where(buena, 0.0, tox * toma * rinde)
@@ -753,6 +758,7 @@ class Simulacion:
                     self.cont["nacimientos"] += padres.size
                     p["n_divisiones"][padres] += 1
                     nuevos["memoria"] = p["memoria"][padres].copy()  # memoria epigenética
+                    nuevos["digestion"] = p["digestion"][padres].copy()
                     # el veneno pendiente se reparte como la energía (antes el hijo nacía limpio: una laguna)
                     p["veneno"][padres] = p["veneno"][padres] / 2.0
                     nuevos["veneno"] = p["veneno"][padres].copy()
