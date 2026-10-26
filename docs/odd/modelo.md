@@ -20,7 +20,7 @@ En cada paso: (1) el entorno regenera recursos (con estación y cambios abruptos
 ## 2. Conceptos de diseño
 
 - **Principios básicos.** Transiciones mayores de la evolución; quimiotaxis bacteriana tipo "correr y dar voltereta"; mutagénesis por estrés (respuesta SOS); efecto Baldwin (el aprendizaje guía la evolución sin heredarse).
-- **Emergencia.** Las conductas de forrajeo, el tamaño del genoma, el uso de cada primitiva y los valores de los rasgos `μ`, `σ` y `η` emergen de la selección. Lo impuesto es la física (primitivas y costos) y el genoma inicial (LUCA).
+- **Emergencia.** Las conductas de forrajeo, el tamaño del genoma, el uso de cada primitiva y los valores de los rasgos `μ`, `σ` y `η` emergen de la selección. Lo impuesto es la física (primitivas y costos) y el genoma inicial (LUCA, por *Last Universal Common Ancestor*: el último antepasado común universal).
 - **Adaptación.** Cada organismo elige en cada paso la primitiva con mayor impulso positivo: el impulso es la suma de las activaciones `tanh` de los genes que la expresan. Una primitiva sin genes no está disponible.
 - **Objetivos.** No hay una función objetivo explícita: lo único que persiste es lo que sobrevive y se reproduce. El aprendizaje usa como recompensa el ΔE relativo a la línea base del propio organismo.
 - **Aprendizaje.** Regla de refuerzo local: los genes que impulsaron la acción ejecutada ajustan su respuesta en la dirección del gradiente de su activación, en proporción a `η · recompensa`. Los ajustes decaen y están acotados. La división queda fuera de la recompensa, de la línea base y del sensor de ΔE.

@@ -1,6 +1,10 @@
-# simbio: de la autonomía individual a la organización colectiva
+# IDE: Inteligencia Distribuida Emergente
 
-Experimento de vida artificial. Organismos simples, que empiezan casi como una bacteria (LUCA), se adaptan para sobrevivir en un mundo de recursos limitados. La pregunta es si, evolución tras evolución, asociándose entre sí (fusionándose en organismos más complejos o coordinándose en sociedades), pueden construir niveles crecientes de organización hasta que emerja algo reconocible como inteligencia.
+*De la autonomía individual a la organización colectiva.* El simulador se llama `simbio`.
+
+Experimento de vida artificial. Organismos simples, que empiezan casi como una bacteria, se adaptan para sobrevivir en un mundo de recursos limitados. La pregunta es si, evolución tras evolución, asociándose entre sí (fusionándose en organismos más complejos o coordinándose en sociedades), pueden construir niveles crecientes de organización hasta que emerja algo reconocible como inteligencia.
+
+Todas las poblaciones parten de **LUCA** (*Last Universal Common Ancestor*, "último antepasado común universal"), el nombre que la biología da al ancestro de toda la vida actual. Aquí es el genoma inicial mínimo: cuatro genes escritos a mano: comer si hay recurso, avanzar si no hay, dar una voltereta al azar o si está bloqueado, y dividirse con energía alta. Todo lo demás lo agrega la evolución.
 
 Las acciones que tiene y usa cada organismo salen de su genoma: genes-regla que conectan lo que percibe (solo localmente) con acciones primitivas de una física fija. No hay modelos preentrenados dentro de los organismos. Toda afirmación se compara con un control y con varias semillas, y las corridas son deterministas.
 
