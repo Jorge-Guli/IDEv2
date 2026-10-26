@@ -49,6 +49,12 @@ class FisicaCfg:
     maquinaria_memoria: float = 0.05  # peso del paso actual en el promedio móvil del uso
     maquinaria_ref: float = 0.35  # uso de referencia (eficiencia 1); ~ el de un generalista
     maquinaria_max: float = 2.5
+    # fase 11, regla de decisión: "argmax" (el impulso mayor; descansar si ninguno es positivo) o "softmax"
+    # (elección al azar con probabilidad ∝ exp(impulso / temperatura), con descansar siempre disponible con
+    # impulso ≥ 0). Con softmax, un cambio chico de impulso cambia un poco la probabilidad: la selección tiene
+    # gradiente aunque los genes estén saturados
+    decision: str = "argmax"
+    temperatura: float = 0.25
 
 
 @dataclass

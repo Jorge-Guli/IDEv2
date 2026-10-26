@@ -85,3 +85,20 @@ def test_la_modulacion_muta_solo_si_esta_permitida():
     cfg.modulacion = True
     gen.mutar(h, np.full(200, 0.2), cfg, rng, con)
     assert h["cond"].max() >= gen.COND_MODULA_A
+
+
+def test_decision_softmax(cfg):
+    """Fase 11: con softmax, la acción de impulso mayor es la más frecuente pero no la única; descansar
+    siempre está disponible."""
+    cfg.fisica.decision, cfg.fisica.temperatura = "softmax", 0.5
+    sim = sim_vacia(cfg)
+    g = genoma_con(cfg, [(gen.COMER, 1.0, {}), (gen.AVANZAR, 0.0, {})])
+    g = {k: np.repeat(v, 28, axis=0) for k, v in g.items()}
+    colocar(sim, g, list(range(2, 30)), [3] * 28, E=50)
+    cuenta = np.zeros(gen.NUM_PRIM)
+    for _ in range(50):
+        act, _ = sim.decidir(_sensar(sim))
+        cuenta += np.bincount(act, minlength=gen.NUM_PRIM)
+    assert cuenta[gen.COMER] > cuenta[gen.AVANZAR] > 0
+    assert cuenta[gen.DESCANSAR] > 0
+    assert cuenta.sum() == cuenta[[gen.COMER, gen.AVANZAR, gen.DESCANSAR]].sum()

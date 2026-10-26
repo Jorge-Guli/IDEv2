@@ -270,6 +270,14 @@ class Simulacion:
         impulso = xp.where(disponible & ~self.no_accion, impulso, -xp.inf)
         # restricción flagelar: quien está en período refractario no puede avanzar (elige otra acción)
         impulso[:, gen.AVANZAR] = xp.where(p["refractario"] > 0, -xp.inf, impulso[:, gen.AVANZAR])
+        if self.cfg.fisica.decision == "softmax":
+            # descansar siempre disponible con impulso ≥ 0 (con argmax equivale a "descansar si nada es positivo");
+            # muestreo por el truco de Gumbel, con el azar de la CPU
+            impulso[:, gen.DESCANSAR] = xp.maximum(impulso[:, gen.DESCANSAR], 0.0)
+            u = self.rng.random((p.n, gen.NUM_PRIM))
+            gumbel = xp.asarray(-np.log(-np.log(np.clip(u, 1e-12, 1.0 - 1e-12))))
+            act = xp.argmax(impulso / self.cfg.fisica.temperatura + gumbel, axis=1).astype(xp.int8)
+            return act, a
         act = xp.argmax(impulso, axis=1)
         maximo = impulso[xp.arange(p.n), act]
         act = xp.where(maximo > 0.0, act, gen.DESCANSAR).astype(xp.int8)
