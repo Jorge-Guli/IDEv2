@@ -10,14 +10,15 @@ Las acciones que tiene y usa cada organismo salen de su genoma: genes-regla que 
 
 ## Estado (2026-10-26)
 
-**Fase en curso: 10, peldaños para la memoria.** La memoria evoluciona solo si cada paso hacia ella tiene premio propio. Se está probando una digestión inducible por la memoria y cómo bloquear sus atajos.
+**Fase en curso: 11, modulación por el estado interno.** En la fase 10 apareció la primera memoria evolucionada del proyecto, pero todavía no se usa para decidir; ahora se busca que la memoria pueda cambiar cómo un gen responde a lo que percibe.
 
 ### Lo que encontramos hasta ahora
 - **La evolución básica funciona.** Los organismos se adaptan y la evolución inventa conductas nuevas (el giro, fase 1).
 - **La asociación evoluciona sola cuando protege.** Con un depredador que solo come organismos sueltos y aparece de a poco, 18 de 20 poblaciones terminan viviendo en grupos de parientes (fase 2c). Poder asociarse, por sí solo, no alcanza (fase 2).
 - **Los grupos se coordinan si moverse juntos es físicamente posible.** Percibir el rumbo de los socios aumenta los grupos de 3 o más (réplica con 20 semillas, p ≈ 0,002, fases 3c y 3d).
 - **No apareció la división del trabajo.** Ni con restricción flagelar, ni con retornos crecientes, ni con energía compartida (fases 4 y 5).
-- **La memoria no evoluciona sin peldaños.**
+- **La memoria evoluciona cuando su primer peldaño se premia.** Con una digestión que se prepara según lo recordado, la memoria de una pista intermitente se sostiene ~1750 generaciones y acierta la estación en el 99–100 % de los organismos (fase 10). Todavía no se usa para decidir qué comer.
+- **Sin peldaños, la memoria no evoluciona.**
   - Aun en un mundo donde recordar es la única forma de pasar del azar y un módulo de memoria armado a mano gana siempre, la memoria no apareció en ~3000 generaciones (fases 6 a 9), ni siquiera con genes cuya expresión depende de la memoria.
   - El camino existe, pero su primer paso no se premia: lo mismo que mostraron Lenski y colegas en Avida (2003).
 - **La evolución encuentra atajos.** Aprender en vida, selección espacial o "recordar" lo que tiene debajo: cada mundo nuevo se verifica primero con competencias.
@@ -35,7 +36,8 @@ Las acciones que tiene y usa cada organismo salen de su genoma: genes-regla que 
 | 6 | Memoria interna | ✅ Nunca se usa (una estrategia reactiva alcanza) | [evaluación](docs/bitacora/2026-10-25-fase6-evaluacion.md) |
 | 7–8 | Mundo con estaciones ocultas y pista | ✅ Atajos; la memoria no evoluciona aunque sea esencial | [7](docs/bitacora/2026-10-26-fase7-evaluacion.md), [8](docs/bitacora/2026-10-26-fase8-evaluacion.md) |
 | 9 | Genes condicionados a la memoria | ✅ La memoria sigue sin evolucionar; falta el primer peldaño | [evaluación](docs/bitacora/2026-10-26-fase9-evaluacion.md) |
-| 10 | Peldaños para la memoria | ▶ En curso | [hoja de ruta](docs/02-hoja-de-ruta.md) |
+| 10 | Peldaños para la memoria | ✅ **Primera memoria evolucionada** (6/7 contra 0/8 sin peldaño); no se usa para la conducta | [evaluación](docs/bitacora/2026-10-26-fase10-evaluacion.md) |
+| 11 | Modulación por el estado interno | ▶ En curso | [hoja de ruta](docs/02-hoja-de-ruta.md) |
 
 Detalle, decisiones y próximos pasos: **[hoja de ruta viva](docs/02-hoja-de-ruta.md)** y **[síntesis](docs/03-sintesis.md)**.
 

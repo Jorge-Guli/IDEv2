@@ -54,3 +54,8 @@ Una memoria interna heredable, capaz de formar interruptores biestables, **no se
 Con **genes que se expresan según la memoria**, la regla "en la estación A comé A" cabe en genes simples, pero la memoria **siguió sin evolucionar** (~1800 generaciones, 8 semillas), aun sembrando el gen de memoria. El mapa de pasos intermedios muestra un camino gradual (memoria → avanzar condicionado → comer condicionado) cuyo primer paso no da ventaja y además se borra por deriva. Es lo que mostraron Lenski y colegas en Avida (2003): una función compleja evoluciona solo si sus peldaños también se premian. Los genes condicionados sí se difundieron, como interruptores heredables.
 
 **Lección:** no alcanza con que el premio final exista y la regla sea representable; **cada peldaño necesita su propio premio**. La fase 10 busca ese primer peldaño.
+
+## Actualización (fase 10)
+**Primera memoria evolucionada.** Cuando el primer peldaño tiene premio propio (una digestión que se prepara según la memoria, con inercia para que solo sirva una memoria sostenida), la memoria de la pista se sostiene ~1750 generaciones y acierta la estación en el 99–100 % de los organismos. Sin ese peldaño, se pierde siempre. Antes hubo que bloquear un atajo: "recordar" el tipo de comida de la celda.
+
+La memoria **no se recluta para la conducta**. Encender o apagar un gen (±1) no alcanza para torcer decisiones que los genes evolucionados ya saturan; el organismo queda indeciso y da vueltas. **Lección:** cada peldaño necesita premio propio y, además, **magnitud suficiente** para cambiar lo que el organismo ya hace. El próximo cambio (fase 11) es la modulación: que la memoria cambie el signo de las entradas de un gen, como un neuromodulador.
