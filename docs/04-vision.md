@@ -26,7 +26,10 @@ Que **pueda replicarse**, como cualquier vida, también fuera de lo digital.
 3. **Manifestación física:** cada agente sería una unidad física (en el extremo, un nanobot) que se asocia y evoluciona como en lo digital.
 
 ### ADN humano
-El autor considera que el ADN humano contiene mucha información que puede ser usada, y quiere usarlo.
+El autor considera que el ADN humano contiene mucha información que puede ser usada. Lo plantea como ejemplo y para el futuro, no como algo para hacer hoy.
+
+### Horizonte lejano
+Una "cápsula LUCA" de nanobots autorreplicantes que entre en simbiosis con el infante y lo acompañe toda la vida, amplificando sus capacidades. Le permitiría a la humanidad explorar el universo y avanzar hacia una civilización de tipo III en la escala de Kardashev. Son ejemplos de lo que podría construirse cuando la base tecnológica exista.
 
 ## 2. Lectura crítica
 
@@ -39,6 +42,7 @@ El autor considera que el ADN humano contiene mucha información que puede ser u
   - Es cierto que contiene muchísima información: salud, predisposiciones, ascendencia.
   - El genoma de estos organismos no puede "leerlo": son lenguajes distintos. Usarlo exige diseñar qué información se toma y para qué (por ejemplo, personalizar al compañero), porque no se traduce solo.
   - Es el dato más sensible que existe, y un recién nacido no puede consentir.
+- **Salvaguardas en la física, no en el genoma.** Una salvaguarda escrita en los genes, como un interruptor de muerte, se pierde por evolución: el mutante que la desactiva tiene ventaja. En bacterias reales, estos interruptores fallan en 1 de cada 10⁶ a 10⁸ células. Lo que dura es la **dependencia**: que la vida necesite algo que solo su anfitrión le da (simbiosis obligada, como las mitocondrias) o que una regla esté en el sustrato y no en los genes. Por ejemplo, que replicarse requiera una licencia firmada criptográficamente por el anfitrión en lo digital, o un catalizador que solo el anfitrión provee en lo físico. Una replicación así es compatible con la seguridad.
 - **Libertad gradual.** Primero, libertad total dentro de su mundo, como ya ocurre. Después, más amplia, a medida que se demuestre, con experimentos y controles, que lo que emerge es confiable y beneficioso.
 
 ## 3. Condiciones de trabajo (vigentes para lo que se construye en este proyecto)
