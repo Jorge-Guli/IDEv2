@@ -241,12 +241,15 @@ class Simulacion:
         w = p["w"] + p["P"]
         ws = xp.einsum("ngs,ns->ng", w, s)
         if self.cfg.memoria.activa and self.cfg.herencia.modulacion:
-            # modulación (fase 11): en los genes con condición 5 o 6, la memoria A o B cambia el signo del
-            # aporte de los sensores, z = b + (2m − 1)·w·s (el sesgo no se modula)
+            # modulación (fase 11): en los genes con condición 5 o 6, la memoria A o B cambia el signo de la
+            # respuesta a los receptores químicos (gen.SENS_MODULABLES): z = b + w·s + (2m − 1 − 1)·w_q·s_q.
+            # Modular un gen que no mira esos receptores es neutro; el uso se construye con sus pesos
             signo = 2.0 * p["memoria"] - 1.0
             mod = xp.where(p["cond"] == gen.COND_MODULA_A, signo[:, 0:1],
                            xp.where(p["cond"] == gen.COND_MODULA_B, signo[:, 1:2], 1.0))
-            ws = ws * mod
+            q = gen.SENS_MODULABLES
+            quimico = xp.einsum("ngs,ns->ng", w[:, :, q], s[:, q])
+            ws = ws + (mod - 1.0) * quimico
         z = ws + p["b"] + p["p"]
         a = xp.tanh(z) * p["activo"]
         if self.cfg.memoria.activa:  # regulación (fase 9): cada gen se expresa según su condición

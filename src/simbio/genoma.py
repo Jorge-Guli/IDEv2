@@ -55,6 +55,8 @@ CAMPOS = ("activo", "prim", "w", "b", "mu", "sens", "eta", "etiqueta", "cond")
 NUM_COND = 5
 # fase 11: condiciones de modulación (la memoria A o B cambia el signo del aporte de los sensores del gen)
 COND_MODULA_A, COND_MODULA_B = 5, 6
+# receptores químicos cuya respuesta puede modularse (fase 11): el tipo de comida de la celda
+SENS_MODULABLES = [S_TIPO_AQUI]
 NUM_COND_MODULACION = 7
 
 

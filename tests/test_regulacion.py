@@ -56,18 +56,23 @@ def test_genomas_sin_condicion_se_completan(tmp_path):
 
 
 def test_gen_modulado_por_la_memoria(cfg):
-    """Fase 11: con la condición 5, la memoria A cambia el signo del aporte de los sensores del gen."""
+    """Fase 11: con la condición 5, la memoria A cambia el signo de la respuesta al tipo de comida (y solo a ese
+    receptor: el resto de las entradas del gen no cambia)."""
     cfg.memoria.activa = True
     cfg.herencia.modulacion = True
+    cfg.estaciones.activa = True
     sim = sim_vacia(cfg)
-    g = genoma_con(cfg, [(gen.COMER, 0.0, {gen.S_ENERGIA: 5.0}), (gen.DESCANSAR, 0.5, {})])
-    g["cond"][0, 0] = gen.COND_MODULA_A
-    colocar(sim, g, [5], [5], E=50)
-    colocar(sim, g, [9], [9], E=50)
+    g = genoma_con(cfg, [(gen.COMER, 0.0, {gen.S_TIPO_AQUI: 5.0}), (gen.DESCANSAR, 0.5, {}),
+                         (gen.AVANZAR, -3.0, {gen.S_ENERGIA: 5.0})])
+    g["cond"][0, [0, 2]] = gen.COND_MODULA_A
+    ya = np.argwhere(sim.tipo > 0)
+    colocar(sim, g, [ya[0][0]], [ya[0][1]], E=50)
+    colocar(sim, g, [ya[1][0]], [ya[1][1]], E=50)
     sim.pob["memoria"][:, 0] = [1.0, 0.0]
     act, a = sim.decidir(_sensar(sim))
     assert a[0, 0] > 0 > a[1, 0]
-    assert list(act) == [gen.COMER, gen.DESCANSAR]
+    assert np.isclose(a[0, 2], a[1, 2])  # la energía no es un receptor modulable
+    assert act[0] == gen.COMER and act[1] != gen.COMER
 
 
 def test_la_modulacion_muta_solo_si_esta_permitida():
