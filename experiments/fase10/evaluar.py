@@ -20,7 +20,7 @@ Condiciones (desde LUCA sembrado con un gen de memoria A conectado a la pista, c
 
 Uso:
     python experiments/fase10/evaluar.py --salida runs/fase10 [--procesos 8] [--pasos 300000] [--semillas 8]
-        [--semilla-inicial 181] [--condiciones ...]
+        [--semilla-inicial 181] [--condiciones ...] (por defecto, las cuatro del prerregistro)
 """
 
 from __future__ import annotations
@@ -56,6 +56,10 @@ CONDICIONES = {
 }
 
 
+# las de la corrida prerregistrada; las de cerrojo + rampa quedan disponibles (piloto negativo)
+PRINCIPALES = ["sem_induccion", "ruido_induccion", "luca_induccion", "sem_cerrojo"]
+
+
 def _correr(tarea):
     salida, nombre, semilla, pasos = tarea
     return fase9.correr_condicion(salida, nombre, semilla, pasos, fase9.BASE + CONDICIONES[nombre],
@@ -79,12 +83,12 @@ def hipotesis(rs):
         v = val(n, m)
         return {"valores": {s: round(x, 3) for s, x in v.items()}, "cumple": sum(x > u for x in v.values()) >= 4}
     return {
-        "P1_acierto_cerrojo_rampa_mayor_a_060": umbral("sem_cerrojo_rampa", "acierto_final", 0.6),
-        "P2_acierto_vs_ruido": prueba("sem_cerrojo_rampa", "ruido_cerrojo_rampa", "acierto_final"),
-        "P3_seguimiento_mayor_a_030": umbral("sem_cerrojo_rampa", "seguimiento_final", 0.3),
-        "P4_acierto_vs_solo_cerrojo": prueba("sem_cerrojo_rampa", "sem_cerrojo", "acierto_final"),
-        "P5_acierto_vs_solo_rampa": prueba("sem_cerrojo_rampa", "sem_rampa", "acierto_final"),
-        "P6_luca_mayor_a_060": umbral("luca_cerrojo_rampa", "acierto_final", 0.6),
+        "P1_seguimiento_induccion_mayor_a_030": umbral("sem_induccion", "seguimiento_final", 0.3),
+        "P2_seguimiento_vs_ruido": prueba("sem_induccion", "ruido_induccion", "seguimiento_final"),
+        "P3_acierto_vs_ruido": prueba("sem_induccion", "ruido_induccion", "acierto_final"),
+        "P4_acierto_induccion_mayor_a_060": umbral("sem_induccion", "acierto_final", 0.6),
+        "P5_seguimiento_vs_sin_induccion": prueba("sem_induccion", "sem_cerrojo", "seguimiento_final"),
+        "P6_luca_seguimiento_mayor_a_030": umbral("luca_induccion", "seguimiento_final", 0.3),
     }
 
 
@@ -95,7 +99,7 @@ def main():
     ap.add_argument("--pasos", type=int, default=300000)
     ap.add_argument("--semillas", type=int, default=8)
     ap.add_argument("--semilla-inicial", type=int, default=181)
-    ap.add_argument("--condiciones", nargs="*", default=list(CONDICIONES))
+    ap.add_argument("--condiciones", nargs="*", default=PRINCIPALES)
     args = ap.parse_args()
     args.salida.mkdir(parents=True, exist_ok=True)
     semillas = list(range(args.semilla_inicial, args.semilla_inicial + args.semillas))
