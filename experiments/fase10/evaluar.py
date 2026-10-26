@@ -5,12 +5,18 @@ condicionada posible). Dos cambios en la física, solos y combinados:
     cerrojo     la memoria solo cambia ante impulsos de magnitud > 0,5 (un sesgo chico no la borra)
     rampa       la pista empieza frecuente (p = 0,2) y baja a 0,01 en 150 000 pasos: al principio, una memoria
                 mala sirve porque se renueva; después hace falta una que dure
-Condiciones (todas desde LUCA sembrado con un gen de memoria A conectado a la pista, como `sem_info` de la fase 9):
+    induccion   digestión inducible (0,25): lo absorbido de cada tipo de comida depende de la memoria A; una
+                memoria que sigue a la estación rinde más. Verificado: el gen de memoria solo, contra un control con
+                el mismo gen en cero, gana en 7/7 semillas con sobrevivientes (sin inducción: 2/5)
+Condiciones (desde LUCA sembrado con un gen de memoria A conectado a la pista, como `sem_info` de la fase 9):
     sem_cerrojo_rampa   cerrojo + rampa
     sem_cerrojo         solo cerrojo
     sem_rampa           solo rampa
     ruido_cerrojo_rampa cerrojo + rampa con la pista aleatoria (control: la memoria no informa)
     luca_cerrojo_rampa  cerrojo + rampa desde LUCA puro
+    sem_induccion       cerrojo + inducción
+    ruido_induccion     cerrojo + inducción con la pista aleatoria (control)
+    luca_induccion      cerrojo + inducción desde LUCA puro
 
 Uso:
     python experiments/fase10/evaluar.py --salida runs/fase10 [--procesos 8] [--pasos 300000] [--semillas 8]
@@ -36,7 +42,12 @@ _spec.loader.exec_module(fase9)
 CERROJO = ["memoria.umbral=0.5"]
 RAMPA = ["estaciones.p_pista_inicial=0.2", "estaciones.rampa_pista=150000"]
 RUIDO = ["estaciones.pista_informativa=false"]
+INDUCCION = ["estaciones.induccion=0.25"]
 CONDICIONES = {
+    # digestión inducible: la memoria tiene utilidad directa (primer peldaño con premio propio)
+    "sem_induccion": CERROJO + INDUCCION,
+    "ruido_induccion": CERROJO + INDUCCION + RUIDO,
+    "luca_induccion": CERROJO + INDUCCION,
     "sem_cerrojo_rampa": CERROJO + RAMPA,
     "sem_cerrojo": CERROJO,
     "sem_rampa": RAMPA,
