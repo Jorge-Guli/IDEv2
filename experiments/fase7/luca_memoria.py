@@ -7,7 +7,7 @@ vigente.
 
 Uso:
     python experiments/fase7/luca_memoria.py [--semillas 6] [--pasos 20000] [--castigos 0.5 2.0] [--procesos 4]
-        [--regulado] [--extra clave=valor ...]
+        [--regulado] [--subconjunto 0 1 2] [--extra clave=valor ...]
 """
 
 from __future__ import annotations
@@ -34,8 +34,10 @@ AJUSTES = fase7.MUNDO + ["memoria.activa=true", "memoria.tasa=1.0", "aprendizaje
 
 
 def _correr(tarea):
-    semilla, pasos, castigo, extra, regulado = tarea
+    semilla, pasos, castigo, extra, regulado, subconjunto = tarea
     genes = inv.GENES_REGULADOS if regulado else inv.GENES
+    if subconjunto:  # fase 9: módulos parciales (pasos intermedios del camino evolutivo)
+        genes = [genes[k] for k in subconjunto]
     cfg = config.cargar(fase7.CONFIG, AJUSTES + [f"estaciones.castigo={castigo}"] + list(extra))
     cfg.sim.semilla = semilla
     n = cfg.sim.poblacion_inicial
@@ -71,9 +73,10 @@ def main():
     ap.add_argument("--extra", nargs="*", default=[])
     ap.add_argument("--procesos", type=int, default=4)
     ap.add_argument("--regulado", action="store_true", help="fase 9: el módulo de memoria con genes condicionados")
+    ap.add_argument("--subconjunto", type=int, nargs="*", default=[], help="índices de los genes del módulo a usar")
     args = ap.parse_args()
     with Pool(args.procesos) as pool:
-        rs = pool.map(_correr, [(s, args.pasos, c, tuple(args.extra), args.regulado) for c in args.castigos
+        rs = pool.map(_correr, [(s, args.pasos, c, tuple(args.extra), args.regulado, tuple(args.subconjunto)) for c in args.castigos
                                 for s in range(1, args.semillas + 1)])
     for r in rs:
         print(r["castigo"], r["semilla"], "memoria:", r["frac_memoria"], "serie (LUCA, memoria):", r["serie"][::5] + r["serie"][-1:])
