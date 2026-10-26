@@ -42,15 +42,25 @@ GENES = [(gen.MEMORIA_A, 0.0, {gen.S_PISTA: 20.0}),
          # y avanzar cuando la comida no coincide (≈ +2), para buscar la del tipo correcto
          (gen.AVANZAR, 0.0, {gen.S_TIPO_AQUI: 5.0, gen.S_MEMORIA_A: 10.0}),
          (gen.AVANZAR, 10.0, {gen.S_TIPO_AQUI: -5.0, gen.S_MEMORIA_A: -10.0})]
+# fase 9: la misma lógica con genes condicionados (cuarto campo: condición de expresión; 1 = memoria A alta,
+# 2 = memoria A baja). Cada gen mira solo el tipo de comida; la memoria decide cuál se expresa. Como en el
+# mutante de arriba, valen ≈ 0 si el tipo coincide con la memoria (en el piloto, con ±1, frenar el avance sobre
+# la comida correcta lo dejaba quieto en celdas vacías y moría de hambre) y ≈ ∓1 si no coincide
+GENES_REGULADOS = [(gen.MEMORIA_A, 0.0, {gen.S_PISTA: 20.0}, 0),
+                   (gen.COMER, -5.0, {gen.S_TIPO_AQUI: 5.0}, 1),
+                   (gen.COMER, -5.0, {gen.S_TIPO_AQUI: -5.0}, 2),
+                   (gen.AVANZAR, 5.0, {gen.S_TIPO_AQUI: -5.0}, 1),
+                   (gen.AVANZAR, 5.0, {gen.S_TIPO_AQUI: 5.0}, 2)]
 
 
-def agregar(g, conectados):
+def agregar(g, conectados, genes=GENES):
     for i in range(len(g["mu"])):
-        libres = np.flatnonzero(~g["activo"][i])[:len(GENES)]
-        if libres.size < len(GENES):
+        libres = np.flatnonzero(~g["activo"][i])[:len(genes)]
+        if libres.size < len(genes):
             raise ValueError("genoma sin ranuras libres")
-        for r, (prim, sesgo, pesos) in zip(libres, GENES):
+        for r, (prim, sesgo, pesos, *cond) in zip(libres, genes):
             g["activo"][i, r], g["prim"][i, r] = True, prim
+            g["cond"][i, r] = cond[0] if cond and conectados else 0
             g["w"][i, r] = 0.0
             g["b"][i, r] = sesgo if conectados else 0.0
             if conectados:

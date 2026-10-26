@@ -7,6 +7,7 @@ vigente.
 
 Uso:
     python experiments/fase7/luca_memoria.py [--semillas 6] [--pasos 20000] [--castigos 0.5 2.0] [--procesos 4]
+        [--regulado] [--extra clave=valor ...]
 """
 
 from __future__ import annotations
@@ -33,7 +34,8 @@ AJUSTES = fase7.MUNDO + ["memoria.activa=true", "memoria.tasa=1.0", "aprendizaje
 
 
 def _correr(tarea):
-    semilla, pasos, castigo, extra = tarea
+    semilla, pasos, castigo, extra, regulado = tarea
+    genes = inv.GENES_REGULADOS if regulado else inv.GENES
     cfg = config.cargar(fase7.CONFIG, AJUSTES + [f"estaciones.castigo={castigo}"] + list(extra))
     cfg.sim.semilla = semilla
     n = cfg.sim.poblacion_inicial
@@ -42,9 +44,9 @@ def _correr(tarea):
     cepas = np.zeros(n, dtype=np.int16)
     cepas[: n // 2] = 1
     a = {k: v[: n // 2] for k, v in g.items()}
-    inv.agregar(a, True)
+    inv.agregar(a, True, genes)
     b = {k: v[n // 2:] for k, v in g.items()}
-    inv.agregar(b, False)
+    inv.agregar(b, False, genes)
     for k in g:
         g[k][: n // 2], g[k][n // 2:] = a[k], b[k]
     sim = Simulacion(cfg, g, cepas)
@@ -68,9 +70,10 @@ def main():
     ap.add_argument("--castigos", type=float, nargs="*", default=[0.5, 2.0])
     ap.add_argument("--extra", nargs="*", default=[])
     ap.add_argument("--procesos", type=int, default=4)
+    ap.add_argument("--regulado", action="store_true", help="fase 9: el módulo de memoria con genes condicionados")
     args = ap.parse_args()
     with Pool(args.procesos) as pool:
-        rs = pool.map(_correr, [(s, args.pasos, c, tuple(args.extra)) for c in args.castigos
+        rs = pool.map(_correr, [(s, args.pasos, c, tuple(args.extra), args.regulado) for c in args.castigos
                                 for s in range(1, args.semillas + 1)])
     for r in rs:
         print(r["castigo"], r["semilla"], "memoria:", r["frac_memoria"], "serie (LUCA, memoria):", r["serie"][::5] + r["serie"][-1:])

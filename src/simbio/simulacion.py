@@ -871,6 +871,10 @@ class Simulacion:
             fila["perfiles_distintos"] = int(len(np.unique(dev.a_cpu(perfil), axis=0)))
             for k, nombre in enumerate(gen.PRIMITIVAS):
                 fila[f"tiene_{nombre}"] = float((perfil[:, k] > 0).mean())
+            if self.cfg.memoria.activa:  # fase 9: genes que se expresan solo según la memoria
+                cond = (p["cond"] > 0) & activo
+                fila["con_gen_condicionado"] = float(cond.any(axis=1).mean())
+                fila["frac_genes_condicionados"] = float(cond.sum() / max(int(activo.sum()), 1))
             # organización
             lab, ii, jj = self.grupos()
             tam = xp.bincount(lab, minlength=n)[lab]
