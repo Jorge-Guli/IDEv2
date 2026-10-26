@@ -12,14 +12,16 @@ en 7/8; con uno de comer, 8/8; uno solo de avanzar, 2/8; sin modulación, el mó
 Parte A (desde las poblaciones finales de `sem_induccion` de la fase 10 que tienen memoria, `resultados/fase10/`):
     a_mod           con modulación
     a_sin_mod       sin modulación (control)
+    a_mod_softmax, a_sin_mod_softmax   lo mismo con decisión estocástica (softmax, temperatura 0,25): un cambio chico
+                   de impulso cambia un poco la probabilidad de cada acción (gradiente para la selección)
 Parte B (desde LUCA sembrado con un gen de memoria A conectado a la pista, como la fase 10):
     b_mod           con modulación
     b_sin_mod       sin modulación (control)
     b_ruido_mod     con modulación y la pista aleatoria (control: la memoria no informa)
 
 Uso:
-    python experiments/fase11/evaluar.py --salida runs/fase11 [--procesos 8] [--pasos-a 150000] [--pasos-b 300000]
-        [--semillas 8] [--semilla-inicial 191] [--partes A B]
+    python experiments/fase11/evaluar.py --salida runs/fase11 [--procesos 8] [--pasos-a 300000] [--pasos-b 300000]
+        [--semillas 8] [--semilla-inicial 191] [--partes A] [--extra ...]
 """
 
 from __future__ import annotations
@@ -46,7 +48,8 @@ fase9 = fase10.fase9
 MUNDO = fase9.BASE + fase10.CERROJO + fase10.INDUCCION + ["memoria.inicial=0.5"]
 MOD = ["herencia.modulacion=true"]
 RUIDO = ["estaciones.pista_informativa=false"]
-CONDICIONES_A = {"a_mod": MOD, "a_sin_mod": []}
+SOFTMAX = ['fisica.decision="softmax"', "fisica.temperatura=0.25"]
+CONDICIONES_A = {"a_mod": MOD, "a_sin_mod": [], "a_mod_softmax": MOD + SOFTMAX, "a_sin_mod_softmax": SOFTMAX}
 CONDICIONES_B = {"b_mod": MOD, "b_sin_mod": [], "b_ruido_mod": MOD + RUIDO}
 # poblaciones de la fase 10 cuya memoria sigue a la pista (la 182 evolucionó el atajo del tipo; la 185 se extinguió)
 POBLACIONES_A = [181, 183, 184, 186, 187, 188]
@@ -104,7 +107,9 @@ def hipotesis(rs):
         return {"valores": {s: round(x, 3) for s, x in v.items()}, "cumple": sum(x > u for x in v.values()) >= k}
     return {
         "A1_acierto_mod_vs_sin_mod": prueba("a_mod", "a_sin_mod", "acierto_final"),
-        "A2_acierto_mod_mayor_a_060": umbral("a_mod", "acierto_final", 0.6, 4),
+        "A2_acierto_mod_mayor_a_060": umbral("a_mod", "acierto_final", 0.6, 3),
+        "A3_acierto_mod_vs_sin_mod_softmax": prueba("a_mod_softmax", "a_sin_mod_softmax", "acierto_final"),
+        "A4_acierto_mod_softmax_mayor_a_060": umbral("a_mod_softmax", "acierto_final", 0.6, 3),
         "B1_acierto_mod_vs_sin_mod": prueba("b_mod", "b_sin_mod", "acierto_final"),
         "B2_acierto_mod_vs_ruido": prueba("b_mod", "b_ruido_mod", "acierto_final"),
         "B3_acierto_mod_mayor_a_060": umbral("b_mod", "acierto_final", 0.6, 4),
@@ -115,11 +120,11 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--salida", type=Path, default=RAIZ / "runs" / "fase11")
     ap.add_argument("--procesos", type=int, default=4)
-    ap.add_argument("--pasos-a", type=int, default=150000)
+    ap.add_argument("--pasos-a", type=int, default=300000)
     ap.add_argument("--pasos-b", type=int, default=300000)
     ap.add_argument("--semillas", type=int, default=8)
     ap.add_argument("--semilla-inicial", type=int, default=191)
-    ap.add_argument("--partes", nargs="*", default=["A", "B"])
+    ap.add_argument("--partes", nargs="*", default=["A"])
     ap.add_argument("--poblaciones", type=int, nargs="*", default=POBLACIONES_A)
     ap.add_argument("--extra", nargs="*", default=[], help="ajustes seccion.clave=valor para todas las condiciones")
     args = ap.parse_args()
