@@ -10,7 +10,7 @@ paso. Corridas largas. Condiciones:
 
 Uso:
     python experiments/fase7/evaluar.py --salida runs/fase7 [--procesos 8] [--pasos 200000] [--semillas 6]
-        [--semilla-inicial 141]
+        [--semilla-inicial 141] [--mundo parches|mosaico]
 """
 
 from __future__ import annotations
@@ -36,6 +36,12 @@ _spec.loader.exec_module(fase4)  # permutacion_pareada
 CONFIG = RAIZ / "experiments" / "configs" / "base.toml"
 MUNDO = ["estaciones.activa=true", "estaciones.castigo=0.5", 'estaciones.toxicidad="diferido"',
          "estaciones.p_pista=0.01", "estaciones.periodo=2000", "sim.registrar_cada=500"]
+MUNDOS = {
+    "parches": MUNDO,  # fase 7
+    # fase 8: los dos tipos de comida en un mosaico fino (sin zonas "buenas" donde refugiarse: sin memoria, el
+    # acierto no puede pasar del azar) y castigo 0,2 (con 0,5, LUCA se extingue)
+    "mosaico": MUNDO + ["estaciones.escala_parche=1.0", "estaciones.castigo=0.2", "memoria.tasa=1.0"],
+}
 CONDICIONES = {
     "mem_info": ["memoria.activa=true", "aprendizaje.activo=false"],
     "mem_ruido": ["memoria.activa=true", "aprendizaje.activo=false", "estaciones.pista_informativa=false"],
@@ -45,8 +51,8 @@ CONDICIONES = {
 
 
 def _correr(tarea):
-    salida, nombre, semilla, pasos = tarea
-    cfg = config.cargar(CONFIG, MUNDO + CONDICIONES[nombre])
+    salida, nombre, semilla, pasos, mundo = tarea
+    cfg = config.cargar(CONFIG, MUNDOS[mundo] + CONDICIONES[nombre])
     cfg.sim.semilla, cfg.sim.pasos = semilla, pasos
     sim = corrida.correr(cfg, Path(salida) / nombre / f"semilla_{semilla}", imagenes=False)
     h = sim.historial
@@ -82,6 +88,9 @@ def hipotesis(rs):
         "M2_memoria_sigue_la_estacion": {"valores": {s: round(v, 3) for s, v in seg.items()},
                                          "cumple": sum(abs(v) > 0.3 for v in seg.values()) >= 4},
         "M3_acierto_info_vs_sin_memoria": prueba("mem_info", "sin_memoria", "acierto_final"),
+        # fase 8 (mosaico): sin memoria el acierto no puede pasar del azar (~0,5)
+        "M4_acierto_info_mayor_a_060": {"valores": {s: round(v, 3) for s, v in val("mem_info", "acierto_final").items()},
+                                        "cumple": sum(v > 0.6 for v in val("mem_info", "acierto_final").values()) >= 4},
     }
 
 
@@ -92,12 +101,13 @@ def main():
     ap.add_argument("--pasos", type=int, default=200000)
     ap.add_argument("--semillas", type=int, default=6)
     ap.add_argument("--semilla-inicial", type=int, default=141)
+    ap.add_argument("--mundo", choices=list(MUNDOS), default="parches")
     args = ap.parse_args()
     args.salida.mkdir(parents=True, exist_ok=True)
     semillas = list(range(args.semilla_inicial, args.semilla_inicial + args.semillas))
     t0 = time.time()
     with Pool(args.procesos) as pool:
-        rs = pool.map(_correr, [(str(args.salida), n, s, args.pasos) for n in CONDICIONES for s in semillas])
+        rs = pool.map(_correr, [(str(args.salida), n, s, args.pasos, args.mundo) for n in CONDICIONES for s in semillas])
     informe = {"parametros": {"pasos": args.pasos, "semillas": semillas, "minutos": round((time.time() - t0) / 60, 1)},
                "hipotesis": hipotesis(rs), "corridas": rs}
     (args.salida / "informe.json").write_text(json.dumps(informe, indent=2, ensure_ascii=False), encoding="utf-8")
