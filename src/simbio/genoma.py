@@ -49,7 +49,10 @@ SENS_RUMBO = np.array([S_RUMBO_SOCIOS_SIN, S_RUMBO_SOCIOS_COS, S_EMPUJE_SOCIOS])
 SENS_SENAL = np.array([S_SENAL_SOCIOS, S_SENAL_PROPIA])
 NUM_SENS = len(SENSORES)
 
-CAMPOS = ("activo", "prim", "w", "b", "mu", "sens", "eta", "etiqueta")
+CAMPOS = ("activo", "prim", "w", "b", "mu", "sens", "eta", "etiqueta", "cond")
+# condición de expresión de cada gen (fase 9): 0 siempre; 1/2 solo si la memoria A está alta/baja (> 0,5 o ≤ 0,5);
+# 3/4 ídem con la memoria B. Solo actúa con la memoria activa
+NUM_COND = 5
 
 
 def primitivas_permitidas(asociacion: bool, conjugacion: bool, bien_publico: bool = False,
@@ -73,6 +76,9 @@ def compatibilizar(g: dict[str, np.ndarray]) -> dict[str, np.ndarray]:
     if faltan > 0:
         g = dict(g)
         g["w"] = np.concatenate([g["w"], np.zeros(g["w"].shape[:-1] + (faltan,))], axis=-1)
+    if "cond" not in g:
+        g = dict(g)
+        g["cond"] = np.zeros(g["activo"].shape, dtype=np.int8)
     return g
 
 
@@ -86,6 +92,7 @@ def vacio(n: int, genes_max: int, xp=np) -> dict[str, np.ndarray]:
         "sens": xp.zeros(n),
         "eta": xp.zeros(n),
         "etiqueta": xp.zeros((n, 2)),
+        "cond": xp.zeros((n, genes_max), dtype=np.int8),
     }
 
 
@@ -160,6 +167,11 @@ def mutar(g: dict[str, np.ndarray], m: np.ndarray, cfg: HerenciaCfg,
     mask_p = (A(rng.random((n, G))) < cfg.k_primitiva * mm) & activo
     g["prim"][mask_p] = A(rng.choice(permitidas, int(mask_p.sum())).astype(np.int8))
 
+    # cambio de condición de expresión (fase 9): solo si la memoria existe en este mundo
+    if MEMORIA_A in permitidas:
+        mask_c = (A(rng.random((n, G))) < cfg.k_condicion * mm) & activo
+        g["cond"][mask_c] = A(rng.integers(0, NUM_COND, int(mask_c.sum())).astype(np.int8))
+
     # eliminación
     mask_del = (A(rng.random((n, G))) < cfg.k_eliminacion * mm) & activo
     activo[mask_del] = False
@@ -179,6 +191,7 @@ def mutar(g: dict[str, np.ndarray], m: np.ndarray, cfg: HerenciaCfg,
             g["prim"][i, k] = g["prim"][i, j]
             g["w"][i, k] = g["w"][i, j]
             g["b"][i, k] = g["b"][i, j]
+            g["cond"][i, k] = g["cond"][i, j]
 
     # gen nuevo aleatorio
     nuevos = np.flatnonzero(rng.random(n) < a_cpu(cfg.k_gen_nuevo * G * m))
@@ -194,6 +207,7 @@ def mutar(g: dict[str, np.ndarray], m: np.ndarray, cfg: HerenciaCfg,
             g["prim"][i, k] = int(rng.choice(permitidas))
             g["w"][i, k] = A(rng.normal(0.0, 1.0, NUM_SENS))
             g["b"][i, k] = float(rng.normal(0.0, 1.0))
+            g["cond"][i, k] = 0
 
     # rasgos heredables
     rasgos = [("mu", cfg.mu_min, cfg.mu_max), ("eta", 0.0, cfg.eta_max)]

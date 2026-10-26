@@ -58,6 +58,7 @@ class HerenciaCfg:
     genes_max: int = 24
     sigma_peso: float = 0.3
     k_primitiva: float = 0.3
+    k_condicion: float = 0.3  # fase 9: prob. de cambiar la condición de expresión de un gen = k_condicion · m
     k_duplicacion: float = 0.5
     k_eliminacion: float = 0.5
     k_gen_nuevo: float = 0.2

@@ -1,0 +1,55 @@
+"""Regulación condicionada (fase 9): cada gen se expresa según una condición sobre la memoria interna."""
+import numpy as np
+
+from simbio import genoma as gen
+from simbio.config import HerenciaCfg
+
+from .conftest import colocar, sim_vacia
+from .test_organismo import genoma_con
+
+
+def _sensar(sim):
+    occ = sim.ocupacion()
+    return sim.sensar(occ, sim.validar_enlaces(occ))
+
+
+def test_gen_condicionado_a_memoria_alta(cfg):
+    cfg.memoria.activa = True
+    sim = sim_vacia(cfg)
+    g = genoma_con(cfg, [(gen.COMER, 5.0, {}), (gen.DESCANSAR, 1.0, {})])
+    g["cond"][0, 0] = 1  # comer solo si la memoria A está alta
+    colocar(sim, g, [5], [5], E=50)
+    colocar(sim, g, [9], [9], E=50)
+    sim.pob["memoria"][:, 0] = [0.9, 0.1]
+    act, _ = sim.decidir(_sensar(sim))
+    assert list(act) == [gen.COMER, gen.DESCANSAR]
+
+
+def test_sin_memoria_la_condicion_no_actua(cfg):
+    sim = sim_vacia(cfg)
+    g = genoma_con(cfg, [(gen.COMER, 5.0, {}), (gen.DESCANSAR, 1.0, {})])
+    g["cond"][0, 0] = 1
+    colocar(sim, g, [5], [5], E=50)
+    act, _ = sim.decidir(_sensar(sim))
+    assert act[0] == gen.COMER
+
+
+def test_la_condicion_muta_solo_con_memoria():
+    cfg = HerenciaCfg(k_condicion=1.0)
+    rng = np.random.default_rng(0)
+    g = gen.repetir(gen.luca(cfg), 200)
+    sin = gen.primitivas_permitidas(True, True)
+    h = {k: v.copy() for k, v in g.items()}
+    gen.mutar(h, np.full(200, 0.2), cfg, rng, sin)
+    assert not h["cond"].any()
+    con = gen.primitivas_permitidas(True, True, memoria=True)
+    gen.mutar(h, np.full(200, 0.2), cfg, rng, con)
+    assert h["cond"].any() and h["cond"].max() < gen.NUM_COND
+
+
+def test_genomas_sin_condicion_se_completan(tmp_path):
+    from simbio.persistencia import cargar_genomas
+    g = gen.vacio(3, 24)
+    del g["cond"]
+    np.savez(tmp_path / "p.npz", **g)
+    assert not cargar_genomas(tmp_path / "p.npz")["cond"].any()

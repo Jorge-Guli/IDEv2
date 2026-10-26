@@ -240,6 +240,10 @@ class Simulacion:
         w = p["w"] + p["P"]
         z = xp.einsum("ngs,ns->ng", w, s) + p["b"] + p["p"]
         a = xp.tanh(z) * p["activo"]
+        if self.cfg.memoria.activa:  # regulación (fase 9): cada gen se expresa según su condición
+            alta = p["memoria"] > 0.5
+            puerta = xp.stack([xp.ones_like(alta[:, 0]), alta[:, 0], ~alta[:, 0], alta[:, 1], ~alta[:, 1]], axis=1)
+            a = a * xp.take_along_axis(puerta, p["cond"].astype(xp.int64), axis=1)
         expresa = (p["prim"][:, :, None] == xp.arange(gen.NUM_PRIM)) & p["activo"][:, :, None]
         impulso = xp.einsum("ng,nge->ne", a, expresa)
         disponible = expresa.any(axis=1) & ~self.bloqueadas
