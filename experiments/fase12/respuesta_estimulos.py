@@ -41,6 +41,38 @@ def pesos(sim, sensor):
     return float(np.abs(w).mean()) if w.size else float("nan")
 
 
+def peso_con_signo(sim, prim, sensor):
+    """Peso medio (con signo) sobre un sensor en los genes activos de una primitiva."""
+    p = sim.pob
+    activo = dev.a_cpu(p["activo"]) & (dev.a_cpu(p["prim"]) == prim)
+    w = dev.a_cpu(p["w"])[:, :, sensor][activo]
+    return float(w.mean()) if w.size else float("nan")
+
+
+def permutacion_pareada(dif) -> float:
+    """p de una cola (media > 0) por inversión de signos exacta (como en las fases 3d y 4)."""
+    d = np.asarray([x for x in dif if x == x], dtype=float)
+    if d.size == 0:
+        return float("nan")
+    signos = ((np.arange(2 ** d.size)[:, None] >> np.arange(d.size)) & 1) * 2 - 1
+    return float(((signos * d).mean(axis=1) >= d.mean() - 1e-12).mean())
+
+
+def evaluar(res: list[dict]) -> dict:
+    """Reglas prerregistradas (docs/bitacora/2026-10-27-fase12-luz-prerregistro.md)."""
+    por = {(r["condicion"], r["semilla"]): r for r in res if r.get("extinta_en") is None}
+    semillas = sorted({s for c, s in por if c == "acoplado"} & {s for c, s in por if c == "desacoplado"})
+    out = {}
+    for regla, medida in (("R1_peso_luz", "peso_luz"), ("R2_enriquecimiento", "enriquecimiento"),
+                          ("E_peso_ruido", "peso_ruido"), ("E_avanzar_luz", "avanzar_luz"),
+                          ("E_comer_luz", "comer_luz")):
+        d = [por["acoplado", s][medida] - por["desacoplado", s][medida] for s in semillas]
+        p = permutacion_pareada(d)
+        out[regla] = {"n": len(d), "diferencias": [round(x, 3) for x in d], "p_una_cola": round(p, 4),
+                      "cumple": bool(d) and p < 0.05}
+    return out
+
+
 def correr(tarea):
     nombre, semilla, pasos, cada = tarea
     cfg = config.cargar(RAIZ / "experiments/configs/clima.toml",
@@ -61,6 +93,8 @@ def correr(tarea):
             "enriquecimiento": float(np.mean(enr)) if enr else float("nan"),
             "poblacion": float(np.mean([f["poblacion"] for f in h])) if h else float("nan"),
             "peso_luz": pesos(sim, gen.S_LUZ), "peso_ruido": pesos(sim, gen.S_RUIDO),
+            "avanzar_luz": peso_con_signo(sim, gen.AVANZAR, gen.S_LUZ),
+            "comer_luz": peso_con_signo(sim, gen.COMER, gen.S_LUZ),
             "generacion": float(dev.a_cpu(sim.pob["generacion"]).mean())}
 
 
@@ -77,9 +111,12 @@ def main() -> None:
         res = pool.map(correr, tareas)
     for r in res:
         print(json.dumps(r, ensure_ascii=False))
+    informe = evaluar(res)
+    print(json.dumps(informe, ensure_ascii=False, indent=2))
     salida = RAIZ / args.salida
     salida.parent.mkdir(parents=True, exist_ok=True)
-    salida.write_text(json.dumps(res, ensure_ascii=False, indent=2), encoding="utf-8")
+    salida.write_text(json.dumps({"corridas": res, "reglas": informe}, ensure_ascii=False, indent=2),
+                      encoding="utf-8")
 
 
 if __name__ == "__main__":
