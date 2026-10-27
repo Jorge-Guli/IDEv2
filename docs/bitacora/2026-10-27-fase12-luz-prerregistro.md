@@ -38,3 +38,11 @@ Corridas extintas: se excluyen del par.
 - **Mundo recalibrado:** `clima.toml` con `capacidad_max = 20`. Verificado con `viabilidad_clima.py`, semillas 11–18, 140 000 pasos: 8 de 8 sobreviven, con población mínima entre 11 y 100. Con 15 y el efecto de la temperatura en 0,1 se extinguían 3 de 8; con el efecto en 0, 2 de 8 (al llegar la toxicidad a pleno).
 - **Semillas nuevas 31–38**, 200 000 pasos. Mismo script y mismas reglas R1 y R2: `python experiments/fase12/respuesta_estimulos.py --pasos 200000 --semillas 31 32 33 34 35 36 37 38 --salida runs/fase12/luz_prerregistro_v2.json`
 - Si vuelve a haber más de 2 extinciones por condición, el resultado se declara inválido otra vez y se reporta así.
+
+## Resultado de la versión 2 (2026-10-27): válido y negativo
+- **Validez:** 1 extinción en 16 corridas (desacoplada, semilla 36, paso 92 526). Por debajo del límite de 2 por condición: el resultado vale. Pares completos: 7.
+- **R1 (peso sobre la luz):** diferencias acoplado − desacoplado +0,25, +0,92, +0,21, −0,36, −0,04, −0,29, −0,41; p = 0,42. **No se cumple.** El piloto (3 de 4) era ruido.
+- **R2 (concentración en la luz):** 6 de 7 diferencias positivas (+0,10 a +0,21; una −0,17); p = 0,055. **No se cumple** por poco. Es lo esperable sin aprendizaje: si la luz hace crecer comida, los organismos se juntan donde hay comida, y eso los deja cerca de la luz. No requiere mirar la luz.
+- **Exploratorias:** peso sobre el sensor de ruido, p = 0,58; signo en avanzar, p = 0,94; en comer, p = 0,59. Nada.
+- **Lectura:** se cumple la predicción negativa escrita antes de correr. El sensor de luz es redundante con los de comida, porque la luz solo hace crecer comida donde los organismos ya la ven. La luz no aporta información propia.
+- **Siguiente:** que la luz *anticipe* la comida (la comida crece unos cientos de pasos después del pulso de luz). Así, quien siga la luz llega antes que quien sigue la comida. Mismo diseño de prerregistro, semillas nuevas.

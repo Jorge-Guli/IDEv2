@@ -501,9 +501,9 @@ class Simulacion:
         antes = p["E"] > 0.0
         p["E"] = p["E"] - quitado
         ganancia = c.eficiencia * efectivo
-        if c.especializacion_gamma > 0:  # especialización trófica: rinde según el uso habitual de atacar
-            ganancia = ganancia * xp.minimum(self.cfg.fisica.maquinaria_max,
-                                             (p["uso_atacar"][i] / c.uso_ref) ** c.especializacion_gamma)
+        if c.especializacion_gamma > 0:  # especialización trófica: el que ataca poco rinde menos
+            # tope 1: con tope mayor (maquinaria_max) eficiencia × factor superaba 1 y atacar creaba energía
+            ganancia = ganancia * xp.minimum(1.0, (p["uso_atacar"][i] / c.uso_ref) ** c.especializacion_gamma)
         p["E"][i] = xp.minimum(p["E"][i] + ganancia, self.cfg.fisica.energia_max)
         self.cont["robado"] += float(efectivo.sum())
         muertos = antes & (p["E"] <= 1e-9) & (quitado > 0)

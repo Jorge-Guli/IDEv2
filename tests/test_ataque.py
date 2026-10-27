@@ -60,7 +60,7 @@ def test_especializacion_trofica():
     p["x"][:] = [2, 3, 8, 9]  # dos pares: 0 ataca a 1, 2 ataca a 3
     p["uso_atacar"][:] = [0.2, 0.0, 0.02, 0.0]  # 0 es depredador habitual, 2 casi nunca ataca
     _atacan(sim, [0, 2])
-    assert p["E"][0] == 50.0 + 0.6 * 10.0 * 2.0
+    assert p["E"][0] == 50.0 + 0.6 * 10.0  # tope 1: atacar nunca crea energía
     assert np.isclose(p["E"][2], 50.0 + 0.6 * 10.0 * 0.2)
     assert p["E"][1] == p["E"][3] == 40.0  # el daño no depende de la especialización
 
