@@ -1,10 +1,10 @@
 {
-  "numpy": "2.5.3",
+  "numpy": "2.5.4",
   "huellas": {
-    "base": "3b0c128f651d2944 75b78aa4172a30ff",
-    "coordinacion_fuerza": "ed4d594806d3abef 1b6eabcc9dbc97e8",
-    "estaciones_memoria": "0418a7bfa84e8117 e68e50a996b9c61c",
-    "vivo": "d1d35a16b91d4683 74013043e278b1eb",
-    "vivo_softmax": "c7bd7d68e0fe1fb8 f4762a77e017efeb"
+    "base": "9cfd35579433e93e 591024cf330a8b9c",
+    "coordinacion_fuerza": "c16c1fd697b117d1 66a20ca98c9f2334",
+    "estaciones_memoria": "89c19e98a9b372d4 a0785348ff4552aa",
+    "vivo": "bd501a6fdf80743b e05c1fe89d4e0bd9",
+    "vivo_softmax": "38b5ce5cc04678b8 d57a5a511784a054"
   }
 }
