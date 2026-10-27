@@ -253,6 +253,18 @@ class RealidadCfg:
 
 
 @dataclass
+class AtaqueCfg:
+    # fase 12, etapa 4: depredación evolucionada. La primitiva atacar quita energía al organismo de enfrente y le
+    # pasa una parte al atacante: el ambiente pasan a ser otros organismos que también evolucionan (Reina Roja)
+    activo: bool = False
+    costo_atacar: float = 0.3
+    fuerza: float = 10.0  # energía que quita un ataque (antes de la protección)
+    eficiencia: float = 0.6  # fracción de lo quitado que gana el atacante (pérdida trófica)
+    # protección por enlaces: el daño se divide por (1 + enlaces del atacado); asociarse defiende
+    proteccion_enlaces: bool = True
+
+
+@dataclass
 class EstimulosCfg:
     # fase 12, etapa 3: estímulos desde afuera (un humano, Claude, una interfaz). Entran como eventos de luz: un
     # campo que se percibe con el sensor local "luz" y hace crecer comida donde cae. Un texto se vuelve una
@@ -291,6 +303,7 @@ class Config:
     estaciones: EstacionesCfg = field(default_factory=EstacionesCfg)
     realidad: RealidadCfg = field(default_factory=RealidadCfg)
     estimulos: EstimulosCfg = field(default_factory=EstimulosCfg)
+    ataque: AtaqueCfg = field(default_factory=AtaqueCfg)
     sim: SimCfg = field(default_factory=SimCfg)
 
     def to_dict(self) -> dict[str, Any]:

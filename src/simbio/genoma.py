@@ -19,12 +19,15 @@ from .dispositivo import a_cpu, modulo
 
 # Primitivas: la "física" fija de las acciones posibles.
 (DESCANSAR, AVANZAR, GIRAR_IZQ, GIRAR_DER, VOLTERETA, COMER, DIVIDIRSE,
- UNIRSE, SOLTARSE, COMPARTIR, DIVIDIRSE_UNIDO, CONJUGAR, SECRETAR, SENALAR, MEMORIA_A, MEMORIA_B) = range(16)
+ UNIRSE, SOLTARSE, COMPARTIR, DIVIDIRSE_UNIDO, CONJUGAR, SECRETAR, SENALAR, MEMORIA_A, MEMORIA_B, ATACAR) = range(17)
 PRIMITIVAS = ["descansar", "avanzar", "girar_izq", "girar_der", "voltereta", "comer", "dividirse",
               "unirse", "soltarse", "compartir", "dividirse_unido", "conjugar", "secretar", "senalar",
-              "memoria_a", "memoria_b"]
+              "memoria_a", "memoria_b", "atacar"]
 PRIM_MEMORIA = np.array([MEMORIA_A, MEMORIA_B])
 NUM_PRIM = len(PRIMITIVAS)
+# primitivas de los mundos sin ataque (fases 1-12): en ellos el azar y las métricas no cambian por haber agregado
+# atacar al final (fase 12, etapa 4)
+NUM_PRIM_SIN_ATAQUE = ATACAR
 PRIM_BASICAS = np.arange(DIVIDIRSE + 1)
 PRIM_ASOCIACION = np.array([UNIRSE, SOLTARSE, COMPARTIR, DIVIDIRSE_UNIDO, CONJUGAR])
 # acciones cuyo valor no se mide en energía propia: no se refuerzan por aprendizaje
@@ -64,7 +67,8 @@ NUM_COND_MODULACION = 7
 
 
 def primitivas_permitidas(asociacion: bool, conjugacion: bool, bien_publico: bool = False,
-                          division_unida: bool = True, senales: bool = False, memoria: bool = False) -> np.ndarray:
+                          division_unida: bool = True, senales: bool = False, memoria: bool = False,
+                          ataque: bool = False) -> np.ndarray:
     permitidas = list(PRIM_BASICAS)
     if asociacion:
         permitidas += [p for p in PRIM_ASOCIACION
@@ -75,6 +79,8 @@ def primitivas_permitidas(asociacion: bool, conjugacion: bool, bien_publico: boo
         permitidas.append(SENALAR)
     if memoria:
         permitidas += list(PRIM_MEMORIA)
+    if ataque:
+        permitidas.append(ATACAR)
     return np.array(permitidas)
 
 
@@ -160,7 +166,7 @@ def mutar(g: dict[str, np.ndarray], m: np.ndarray, cfg: HerenciaCfg,
     if n == 0 or not cfg.mutacion:
         return g
     if permitidas is None:
-        permitidas = np.arange(NUM_PRIM)
+        permitidas = np.arange(NUM_PRIM_SIN_ATAQUE)
     # el azar sale siempre del generador en CPU y se copia al dispositivo (misma secuencia en CPU y GPU)
     xp = modulo(g["w"])
     A = xp.asarray

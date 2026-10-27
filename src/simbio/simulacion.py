@@ -38,6 +38,7 @@ class Simulacion:
     clima: Clima | None = None
     n_sens: int = gen.NUM_SENS_SIN_REALIDAD
     luz = None  # campo de luz de los estímulos (etapa 3)
+    n_prim: int = gen.NUM_PRIM_SIN_ATAQUE
 
     def __init__(self, cfg: Config, genomas: dict[str, np.ndarray] | None = None,
                  cepas: np.ndarray | None = None):
@@ -75,10 +76,14 @@ class Simulacion:
                gen.UNIRSE, gen.SOLTARSE, gen.COMPARTIR, gen.CONJUGAR, gen.SECRETAR]] = [
             f.costo_avanzar, f.costo_girar, f.costo_girar, f.costo_voltereta, f.costo_comer,
             a.costo_unirse, a.costo_soltarse, a.costo_compartir, a.costo_conjugar, cfg.bien_publico.costo_secretar]
+        costo[gen.ATACAR] = cfg.ataque.costo_atacar
         self.costo_accion = xp.asarray(costo)
         self.sin_refuerzo = xp.asarray(gen.PRIM_SIN_REFUERZO)
         self.permitidas = gen.primitivas_permitidas(a.activa, a.conjugacion, cfg.bien_publico.activo,
-                                                    a.division_unida, cfg.coordinacion.senales, cfg.memoria.activa)
+                                                    a.division_unida, cfg.coordinacion.senales, cfg.memoria.activa,
+                                                    cfg.ataque.activo)
+        # primitivas que existen en este mundo (para el azar de la decisión y las métricas; etapa 4)
+        self.n_prim = gen.NUM_PRIM if cfg.ataque.activo else gen.NUM_PRIM_SIN_ATAQUE
         self.bloqueadas = xp.asarray(~np.isin(np.arange(gen.NUM_PRIM), self.permitidas))
         self.no_accion = xp.asarray(np.isin(np.arange(gen.NUM_PRIM), gen.PRIM_NO_ACCION))
         self._reiniciar_contadores()
@@ -150,7 +155,7 @@ class Simulacion:
                      "comido_libre_sec": 0.0, "comido_libre_nosec": 0.0, "depredados": 0,
                      "depredados_en_refugio": 0, "enlaces_por_union": 0, "enlaces_por_division": 0,
                      "grupos_empujan": 0, "grupos_mueven": 0, "grupos3_empujan": 0, "grupos3_mueven": 0,
-                     "grupos_bloqueados": 0, "difundido": 0.0, "comida_buena": 0.0, "comida_mala": 0.0, "conjugaciones": 0, "enlaces_creados": 0,
+                     "grupos_bloqueados": 0, "difundido": 0.0, "ataques": 0, "robado": 0.0, "muertes_por_ataque": 0, "comida_buena": 0.0, "comida_mala": 0.0, "conjugaciones": 0, "enlaces_creados": 0,
                      "acciones": xp.zeros(gen.NUM_PRIM, dtype=xp.int64)}
 
     def vecinos_enlazados(self, occ: np.ndarray) -> np.ndarray:
@@ -294,8 +299,11 @@ class Simulacion:
             # descansar siempre disponible con impulso ≥ 0 (con argmax equivale a "descansar si nada es positivo");
             # muestreo por el truco de Gumbel, con el azar de la CPU
             impulso[:, gen.DESCANSAR] = xp.maximum(impulso[:, gen.DESCANSAR], 0.0)
-            u = self.rng.random((p.n, gen.NUM_PRIM))
-            gumbel = xp.asarray(-np.log(-np.log(np.clip(u, 1e-12, 1.0 - 1e-12))))
+            u = self.rng.random((p.n, self.n_prim))
+            gumbel = -np.log(-np.log(np.clip(u, 1e-12, 1.0 - 1e-12)))
+            if self.n_prim < gen.NUM_PRIM:  # primitivas que no existen en este mundo: nunca se eligen
+                gumbel = np.pad(gumbel, ((0, 0), (0, gen.NUM_PRIM - self.n_prim)))
+            gumbel = xp.asarray(gumbel)
             act = xp.argmax(impulso / self.cfg.fisica.temperatura + gumbel, axis=1).astype(xp.int8)
             return act, a
         act = xp.argmax(impulso, axis=1)
@@ -467,6 +475,36 @@ class Simulacion:
         """Maquinaria por uso (fase 5): eficiencia de una acción según su uso reciente."""
         f = self.cfg.fisica
         return self.xp.minimum(f.maquinaria_max, (uso / f.maquinaria_ref) ** f.maquinaria_gamma)
+
+    def _atacar(self, act, occ, socios) -> None:
+        """Cada atacante quita energía al organismo de enfrente (dividida por 1 + sus enlaces si hay protección) y
+        gana una fracción. Si varios atacan al mismo y no alcanza su energía, se reparte en proporción."""
+        xp, p, c = self.xp, self.pob, self.cfg.ataque
+        H, W = self.entorno.alto, self.entorno.ancho
+        i = xp.flatnonzero(act == gen.ATACAR)
+        if i.size == 0:
+            return None
+        d = p["dir"][i].astype(xp.int64)
+        j = occ[(p["y"][i] + self.DY[d]) % H, (p["x"][i] + self.DX[d]) % W]
+        hay = (j >= 0) & (j != i)
+        i, j = i[hay], j[hay]
+        self.cont["ataques"] += int(i.size)
+        if i.size == 0:
+            return None
+        dano = xp.full(i.size, c.fuerza)
+        if c.proteccion_enlaces:
+            dano = dano / (1.0 + (socios[j] >= 0).sum(axis=1))
+        total = xp.bincount(j, weights=dano, minlength=p.n)
+        escala = xp.where(total > 0, xp.minimum(1.0, xp.maximum(p["E"], 0.0) / xp.maximum(total, 1e-12)), 0.0)
+        efectivo = dano * escala[j]
+        quitado = xp.bincount(j, weights=efectivo, minlength=p.n)
+        antes = p["E"] > 0.0
+        p["E"] = p["E"] - quitado
+        p["E"][i] = xp.minimum(p["E"][i] + c.eficiencia * efectivo, self.cfg.fisica.energia_max)
+        self.cont["robado"] += float(efectivo.sum())
+        muertos = antes & (p["E"] <= 1e-9) & (quitado > 0)
+        self.cont["muertes_por_ataque"] += int(muertos.sum())
+        return muertos
 
     def estimular(self, dato: dict) -> int:
         """Programa un estímulo (estimulos.py) a partir del paso actual. Devuelve cuántos pulsos agregó."""
@@ -719,6 +757,10 @@ class Simulacion:
 
             # compartir (antes de comer: así quien recibe ajusta lo que toma y el recurso queda en la celda)
             self._compartir(act, socios)
+            if cfg.ataque.activo:  # depredación evolucionada (etapa 4): el muerto por un ataque ya no actúa
+                muertos = self._atacar(act, occ, socios)
+                if muertos is not None:
+                    act = xp.where(muertos, gen.DESCANSAR, act).astype(xp.int8)
 
             # comer
             i = xp.flatnonzero(act == gen.COMER)
@@ -968,9 +1010,9 @@ class Simulacion:
                 "generacion_max": int(p["generacion"].max()),
                 "frac_cepa1": float((p["cepa"] == 1).mean()),
             })
-            perfil = xp.stack([((p["prim"] == k) & activo).sum(1) for k in range(gen.NUM_PRIM)], axis=1)
+            perfil = xp.stack([((p["prim"] == k) & activo).sum(1) for k in range(self.n_prim)], axis=1)
             fila["perfiles_distintos"] = int(len(np.unique(dev.a_cpu(perfil), axis=0)))
-            for k, nombre in enumerate(gen.PRIMITIVAS):
+            for k, nombre in enumerate(gen.PRIMITIVAS[:self.n_prim]):
                 fila[f"tiene_{nombre}"] = float((perfil[:, k] > 0).mean())
             if self.cfg.memoria.activa:  # fase 9: genes que se expresan solo según la memoria
                 cond = (p["cond"] > 0) & activo
@@ -1044,6 +1086,10 @@ class Simulacion:
                     # alimento libre comido en el intervalo, por organismo del grupo (al momento de medir)
                     clave = "comido_libre_sec" if nombre == "secretores" else "comido_libre_nosec"
                     fila[f"libre_por_{nombre}"] = c[clave] / max(k, 1) / max(self.cfg.sim.registrar_cada, 1)
-        for k, nombre in enumerate(gen.PRIMITIVAS):
+        if self.cfg.ataque.activo:  # depredación evolucionada (etapa 4)
+            fila["ataques"] = c["ataques"]
+            fila["robado_por_org_paso"] = c["robado"] / org_pasos
+            fila["muertes_por_ataque"] = c["muertes_por_ataque"]
+        for k, nombre in enumerate(gen.PRIMITIVAS[:self.n_prim]):
             fila[f"usa_{nombre}"] = float(c["acciones"][k] / org_pasos)
         return fila
