@@ -56,6 +56,47 @@ def correr(tarea):
             "extinta_en": sim.t if sim.pob.n == 0 else None, "serie": serie}
 
 
+def permutacion_pareada(dif) -> float:
+    """p de una cola (media > 0) por inversión de signos exacta."""
+    d = np.asarray([x for x in dif if x == x], dtype=float)
+    if d.size == 0:
+        return float("nan")
+    signos = ((np.arange(2 ** d.size)[:, None] >> np.arange(d.size)) & 1) * 2 - 1
+    return float(((signos * d).mean(axis=1) >= d.mean() - 1e-12).mean())
+
+
+def final(r, clave, desde):
+    """Media de una medida en los bloques con t ≥ desde (NaN si la corrida se extinguió)."""
+    v = [f[clave] for f in r["serie"] if f["t"] >= desde and clave in f]
+    return float(np.mean(v)) if v and r["extinta_en"] is None else float("nan")
+
+
+def evaluar(res: list[dict], desde: int) -> dict:
+    """Reglas prerregistradas (docs/bitacora/2026-10-27-fase12-reina-roja-prerregistro.md)."""
+    por = {(r["condicion"], r["semilla"]): r for r in res}
+    semillas = sorted({s for _, s in por})
+
+    def prueba(a, b, clave):
+        d = [final(por[a, s], clave, desde) - final(por[b, s], clave, desde) for s in semillas
+             if (a, s) in por and (b, s) in por]
+        d = [x for x in d if x == x]
+        p = permutacion_pareada(d)
+        return {"n": len(d), "diferencias": [round(x, 5) for x in d], "p_una_cola": round(p, 4),
+                "cumple": bool(d) and p < 0.05}
+
+    ext = {c: sum(por[c, s]["extinta_en"] is not None for s in semillas if (c, s) in por)
+           for c in CONDICIONES}
+    return {
+        "R1_mutacion_ataque_vs_sin": prueba("ataque", "sin", "tasa_efectiva_media"),
+        "R2_diversidad_ataque_vs_sin": prueba("ataque", "sin", "perfiles_distintos"),
+        "R3_extinciones_ataque_max_2": {"extinciones": ext, "cumple": ext.get("ataque", 99) <= 2},
+        "R4_mutacion_ataque_vs_fijo": prueba("ataque", "fijo", "tasa_efectiva_media"),
+        "E_ataque_presente": {s: round(final(por["ataque", s], "tiene_atacar", desde), 3)
+                              for s in semillas if ("ataque", s) in por},
+        "E_genes_ataque_vs_sin": prueba("ataque", "sin", "genes_medios"),
+    }
+
+
 def main() -> None:
     a = argparse.ArgumentParser()
     a.add_argument("--pasos", type=int, default=200_000)
@@ -76,6 +117,11 @@ def main() -> None:
     salida = RAIZ / args.salida
     salida.parent.mkdir(parents=True, exist_ok=True)
     salida.write_text(json.dumps(res, ensure_ascii=False, indent=2), encoding="utf-8")
+    if set(args.condiciones) == set(CONDICIONES):
+        informe = evaluar(res, desde=args.pasos - args.pasos // 3)  # el último tercio
+        print(json.dumps(informe, ensure_ascii=False, indent=2))
+        salida.with_name(salida.stem + "_informe.json").write_text(
+            json.dumps(informe, ensure_ascii=False, indent=2), encoding="utf-8")
 
 
 if __name__ == "__main__":
