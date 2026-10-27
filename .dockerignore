@@ -1,0 +1,6 @@
+runs/
+resultados/
+.git/
+**/__pycache__/
+*.npz
+.pytest_cache/

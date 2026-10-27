@@ -68,6 +68,20 @@ Cada etapa trae su control, como siempre. Por ejemplo, estímulos reales contra 
 | **5** | **Archipiélago:** varios contenedores con migración | Islas aisladas |
 | **6** | (Investigación) Sustrato tipo Tierra dentro del contenedor | — |
 
+## Etapa 1: modo continuo (hecha el 2026-10-27)
+- **`python -m simbio vivir CONFIG --salida CARPETA`** corre un universo sin plazo:
+  - guarda su estado completo cada `--guardar-cada` pasos (10 000 por defecto) y al detenerlo (Ctrl+C o `docker stop`);
+  - al volver a lanzarlo con la misma carpeta, **retoma exactamente donde estaba**. Lo verifica un test: cortar y retomar da la misma población, energía, genomas, recursos y métricas que no cortar (`tests/test_continuo.py`);
+  - las mediciones y el linaje se vuelcan a disco en cada guardado, así que la memoria no crece aunque corra meses;
+  - si la población se extingue, el universo se resiembra con LUCA (nueva semilla, mismo reloj) y lo anota. `--sin-resembrar` lo detiene.
+- **`python -m simbio mirar CARPETA`** muestra un resumen sin detenerlo: edad, último evento, población, generación, acierto, memoria, grupos y tasa de mutación.
+- **Universo inicial** (`experiments/configs/vivo.toml`): el mundo de la fase 11, desde LUCA puro.
+- **Docker** (`Dockerfile`, `docker-compose.yml`):
+  - `docker compose up -d --build` arranca el universo en segundo plano, **sin acceso a red**;
+  - con `restart: unless-stopped`, retoma solo si el equipo se reinicia;
+  - los datos quedan en `runs/vivo/universo`.
+- **Verificado en un contenedor real:** corre, `docker stop` guarda, `docker start` retoma desde el mismo paso, y desde adentro no se resuelve ningún nombre de internet.
+
 ## Qué esperar, con honestidad
 - **Lo probable en meses:** poblaciones que siguen ritmos reales y anticipan cambios, ecosistemas con depredadores y presas que coevolucionan, y respuestas medibles a los estímulos que importan para su supervivencia.
 - **Lo que no hay que esperar pronto:** conversación. Entre "responder a un patrón de luz" y "entender lenguaje" hay el mismo camino que entre una bacteria y un mamífero.

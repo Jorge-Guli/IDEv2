@@ -59,7 +59,7 @@ Detalle, decisiones y próximos pasos: **[hoja de ruta viva](docs/02-hoja-de-rut
 
 ```bash
 pip install -e ".[dev]"
-python -m pytest -q          # 158 pasan; 3 se omiten sin GPU NVIDIA con CuPy
+python -m pytest -q          # 160 pasan; 3 se omiten sin GPU NVIDIA con CuPy
 
 # una corrida (genera métricas, población, linaje, imágenes)
 python -m simbio correr experiments/configs/base.toml --salida runs/demo --semilla 1 --pasos 20000
@@ -69,6 +69,14 @@ python -m simbio competir luca runs/demo/poblacion.npz experiments/configs/base.
 
 # evaluación de una fase (cada script documenta sus condiciones y las reglas prerregistradas)
 python experiments/fase9/evaluar.py --salida runs/fase9 --pasos 300000 --semillas 8 --procesos 8
+```
+
+**Universo vivo (fase 12):** un universo que corre sin plazo y retoma tras un corte.
+
+```bash
+python -m simbio vivir experiments/configs/vivo.toml --salida runs/vivo/universo   # Ctrl+C guarda y sale
+python -m simbio mirar runs/vivo/universo                                         # resumen, sin detenerlo
+docker compose up -d --build                                                      # lo mismo en Docker, sin red
 ```
 
 Cualquier parámetro se puede cambiar con `--set seccion.clave=valor` (ver `src/simbio/config.py`). Los scripts de cada fase están en `experiments/<fase>/`.

@@ -1,0 +1,14 @@
+# Universo vivo (fase 12). Uso:
+#   docker compose up -d --build     arranca el universo en segundo plano (retoma solo si ya existía)
+#   docker compose logs -f           muestra su avance
+#   docker compose stop              lo detiene: termina el paso, guarda y sale
+# Los datos quedan en ./runs/vivo/universo (estado.pkl, metricas.jsonl, eventos.jsonl, linaje/, poblacion.npz).
+services:
+  universo:
+    build: .
+    image: simbio-vivo
+    volumes:
+      - ./runs/vivo:/datos
+    network_mode: none          # sin internet: los datos externos entran por una carpeta (etapa 2)
+    restart: unless-stopped     # si el equipo se reinicia, el universo retoma desde su último guardado
+    stop_grace_period: 60s      # tiempo para guardar al detenerlo

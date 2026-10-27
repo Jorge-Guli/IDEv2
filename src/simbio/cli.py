@@ -3,6 +3,8 @@
     python -m simbio correr [CONFIG] --salida runs/x --semilla 1 --pasos 20000 --set mundo.alto=256
     python -m simbio competir A.npz B.npz [CONFIG] --pasos 3000 --salida runs/comp
     python -m simbio dispositivo [--rapido]
+    python -m simbio vivir [CONFIG] --salida runs/vivo [--guardar-cada 10000] [--pasos N] [--sin-resembrar]
+    python -m simbio mirar runs/vivo
 """
 
 from __future__ import annotations
@@ -38,7 +40,31 @@ def main(argv: list[str] | None = None) -> None:
         sp.add_argument("--semilla", type=int, default=None)
         sp.add_argument("--pasos", type=int, default=None)
         sp.add_argument("--set", action="append", default=[], metavar="seccion.clave=valor")
+    sp = sub.add_parser("vivir", help="universo continuo: corre sin plazo, guarda su estado y retoma tras un corte")
+    sp.add_argument("config", nargs="?", default=None)
+    sp.add_argument("--salida", type=Path, required=True)
+    sp.add_argument("--semilla", type=int, default=None)
+    sp.add_argument("--pasos", type=int, default=None, help="pasos totales (por defecto, sin plazo)")
+    sp.add_argument("--guardar-cada", type=int, default=10_000)
+    sp.add_argument("--sin-resembrar", action="store_true", help="detenerse si la población se extingue")
+    sp.add_argument("--set", action="append", default=[], metavar="seccion.clave=valor")
+    sp = sub.add_parser("mirar", help="resumen del estado de un universo continuo (sin detenerlo)")
+    sp.add_argument("salida", type=Path)
     args = ap.parse_args(argv)
+    if args.cmd == "mirar":
+        from . import continuo
+
+        print(continuo.resumen(args.salida))
+        return
+    if args.cmd == "vivir":
+        from . import continuo
+
+        cfg = config.cargar(args.config, args.set)
+        if args.semilla is not None:
+            cfg.sim.semilla = args.semilla
+        sim = continuo.vivir(cfg, args.salida, args.guardar_cada, args.pasos, not args.sin_resembrar)
+        print(json.dumps({"pasos": sim.t, "poblacion": sim.pob.n}))
+        return
     if args.cmd == "dispositivo":
         from . import verificar
 
