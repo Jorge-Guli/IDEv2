@@ -54,6 +54,17 @@ def test_varios_atacantes_se_reparten_y_el_muerto_no_actua():
     assert p["E"][0] == p["E"][2] == 50.0 + 0.6 * 4.0
 
 
+def test_especializacion_trofica():
+    sim = _sim(4, "ataque.especializacion_gamma=1.0", "ataque.uso_ref=0.1")
+    p = sim.pob
+    p["x"][:] = [2, 3, 8, 9]  # dos pares: 0 ataca a 1, 2 ataca a 3
+    p["uso_atacar"][:] = [0.2, 0.0, 0.02, 0.0]  # 0 es depredador habitual, 2 casi nunca ataca
+    _atacan(sim, [0, 2])
+    assert p["E"][0] == 50.0 + 0.6 * 10.0 * 2.0
+    assert np.isclose(p["E"][2], 50.0 + 0.6 * 10.0 * 0.2)
+    assert p["E"][1] == p["E"][3] == 40.0  # el daño no depende de la especialización
+
+
 def test_sin_ataque_no_existe():
     cfg = config.cargar(None, ["mundo.alto=16", "mundo.ancho=16", "sim.poblacion_inicial=20"])
     sim = Simulacion(cfg)

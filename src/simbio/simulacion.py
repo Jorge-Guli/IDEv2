@@ -500,7 +500,11 @@ class Simulacion:
         quitado = xp.bincount(j, weights=efectivo, minlength=p.n)
         antes = p["E"] > 0.0
         p["E"] = p["E"] - quitado
-        p["E"][i] = xp.minimum(p["E"][i] + c.eficiencia * efectivo, self.cfg.fisica.energia_max)
+        ganancia = c.eficiencia * efectivo
+        if c.especializacion_gamma > 0:  # especialización trófica: rinde según el uso habitual de atacar
+            ganancia = ganancia * xp.minimum(self.cfg.fisica.maquinaria_max,
+                                             (p["uso_atacar"][i] / c.uso_ref) ** c.especializacion_gamma)
+        p["E"][i] = xp.minimum(p["E"][i] + ganancia, self.cfg.fisica.energia_max)
         self.cont["robado"] += float(efectivo.sum())
         muertos = antes & (p["E"] <= 1e-9) & (quitado > 0)
         self.cont["muertes_por_ataque"] += int(muertos.sum())
@@ -734,6 +738,8 @@ class Simulacion:
             r = f.maquinaria_memoria
             p["uso_comer"] += r * ((act == gen.COMER) - p["uso_comer"])
             p["uso_avanzar"] += r * ((act == gen.AVANZAR) - p["uso_avanzar"])
+            if cfg.ataque.activo:
+                p["uso_atacar"] += r * ((act == gen.ATACAR) - p["uso_atacar"])
             p["refractario"] = xp.maximum(p["refractario"] - 1, 0).astype(xp.int16)
             if cfg.estaciones.induccion > 0 and cfg.memoria.activa:
                 # las enzimas siguen a la memoria A con inercia: una memoria que cambia de celda en celda se
@@ -880,6 +886,7 @@ class Simulacion:
                     nuevos["veneno"] = p["veneno"][padres].copy()
                     nuevos["uso_comer"] = p["uso_comer"][padres].copy()  # el hijo hereda la maquinaria
                     nuevos["uso_avanzar"] = p["uso_avanzar"][padres].copy()
+                    nuevos["uso_atacar"] = p["uso_atacar"][padres].copy()
                     T = f.refractario_division
                     if T > 0 and f.refractario_modo == "division":
                         p["refractario"][padres] = T
@@ -1090,6 +1097,11 @@ class Simulacion:
             fila["ataques"] = c["ataques"]
             fila["robado_por_org_paso"] = c["robado"] / org_pasos
             fila["muertes_por_ataque"] = c["muertes_por_ataque"]
+            if n:  # especialización: depredadores (atacan > 5 % del tiempo) y presas, y cuánto come cada grupo
+                dep = p["uso_atacar"] > 0.05
+                fila["frac_depredadores"] = float(dep.mean())
+                fila["uso_comer_depredadores"] = float(p["uso_comer"][dep].mean()) if bool(dep.any()) else float("nan")
+                fila["uso_comer_presas"] = float(p["uso_comer"][~dep].mean()) if bool((~dep).any()) else float("nan")
         for k, nombre in enumerate(gen.PRIMITIVAS[:self.n_prim]):
             fila[f"usa_{nombre}"] = float(c["acciones"][k] / org_pasos)
         return fila

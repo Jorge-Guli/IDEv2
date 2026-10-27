@@ -82,6 +82,9 @@ Detalle completo: `docs/02-hoja-de-ruta.md` (tabla de fases con enlaces), `docs/
 | 11 | Modulación por la memoria y decisión estocástica: la memoria se mantiene, pero no se recluta. La revisión encontró que **la tasa de mutación había colapsado** de 0,02 a ~0,0006 |
 | 12, etapa 0 | Con la tasa de mutación reiniciada, tampoco se recluta |
 | **12, etapa 1** | **Modo continuo:** universo sin plazo, guardado y reanudación exactos, Docker sin red. Hecho y verificado |
+| 12, etapa 2 | **Clima real** de Capitán Bermúdez (2000–2025) regulando el mundo. Viable con `capacidad_max = 20` (el invierno extinguía). **El clima no premia anticipar:** la presión predice mal la lluvia y las rachas duran días (`experiments/fase12/valor_anticipar.py`) |
+| 12, etapa 3 | **Estímulos desde afuera** (luz y texto) por la carpeta `entradas/`, grabados en `estimulos.jsonl`. Claude le habla al universo `clima`. Piloto: indicio de que la selección mira la luz si alimenta (3/4); prerregistro v1 inválido por extinciones en invierno; v2 en curso |
+| 12, etapa 4 | **Depredación evolucionada** (`atacar`): evoluciona sola desde LUCA, pero **negativo prerregistrado**: 5/8 extinciones, monocultivos caníbales, sin más mutación ni diversidad. Próximo: especialización trófica |
 
 ### Lecciones que guían el diseño
 1. **El mundo tiene que premiar un rasgo antes de esperar que evolucione.** Se verifica con competencias o invasión (hay scripts en `experiments/fase7`, `fase10` y `fase11`).
@@ -97,10 +100,24 @@ Detalle completo: `docs/02-hoja-de-ruta.md` (tabla de fases con enlaces), `docs/
 - **Memoria** (`memoria.*`): dos variables, tasa, cerrojo (`umbral`) y valor inicial.
 - **Herencia** (`herencia.*`): condición de expresión por gen (`k_condicion`) y modulación (`modulacion`, condiciones 5 y 6 sobre `genoma.SENS_MODULABLES`).
 - **Decisión** (`fisica.decision`): "argmax" o "softmax", con `temperatura`.
+- **Realidad** (`realidad.*`, `src/simbio/realidad.py`): clima horario (radiación → recrecimiento, temperatura → costo basal, lluvia → qué comida nutre, sensor de presión); controles `barajar_dias` y `presion_desacoplada`. Datos en `datos/clima/` (los baja `experiments/herramientas/descargar_clima.py`).
+- **Estímulos** (`estimulos.*`, `src/simbio/estimulos.py`): campo de luz que alimenta y se percibe con el sensor `luz`; texto como secuencia de pulsos; `python -m simbio estimular <universo> --texto "..."`.
+- **Ataque** (`ataque.*`): primitiva `atacar`, protección por enlaces, especialización trófica (`especializacion_gamma`, junto con `fisica.maquinaria_gamma`).
+- **Neutralidad:** los sensores (`presion`, `luz`) y la primitiva nuevos van al final; en mundos sin ellos no mutan ni consumen azar (`gen.NUM_SENS_SIN_REALIDAD`, `gen.NUM_PRIM_SIN_ATAQUE`). Las huellas siguen idénticas.
+- **Docker:** dos servicios, `universo` (vivo.toml) y `clima` (clima.toml + estímulos; `./datos` en solo lectura).
 - **Universo vivo:** `src/simbio/continuo.py` (`vivir`, `mirar`, guardado con pickle portable entre CPU y GPU, volcado incremental de métricas y linaje, resiembra tras una extinción) y `experiments/configs/vivo.toml` (el mundo de la fase 11 desde LUCA puro).
 
 ## 8. Pasos a seguir (en orden)
 El diseño completo está en `docs/06-universo-vivo.md`. Resumen operativo:
+
+### Estado al 2026-10-27 (tarde)
+- **Hecho:** 8.0; las etapas 2 y 3 construidas; la etapa 4 construida y con su primer prerregistro (negativo). Detalle en `docs/bitacora/2026-10-27-fase12-*.md`.
+- **El autor vive en Capitán Bermúdez (Santa Fe)** y tiene Docker Desktop. Pidió que Claude alimente el universo e interactúe con él directamente.
+- **Pendiente:**
+  1. evaluar la luz v2 (`runs/fase12/luz_prerregistro_v2.json`);
+  2. probar la especialización trófica para una depredación sostenible;
+  3. un mundo donde anticipar pague (daño al empezar la lluvia, o respuesta lenta);
+  4. el ODD, la hoja de ruta y el cambio de OpenSpec de la fase 12.
 
 ### 8.0 Al conectarse en el equipo del autor
 1. Ir a `C:\Desarrollo\IDEv2`, activar `.venv`, hacer `git pull --no-edit` y correr `python -m pytest -q`: tiene que dar 160 pasan y 3 omitidos.

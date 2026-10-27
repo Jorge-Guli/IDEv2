@@ -34,6 +34,7 @@ ESTADO = {
     "memoria": (np.float64, (2,)),  # memoria interna (paso C)
     "veneno": (np.float64, ()),  # veneno pendiente de descontar (fase 7, toxicidad diferida)
     "digestion": (np.float64, ()),  # estado digestivo, sigue lento a la memoria A (fase 10)
+    "uso_atacar": (np.float64, ()),  # promedio móvil del uso de atacar (fase 12, etapa 4)
 }
 
 
@@ -58,6 +59,9 @@ class Poblacion:
     def compatibilizar(self) -> None:
         """Completa con ceros los arreglos por sensor de una población guardada con menos sensores."""
         xp = self.xp
+        for k, (dt, forma) in ESTADO.items():  # atributos nuevos: en cero
+            if k not in self.d:
+                self.d[k] = xp.zeros((self.n, *forma), dtype=dt)
         for k in ("w", "P", "ult_s"):
             faltan = gen.NUM_SENS - self.d[k].shape[-1]
             if faltan > 0:

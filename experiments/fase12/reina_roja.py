@@ -30,7 +30,7 @@ CONDICIONES = {
 }
 CLAVES = ["poblacion", "generacion_media", "tasa_efectiva_media", "mu_media", "perfiles_distintos", "genes_medios",
           "tiene_atacar", "usa_atacar", "muertes_por_ataque", "frac_enlazados", "grupos_de_3_o_mas",
-          "acierto_comida", "tiene_memoria_a"]
+          "acierto_comida", "tiene_memoria_a", "frac_depredadores", "uso_comer_depredadores", "uso_comer_presas"]
 
 
 def correr(tarea):

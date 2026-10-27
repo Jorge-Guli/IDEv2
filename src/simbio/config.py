@@ -262,6 +262,12 @@ class AtaqueCfg:
     eficiencia: float = 0.6  # fracción de lo quitado que gana el atacante (pérdida trófica)
     # protección por enlaces: el daño se divide por (1 + enlaces del atacado); asociarse defiende
     proteccion_enlaces: bool = True
+    # especialización trófica: lo ganado atacando se multiplica por min(maquinaria_max, (uso / uso_ref)^γ), con
+    # uso el promedio móvil de atacar (misma memoria que la maquinaria de la fase 5). Junto con
+    # fisica.maquinaria_gamma (comer rinde según el uso de comer), un generalista rinde poco en las dos cosas.
+    # γ = 0: sin efecto
+    especializacion_gamma: float = 0.0
+    uso_ref: float = 0.1
 
 
 @dataclass
