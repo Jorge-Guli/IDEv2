@@ -4,12 +4,12 @@
 #   estación artificial: seco, tipo A; húmedo, tipo B); presión → sensor local con su tendencia de 24 horas.
 # Calibrado de viabilidad (experiments/fase12/viabilidad_clima.py): con el recrecimiento solo de día (acople 1)
 # la población crece de día y muere entera de noche; con acople 0,5 y capacidad 10, la mitad de las semillas se
-# extingue cuando la toxicidad llega a pleno; con acople 0,5 y capacidad_max = 15, sobreviven 4 de 4.
+# extingue cuando la toxicidad llega a pleno; con acople 0,5 y capacidad_max = 15, sobreviven 4 de 4, pero con semillas 11-18 el invierno (mayo-julio: frío y poco sol) extingue 11 de 16 corridas; con capacidad_max = 20, 8 de 8 cruzan el invierno (población mínima 11-100).
 # 20 pasos por hora: un año real son 175 200 pasos. Datos: python experiments/herramientas/descargar_clima.py
 [mundo]
 alto = 128
 ancho = 128
-capacidad_max = 15.0
+capacidad_max = 20.0
 regeneracion = 0.02
 escala_parche = 6.0
 contraste = 2.0

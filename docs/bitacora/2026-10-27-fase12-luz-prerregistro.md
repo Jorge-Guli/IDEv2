@@ -33,3 +33,7 @@ Corridas extintas: se excluyen del par.
 - **Por qué no se vio antes:** la viabilidad previa (semillas 1–2) pasó el invierno con mínimos de 18 y 52 organismos, es decir, de casualidad.
 - **Sobrevivientes:** solo un par completo (semilla 11). R1 y R2 no se pueden evaluar (n = 1). **No se concluye nada sobre la luz.**
 - **Siguiente:** recalibrar el mundo para que el invierno sea duro pero no mortal, verificarlo con 8 semillas que crucen al menos un invierno, y repetir este prerregistro con semillas nuevas.
+## Repetición prerregistrada (versión 2), escrita antes de correr
+- **Mundo recalibrado:** clima.toml con capacidad_max = 20. Verificado con iabilidad_clima.py, semillas 11–18, 140 000 pasos: 8 de 8 sobreviven, con población mínima entre 11 y 100. Con 15 y el efecto de la temperatura en 0,1 se extinguían 3 de 8; con el efecto en 0, 2 de 8 (al llegar la toxicidad a pleno).
+- **Semillas nuevas 31–38**, 200 000 pasos. Mismo script y mismas reglas R1 y R2: python experiments/fase12/respuesta_estimulos.py --pasos 200000 --semillas 31 32 33 34 35 36 37 38 --salida runs/fase12/luz_prerregistro_v2.json
+- Si vuelve a haber más de 2 extinciones por condición, el resultado se declara inválido otra vez y se reporta así.
