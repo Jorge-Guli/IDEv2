@@ -51,6 +51,7 @@ Detalle, decisiones y próximos pasos: **[hoja de ruta viva](docs/02-hoja-de-rut
 - Visión a largo plazo y salvaguardas: [`docs/04-vision.md`](docs/04-vision.md)
 - Estado del arte (Avida, Symbulation, MABE, JaxLife): [`docs/05-estado-del-arte.md`](docs/05-estado-del-arte.md)
 - Universo vivo (evolución constante, estimulada por la realidad): [`docs/06-universo-vivo.md`](docs/06-universo-vivo.md)
+- Traspaso (estado actual y próximos pasos, para retomar el trabajo): [`docs/07-traspaso.md`](docs/07-traspaso.md)
 - Modelo vigente (protocolo ODD): [`docs/odd/modelo.md`](docs/odd/modelo.md)
 - Bitácora de experimentos: [`docs/bitacora/`](docs/bitacora/)
 - Especificaciones por fase (OpenSpec): [`openspec/`](openspec/)

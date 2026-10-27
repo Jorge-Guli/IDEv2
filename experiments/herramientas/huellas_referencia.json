@@ -1,0 +1,10 @@
+{
+  "numpy": "2.5.3",
+  "huellas": {
+    "base": "3b0c128f651d2944 75b78aa4172a30ff",
+    "coordinacion_fuerza": "ed4d594806d3abef 1b6eabcc9dbc97e8",
+    "estaciones_memoria": "0418a7bfa84e8117 e68e50a996b9c61c",
+    "vivo": "d1d35a16b91d4683 74013043e278b1eb",
+    "vivo_softmax": "c7bd7d68e0fe1fb8 f4762a77e017efeb"
+  }
+}

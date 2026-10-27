@@ -1,6 +1,6 @@
 # Guía del proyecto para agentes
 
-Proyecto de investigación en vida artificial: organismos simples que se adaptan y se asocian, para estudiar si evolución tras evolución emergen organizaciones más complejas e inteligencia. Leer primero `docs/00-hipotesis-fundacional.md` y `docs/01-metodologia.md`.
+Proyecto de investigación en vida artificial (IDE: Inteligencia Distribuida Emergente; simulador `simbio`): organismos simples que se adaptan y se asocian, para estudiar si evolución tras evolución emergen organizaciones más complejas e inteligencia. **Para retomar el trabajo, leer primero `docs/07-traspaso.md`** (estado actual, cómo trabaja el autor y próximos pasos). Fundamentos: `docs/00-hipotesis-fundacional.md` y `docs/01-metodologia.md`.
 
 ## Idioma
 Documentación, specs, comentarios y nombres del dominio en **español**. Los encabezados estructurales y las palabras SHALL/MUST de OpenSpec van en inglés.
@@ -26,3 +26,5 @@ Documentación, specs, comentarios y nombres del dominio en **español**. Los en
 - Evaluación de la fase 1: `python experiments/fase1/evaluar.py --salida runs/fase1`
 - Validar specs: `openspec validate --all --strict`
 - Dispositivo: `python -m simbio dispositivo`
+- Universo continuo: `python -m simbio vivir experiments/configs/vivo.toml --salida runs/vivo/universo` y `python -m simbio mirar runs/vivo/universo` (o `docker compose up -d --build`)
+- Huellas de determinismo: `python experiments/herramientas/huellas.py --comparar`
