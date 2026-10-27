@@ -1,0 +1,174 @@
+# Universo con clima real (fase 12, etapa 2): el mundo del universo vivo (vivo.toml, el de la fase 11 desde LUCA
+# puro) con el clima horario de Capitán Bermúdez (Santa Fe, Argentina), 2000-2025, regulando el mundo:
+#   radiación → recrecimiento de la comida; temperatura → costo basal; lluvia → qué comida nutre (reemplaza a la
+#   estación artificial: seco, tipo A; húmedo, tipo B); presión → sensor local con su tendencia de 24 horas.
+# Calibrado de viabilidad (experiments/fase12/viabilidad_clima.py): con el recrecimiento solo de día (acople 1)
+# la población crece de día y muere entera de noche; con acople 0,5 y capacidad 10, la mitad de las semillas se
+# extingue cuando la toxicidad llega a pleno; con acople 0,5 y capacidad_max = 15, sobreviven 4 de 4.
+# 20 pasos por hora: un año real son 175 200 pasos. Datos: python experiments/herramientas/descargar_clima.py
+[mundo]
+alto = 128
+ancho = 128
+capacidad_max = 15.0
+regeneracion = 0.02
+escala_parche = 6.0
+contraste = 2.0
+recurso_inicial = 1.0
+amplitud_estacional = 0.0
+periodo_estacional = 2000
+cambio_en_paso = -1
+
+[fisica]
+energia_max = 100.0
+energia_inicial = 50.0
+costo_basal = 0.3
+costo_por_gen = 0.01
+costo_avanzar = 0.4
+costo_girar = 0.05
+costo_voltereta = 0.1
+costo_comer = 0.05
+toma_max = 4.0
+costo_division = 2.0
+energia_min_division = 20.0
+refractario_division = 0
+refractario_modo = "division"
+maquinaria_gamma = 0.0
+maquinaria_memoria = 0.05
+maquinaria_ref = 0.35
+maquinaria_max = 2.5
+decision = "argmax"
+temperatura = 0.25
+
+[herencia]
+mutacion = true
+estres = true
+genes_max = 24
+sigma_peso = 0.3
+k_primitiva = 0.3
+k_condicion = 0.3
+modulacion = true
+k_duplicacion = 0.5
+k_eliminacion = 0.5
+k_gen_nuevo = 0.2
+k_rasgo = 10.0
+sigma_log_rasgo = 0.2
+sigma_etiqueta = 0.05
+tasa_max = 0.2
+memoria_estres = 0.05
+umbral_hambre = 25.0
+estres_modo = "propio"
+mu_inicial = 0.02
+sensibilidad_inicial = 2.0
+eta_inicial = 0.05
+mu_min = 0.0001
+mu_max = 0.3
+sensibilidad_max = 20.0
+eta_max = 1.0
+
+[aprendizaje]
+activo = false
+escala_recompensa = 5.0
+memoria_linea_base = 0.1
+decaimiento = 0.01
+limite = 2.0
+
+[asociacion]
+activa = true
+conjugacion = true
+adhesion = true
+movimiento = "unanime"
+fraccion_empuje = 0.5
+exponente_arrastre = 1.0
+inerte = false
+division_unida = true
+costo_enlace = 0.02
+costo_unirse = 0.1
+costo_soltarse = 0.05
+costo_compartir = 0.05
+fraccion_compartir = 0.2
+eficiencia_compartir = 0.9
+costo_conjugar = 0.5
+difusion_energia = 0.0
+difusion_aprende = false
+
+[bien_publico]
+activo = false
+secrecion_inerte = false
+privado = false
+capacidad_complejo_max = 20.0
+regeneracion_complejo = 0.01
+escala_parche_complejo = 8.0
+contraste_complejo = 1.0
+costo_secretar = 0.3
+enzima_por_secrecion = 1.0
+degradacion_enzima = 0.3
+difusion_enzima = 0.1
+tasa_digestion = 0.05
+rendimiento = 1.0
+degradacion_libre = 0.02
+difusion_libre = 0.8
+
+[depredacion]
+activa = false
+modo = "tamano"
+prob_ataque = 0.002
+prob_perdon = 0.9
+inicio = 0
+rampa = 0
+refugio = 4
+gradual = true
+refugio_final = 0.0
+escalada_inicio = 0
+escalada_pasos = 0
+
+[coordinacion]
+rumbo = false
+senales = false
+barajar = false
+costo_senal = 0.05
+
+[memoria]
+activa = true
+tasa = 1.0
+inicial = 0.5
+umbral = 0.5
+
+[estaciones]
+activa = true
+periodo = 2000
+castigo = 0.2
+p_pista = 0.01
+escala_parche = 1.0
+toxicidad = "diferido"
+pista_informativa = true
+tasa_veneno = 0.05
+rampa_toxicidad = 30000
+p_pista_inicial = 0.0
+rampa_pista = 0
+induccion = 0.25
+inercia_digestion = 100
+
+[realidad]
+activa = true
+archivo = "datos/clima/capitan_bermudez.npz"
+pasos_por_hora = 20
+hora_inicial = 0
+barajar_dias = false
+acople_radiacion = 0.5
+acople_temperatura = 0.25
+temperatura_optima = 20.0
+lluvia = true
+ventana_lluvia = 48.0
+fraccion_humeda = 0.3
+sensor_presion = true
+ventana_presion = 24
+presion_desacoplada = false
+
+[sim]
+semilla = 0
+pasos = 5000
+poblacion_inicial = 200
+registrar_cada = 1000
+imagen_cada = 0
+dispositivo = "auto"
+umbral_gpu_celdas = 90000

@@ -62,11 +62,12 @@ class Entorno:
         factor = 1.0 + c.amplitud_estacional * np.sin(2.0 * np.pi * t / c.periodo_estacional)
         return self.K_base * max(factor, 0.0)
 
-    def paso(self, t: int) -> None:
+    def paso(self, t: int, regeneracion: float | None = None) -> None:
+        """`regeneracion`: tasa de este paso (datos reales, etapa 2); por defecto, la de la configuración."""
         if t == self.cfg.cambio_en_paso:
             self.K_base = self._nuevo_mapa()
         K = self.capacidad(t)
-        self.R += self.cfg.regeneracion * (K - self.R)
+        self.R += (self.cfg.regeneracion if regeneracion is None else regeneracion) * (K - self.R)
         self.xp.minimum(self.R, K, out=self.R)
         self.xp.maximum(self.R, 0.0, out=self.R)
         if self.bp.activo:

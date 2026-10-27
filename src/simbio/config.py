@@ -219,6 +219,54 @@ class EstacionesCfg:
 
 
 @dataclass
+class RealidadCfg:
+    # fase 12, etapa 2: el clima real de una ciudad (serie horaria, ver experiments/herramientas/descargar_clima.py)
+    # regula el mundo. La simulación solo lee el archivo; nunca toca la red
+    activa: bool = False
+    archivo: str = "datos/clima/capitan_bermudez.npz"
+    pasos_por_hora: int = 20  # un año real son 175 200 pasos
+    hora_inicial: int = 0  # hora de la serie en el paso 0 (al terminar la serie, vuelve a empezar)
+    # control: los días (bloques de 24 horas) se recorren en un orden al azar; mismas cantidades, sin las
+    # secuencias de varios días (frentes, rachas de lluvia)
+    barajar_dias: bool = False
+    # radiación → recrecimiento: regeneracion · (1 − a + a · radiación / radiación media); a = 0: sin efecto.
+    # Con a = 1 no crece nada de noche y LUCA se extingue (auge de día, hambre de noche): ver clima.toml
+    acople_radiacion: float = 0.5
+    # temperatura → costo basal: costo_basal · (1 + k · ((T − T_óptima) / 10)²); k = 0: sin efecto
+    acople_temperatura: float = 0.25
+    temperatura_optima: float = 20.0
+    # lluvia → qué comida nutre (reemplaza a la estación artificial; requiere estaciones.activa): húmedo (tipo B)
+    # cuando la lluvia acumulada reciente (promedio móvil exponencial de `ventana_lluvia` horas) está en la
+    # fracción `fraccion_humeda` más alta de la serie; seco (tipo A) si no
+    lluvia: bool = True
+    ventana_lluvia: float = 48.0
+    fraccion_humeda: float = 0.3
+    # presión → sensor local "presion": su tendencia en las últimas `ventana_presion` horas, en desvíos típicos,
+    # recortada a [−1, 1]. Antes de una lluvia la presión suele bajar: premia anticipar. Con 24 horas se cancela
+    # la marea diaria de la presión; en Capitán Bermúdez, con la tendencia bajo −0,5, la probabilidad de que
+    # empiece una racha húmeda en las 12 horas siguientes es 0,12 (0,06 en general; 0,02 con la tendencia sobre 0,5)
+    sensor_presion: bool = True
+    ventana_presion: int = 24
+    # control: el sensor lee la presión de otro momento de la serie (corrida circular de medio registro): misma
+    # distribución y misma dinámica, sin relación con la lluvia vigente
+    presion_desacoplada: bool = False
+
+
+@dataclass
+class EstimulosCfg:
+    # fase 12, etapa 3: estímulos desde afuera (un humano, Claude, una interfaz). Entran como eventos de luz: un
+    # campo que se percibe con el sensor local "luz" y hace crecer comida donde cae. Un texto se vuelve una
+    # secuencia de pulsos (cada letra, un lugar y un tamaño). En el modo continuo llegan como archivos JSON en
+    # <universo>/entradas/ y quedan grabados en estimulos.jsonl con el paso en que se aplicaron
+    activo: bool = False
+    # luz → recrecimiento extra: R += acople_luz · luz · (K − R); 0 (control): la luz se ve pero no alimenta
+    acople_luz: float = 0.05
+    decaimiento_luz: float = 0.02  # fracción de la luz que se apaga por paso
+    pasos_por_letra: int = 40  # separación entre los pulsos de un texto
+    revisar_cada: int = 100  # cada cuántos pasos el modo continuo mira la carpeta de entradas
+
+
+@dataclass
 class SimCfg:
     semilla: int = 0
     pasos: int = 5000
@@ -241,6 +289,8 @@ class Config:
     coordinacion: CoordinacionCfg = field(default_factory=CoordinacionCfg)
     memoria: MemoriaCfg = field(default_factory=MemoriaCfg)
     estaciones: EstacionesCfg = field(default_factory=EstacionesCfg)
+    realidad: RealidadCfg = field(default_factory=RealidadCfg)
+    estimulos: EstimulosCfg = field(default_factory=EstimulosCfg)
     sim: SimCfg = field(default_factory=SimCfg)
 
     def to_dict(self) -> dict[str, Any]:

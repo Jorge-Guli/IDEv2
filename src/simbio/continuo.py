@@ -6,6 +6,8 @@ después de un corte (apagado, reinicio, Ctrl+C) exactamente donde estaba.
 En la carpeta de salida:
     estado.pkl        estado completo de la simulación (incluye los generadores de azar): retomar desde aquí da
                       lo mismo que no haber cortado
+    entradas/         estímulos que esperan (con estimulos.activo; `python -m simbio estimular`)
+    estimulos.jsonl   cada estímulo aplicado, con el paso: con ellos la corrida se puede repetir
     metricas.jsonl    una fila JSON por medición (se agrega; las columnas pueden crecer con el tiempo)
     linaje/           el linaje en bloques (id, padre, nacimiento, generación, cepa)
     poblacion.npz     genomas de la población en el último guardado
@@ -18,6 +20,7 @@ deja un estado roto.
 
 from __future__ import annotations
 
+import dataclasses
 import io
 import json
 import os
@@ -30,7 +33,7 @@ from types import ModuleType
 import numpy as np
 
 from . import dispositivo as dev
-from . import persistencia
+from . import estimulos, persistencia
 from .config import Config
 from .simulacion import Simulacion
 
@@ -82,6 +85,11 @@ def cargar_estado(ruta: Path) -> Simulacion:
         xp, nombre = dev.elegir(cab["dispositivo"], cab["celdas"], cab["umbral"])
         sim = _Cargador(f, xp).load()
     sim.xp, sim.dispositivo = xp, nombre
+    # estados guardados antes de las etapas 2 y 3: secciones de configuración nuevas (apagadas) y menos sensores
+    for campo in dataclasses.fields(Config):
+        if not hasattr(sim.cfg, campo.name):
+            setattr(sim.cfg, campo.name, campo.default_factory())
+    sim.pob.compatibilizar()
     return sim
 
 
@@ -132,6 +140,10 @@ def vivir(cfg: Config, salida: Path, guardar_cada: int = 10_000, pasos: int | No
     inicio, t0 = time.time(), sim.t
     try:
         while (pasos is None or sim.t < pasos) and not cortar["pedido"]:
+            if sim.luz is not None and sim.t % sim.cfg.estimulos.revisar_cada == 0:
+                for fila in estimulos.recibir(sim, salida):  # estímulos desde afuera (etapa 3)
+                    if verbose:
+                        print(f"t={sim.t} estímulo {fila.get('dato', fila.get('error'))}", flush=True)
             sim.paso()
             if sim.pob.n == 0:
                 _volcar(sim, salida)

@@ -37,17 +37,20 @@ PRIM_NO_ACCION = np.array([SENALAR, MEMORIA_A, MEMORIA_B])
  S_VECINOS, S_BLOQUEADO, S_DELTA_E, S_RUIDO,
  S_ENLACES, S_ENERGIA_SOCIOS, S_SOCIO_FRENTE, S_SIMILITUD_FRENTE, S_COMPLEJO_AQUI,
  S_RUMBO_SOCIOS_SIN, S_RUMBO_SOCIOS_COS, S_EMPUJE_SOCIOS, S_SENAL_SOCIOS, S_SENAL_PROPIA,
- S_MEMORIA_A, S_MEMORIA_B, S_TIPO_AQUI, S_PISTA) = range(24)
+ S_MEMORIA_A, S_MEMORIA_B, S_TIPO_AQUI, S_PISTA, S_PRESION, S_LUZ) = range(26)
 SENSORES = ["const", "recurso_aqui", "recurso_frente", "recurso_frente_izq", "recurso_frente_der",
             "energia", "vecinos", "bloqueado", "delta_e", "ruido",
             "enlaces", "energia_socios", "socio_frente", "similitud_frente", "complejo_aqui",
             "rumbo_socios_sin", "rumbo_socios_cos", "empuje_socios", "senal_socios", "senal_propia",
-            "memoria_a", "memoria_b", "tipo_aqui", "pista"]
+            "memoria_a", "memoria_b", "tipo_aqui", "pista", "presion", "luz"]
 SENS_MEMORIA = np.array([S_MEMORIA_A, S_MEMORIA_B])
 SENS_ESTACIONES = np.array([S_TIPO_AQUI, S_PISTA])
 SENS_RUMBO = np.array([S_RUMBO_SOCIOS_SIN, S_RUMBO_SOCIOS_COS, S_EMPUJE_SOCIOS])
 SENS_SENAL = np.array([S_SENAL_SOCIOS, S_SENAL_PROPIA])
 NUM_SENS = len(SENSORES)
+# sensores de los mundos sin datos reales ni estímulos (fases 1-12): en ellos solo mutan estos pesos, así el azar
+# que se consume y las dinámicas no cambian por haber agregado al final los sensores nuevos (fase 12, etapas 2 y 3)
+NUM_SENS_SIN_REALIDAD = S_PRESION
 
 CAMPOS = ("activo", "prim", "w", "b", "mu", "sens", "eta", "etiqueta", "cond")
 # condición de expresión de cada gen (fase 9): 0 siempre; 1/2 solo si la memoria A está alta/baja (> 0,5 o ≤ 0,5);
@@ -146,10 +149,12 @@ def tasa_efectiva(mu: np.ndarray, sens: np.ndarray, estres: np.ndarray, cfg: Her
 
 
 def mutar(g: dict[str, np.ndarray], m: np.ndarray, cfg: HerenciaCfg,
-          rng: np.random.Generator, permitidas: np.ndarray | None = None) -> dict[str, np.ndarray]:
+          rng: np.random.Generator, permitidas: np.ndarray | None = None,
+          n_sens: int = NUM_SENS_SIN_REALIDAD) -> dict[str, np.ndarray]:
     """Aplica los operadores de mutación in situ con tasa efectiva m (n,) y devuelve g.
 
     `permitidas`: primitivas que pueden aparecer por mutación (por defecto, todas).
+    `n_sens`: cuántos sensores (los primeros) tienen pesos que mutan; los demás quedan como están.
     """
     n, G = g["activo"].shape
     if n == 0 or not cfg.mutacion:
@@ -163,8 +168,9 @@ def mutar(g: dict[str, np.ndarray], m: np.ndarray, cfg: HerenciaCfg,
     activo = g["activo"]
 
     # mutación puntual de pesos y sesgos
-    mask_w = (A(rng.random(g["w"].shape)) < m[:, None, None]) & activo[:, :, None]
-    g["w"] += mask_w * A(rng.normal(0.0, cfg.sigma_peso, g["w"].shape))
+    forma_w = (n, G, n_sens)
+    mask_w = (A(rng.random(forma_w)) < m[:, None, None]) & activo[:, :, None]
+    g["w"][:, :, :n_sens] += mask_w * A(rng.normal(0.0, cfg.sigma_peso, forma_w))
     mask_b = (A(rng.random((n, G))) < mm) & activo
     g["b"] += mask_b * A(rng.normal(0.0, cfg.sigma_peso, (n, G)))
 
@@ -211,7 +217,8 @@ def mutar(g: dict[str, np.ndarray], m: np.ndarray, cfg: HerenciaCfg,
             activo_h[i, k] = True
             activo[i, k] = True
             g["prim"][i, k] = int(rng.choice(permitidas))
-            g["w"][i, k] = A(rng.normal(0.0, 1.0, NUM_SENS))
+            g["w"][i, k] = 0.0
+            g["w"][i, k, :n_sens] = A(rng.normal(0.0, 1.0, n_sens))
             g["b"][i, k] = float(rng.normal(0.0, 1.0))
             g["cond"][i, k] = 0
 

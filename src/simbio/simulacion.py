@@ -9,6 +9,8 @@ from . import genoma as gen
 from .config import Config
 from .entorno import Entorno, generar_parches
 from .poblacion import Poblacion
+from .estimulos import mancha, pulsos
+from .realidad import Clima
 
 # Las 8 orientaciones: N, NE, E, SE, S, SO, O, NO. La opuesta de k es (k + 4) % 8.
 DY = np.array([-1, -1, 0, 1, 1, 1, 0, -1])
@@ -32,6 +34,11 @@ def componentes(socios: np.ndarray) -> np.ndarray:
 
 
 class Simulacion:
+    # valores para los estados guardados antes de la etapa 2 (sin datos reales)
+    clima: Clima | None = None
+    n_sens: int = gen.NUM_SENS_SIN_REALIDAD
+    luz = None  # campo de luz de los estímulos (etapa 3)
+
     def __init__(self, cfg: Config, genomas: dict[str, np.ndarray] | None = None,
                  cepas: np.ndarray | None = None):
         self.cfg = cfg
@@ -39,8 +46,9 @@ class Simulacion:
                                                cfg.sim.umbral_gpu_celdas)
         xp = self.xp
         self.DY, self.DX, self.OPUESTA = xp.asarray(DY), xp.asarray(DX), xp.asarray(OPUESTA)
-        # spawn(4) conserva los primeros flujos de spawn(2) y spawn(3): las corridas anteriores no cambian
-        semilla_entorno, semilla_sim, semilla_dep, semilla_est = np.random.SeedSequence(cfg.sim.semilla).spawn(4)
+        # spawn(5) conserva los primeros flujos de spawn(2), spawn(3) y spawn(4): las corridas anteriores no cambian
+        (semilla_entorno, semilla_sim, semilla_dep, semilla_est,
+         semilla_real) = np.random.SeedSequence(cfg.sim.semilla).spawn(5)
         self.rng = np.random.default_rng(semilla_sim)
         self.rng_dep = np.random.default_rng(semilla_dep)  # depredador: mismos sorteos en todos los modos
         self.rng_est = np.random.default_rng(semilla_est)  # estaciones: mapa de tipos y pistas (fase 7)
@@ -48,7 +56,15 @@ class Simulacion:
         if cfg.estaciones.activa:  # tipo de comida de cada celda: +1 (A) o −1 (B), en parches
             campo = generar_parches(cfg.mundo.alto, cfg.mundo.ancho, cfg.estaciones.escala_parche, 1.0, self.rng_est)
             self.tipo = xp.asarray(np.where(campo > np.median(campo), 1.0, -1.0))
-        self.pob = Poblacion(cfg.herencia.genes_max, xp)
+        # datos reales (fase 12, etapa 2): el clima regula el mundo; con ellos mutan también los pesos de sus sensores
+        if cfg.realidad.activa and cfg.realidad.lluvia and not cfg.estaciones.activa:
+            raise ValueError("realidad.lluvia decide qué comida nutre: requiere estaciones.activa")
+        self.clima = Clima(cfg.realidad, np.random.default_rng(semilla_real)) if cfg.realidad.activa else None
+        self.n_sens = gen.NUM_SENS if cfg.realidad.activa or cfg.estimulos.activo else gen.NUM_SENS_SIN_REALIDAD
+        if cfg.estimulos.activo:  # estímulos desde afuera (etapa 3): campo de luz y pulsos programados
+            self.luz = xp.zeros((cfg.mundo.alto, cfg.mundo.ancho))
+            self.agenda: list[tuple[int, int, int, float, float]] = []
+        self.pob =Poblacion(cfg.herencia.genes_max, xp)
         self.t = 0
         self.sig_id = 0
         self.historial: list[dict[str, float]] = []
@@ -204,6 +220,10 @@ class Simulacion:
             ve = xp.asarray(u[0] < self.p_pista())
             valor = self.estacion() if e.pista_informativa else xp.asarray(np.where(u[1] < 0.5, 1.0, -1.0))
             s[:, gen.S_PISTA] = xp.where(ve, valor, 0.0)
+        if self.clima is not None and self.cfg.realidad.sensor_presion:
+            s[:, gen.S_PRESION] = self.clima.presion[self.clima.hora(self.t)]
+        if self.luz is not None:
+            s[:, gen.S_LUZ] = self.luz[y, x]
         return s
 
     def _sensar_coordinacion(self, s, socios, enlazado, n_enl) -> None:
@@ -448,8 +468,32 @@ class Simulacion:
         f = self.cfg.fisica
         return self.xp.minimum(f.maquinaria_max, (uso / f.maquinaria_ref) ** f.maquinaria_gamma)
 
+    def estimular(self, dato: dict) -> int:
+        """Programa un estímulo (estimulos.py) a partir del paso actual. Devuelve cuántos pulsos agregó."""
+        if self.luz is None:
+            raise ValueError("este universo no tiene estímulos (estimulos.activo = false)")
+        nuevos = [(self.t + dt, y, x, r, i) for dt, y, x, r, i in
+                  pulsos(dato, self.cfg.estimulos, self.entorno.alto, self.entorno.ancho)]
+        self.agenda = sorted(self.agenda + nuevos, key=lambda p: p[0])
+        return len(nuevos)
+
+    def _luz(self) -> None:
+        """Enciende los pulsos que tocan, apaga de a poco la luz y hace crecer comida donde hay luz."""
+        xp, e, ent = self.xp, self.cfg.estimulos, self.entorno
+        while self.agenda and self.agenda[0][0] <= self.t:
+            _, y, x, radio, inten = self.agenda.pop(0)
+            self.luz += xp.asarray(inten * mancha(ent.alto, ent.ancho, y, x, radio))
+        self.luz *= 1.0 - e.decaimiento_luz
+        xp.minimum(self.luz, 1.0, out=self.luz)
+        if e.acople_luz > 0:
+            K = ent.capacidad(self.t)
+            ent.R += e.acople_luz * self.luz * (K - ent.R)
+
     def estacion(self) -> float:
-        """Estación vigente (fase 7): +1 nutre el tipo A, −1 nutre el tipo B."""
+        """Estación vigente (fase 7): +1 nutre el tipo A, −1 nutre el tipo B. Con datos reales y lluvia (etapa 2),
+        la estación es el clima: seco (+1) o húmedo (−1)."""
+        if self.clima is not None and self.cfg.realidad.lluvia:
+            return float(self.clima.estacion[self.clima.hora(self.t)])
         return 1.0 if (self.t // self.cfg.estaciones.periodo) % 2 == 0 else -1.0
 
     def p_pista(self) -> float:
@@ -609,7 +653,15 @@ class Simulacion:
         cfg, p, ent = self.cfg, self.pob, self.entorno
         f = cfg.fisica
         H, W = ent.alto, ent.ancho
-        ent.paso(self.t)
+        basal = f.costo_basal
+        if self.clima is not None:  # datos reales: la radiación hace crecer la comida; la temperatura cuesta
+            hora = self.clima.hora(self.t)
+            ent.paso(self.t, cfg.mundo.regeneracion * self.clima.f_regeneracion[hora])
+            basal = f.costo_basal * self.clima.f_basal[hora]
+        else:
+            ent.paso(self.t)
+        if self.luz is not None:
+            self._luz()
 
         if p.n > 0:
             self.aprender()
@@ -627,7 +679,7 @@ class Simulacion:
                 p["E"] -= dosis
 
             # costos: basal + genoma + acción + enlaces
-            p["E"] -= (f.costo_basal + f.costo_por_gen * p["activo"].sum(axis=1) + self.costo_accion[act]
+            p["E"] -= (basal + f.costo_por_gen * p["activo"].sum(axis=1) + self.costo_accion[act]
                        + cfg.asociacion.costo_enlace * (socios >= 0).sum(axis=1)
                        + cfg.coordinacion.costo_senal * p["senal"])
 
@@ -767,7 +819,7 @@ class Simulacion:
                     if h.estres_modo == "barajado":  # control: rompe el vínculo con la condición propia
                         estres = estres[xp.asarray(self.rng.permutation(p.n))]
                     m = gen.tasa_efectiva(hijos["mu"], hijos["sens"], estres[padres], h)
-                    gen.mutar(hijos, m, h, self.rng, self.permitidas)
+                    gen.mutar(hijos, m, h, self.rng, self.permitidas, self.n_sens)
                     nuevos = self._nuevos(hijos, celdas // W, celdas % W, p["E"][padres],
                                           padre=p["id"][padres], generacion=p["generacion"][padres] + 1,
                                           cepa=p["cepa"][padres], estres=xp.zeros(padres.size))
@@ -958,6 +1010,21 @@ class Simulacion:
                     mem = dev.a_cpu(p["memoria"])
                     al = [float(((2 * mem[:, k] - 1) * self.estacion()).mean()) for k in range(2)]
                     fila["memoria_alineada_a"], fila["memoria_alineada_b"] = al
+            if self.clima is not None:  # datos reales: la hora de la serie y el clima vigente
+                h = self.clima.hora(self.t)
+                fila["hora_clima"] = h
+                fila["temperatura"] = float(self.clima.serie["temperatura"][h])
+                fila["f_regeneracion"] = float(self.clima.f_regeneracion[h])
+                fila["presion_tendencia"] = float(self.clima.presion[h])
+                pesos = p["w"][:, :, gen.S_PRESION][activo]
+                fila["con_gen_presion"] = float(((xp.abs(p["w"][:, :, gen.S_PRESION]) > 0.5) & activo)
+                                                .any(axis=1).mean())
+                fila["peso_presion_medio"] = float(xp.abs(pesos).mean()) if pesos.size else 0.0
+            if self.luz is not None:  # estímulos: cuánta luz hay, cuántos están en ella y cuántos la miran
+                fila["luz_total"] = float(self.luz.sum())
+                fila["frac_en_luz"] = float((self.luz[p["y"], p["x"]] > 0.1).mean())
+                fila["frac_celdas_con_luz"] = float((self.luz > 0.1).mean())
+                fila["con_gen_luz"] = float(((xp.abs(p["w"][:, :, gen.S_LUZ]) > 0.5) & activo).any(axis=1).mean())
             fila["senal_media"] = float(p["senal"].mean())
             et = p["etiqueta"]
             fila["dist_etiqueta_enlazados"] = float(xp.linalg.norm(et[ii] - et[jj], axis=1).mean()) if ii.size \

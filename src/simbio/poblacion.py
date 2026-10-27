@@ -55,6 +55,14 @@ class Poblacion:
         d["socio"] = xp.full((n, 8), -1, dtype=np.int64)  # id del enlazado en cada dirección
         return d
 
+    def compatibilizar(self) -> None:
+        """Completa con ceros los arreglos por sensor de una población guardada con menos sensores."""
+        xp = self.xp
+        for k in ("w", "P", "ult_s"):
+            faltan = gen.NUM_SENS - self.d[k].shape[-1]
+            if faltan > 0:
+                self.d[k] = xp.concatenate([self.d[k], xp.zeros(self.d[k].shape[:-1] + (faltan,))], axis=-1)
+
     @property
     def n(self) -> int:
         return len(self.d["E"])

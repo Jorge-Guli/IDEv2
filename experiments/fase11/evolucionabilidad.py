@@ -31,7 +31,7 @@ def medir(origen, sigma, reps=20):
         i = np.arange(p.n)
         gi = np.array([rng.choice(np.flatnonzero(p["activo"][k])) for k in i])
         if rng.random() < 0.5:
-            si = rng.integers(0, gen.NUM_SENS, p.n); p["w"][i, gi, si] += rng.normal(0, sigma, p.n)
+            si = rng.integers(0, gen.NUM_SENS_SIN_REALIDAD, p.n); p["w"][i, gi, si] += rng.normal(0, sigma, p.n)
         else:
             p["b"][i, gi] += rng.normal(0, sigma, p.n)
         cambios.append((decide() != base).mean())

@@ -12,3 +12,19 @@ services:
     network_mode: none          # sin internet: los datos externos entran por una carpeta (etapa 2)
     restart: unless-stopped     # si el equipo se reinicia, el universo retoma desde su último guardado
     stop_grace_period: 60s      # tiempo para guardar al detenerlo
+
+  # Universo con el clima real de Capitán Bermúdez (etapa 2). Los datos del clima entran por ./datos, en solo
+  # lectura; los trae antes, fuera del contenedor, experiments/herramientas/descargar_clima.py.
+  # Recibe estímulos (etapa 3): python -m simbio estimular runs/vivo/clima --texto "hola"
+  # Datos en ./runs/vivo/clima.
+  clima:
+    image: simbio-vivo
+    depends_on: [universo]      # misma imagen: se construye con el servicio universo
+    volumes:
+      - ./runs/vivo:/datos
+      - ./datos:/simbio/datos:ro
+    command: ["experiments/configs/clima.toml", "--salida", "/datos/clima", "--guardar-cada", "10000",
+              "--set", "estimulos.activo=true"]
+    network_mode: none
+    restart: unless-stopped
+    stop_grace_period: 60s

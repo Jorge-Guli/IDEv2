@@ -5,6 +5,7 @@
     python -m simbio dispositivo [--rapido]
     python -m simbio vivir [CONFIG] --salida runs/vivo [--guardar-cada 10000] [--pasos N] [--sin-resembrar]
     python -m simbio mirar runs/vivo
+    python -m simbio estimular runs/vivo/clima --texto "hola" | --luz Y X RADIO [--repetir N --cada PASOS]
 """
 
 from __future__ import annotations
@@ -50,7 +51,27 @@ def main(argv: list[str] | None = None) -> None:
     sp.add_argument("--set", action="append", default=[], metavar="seccion.clave=valor")
     sp = sub.add_parser("mirar", help="resumen del estado de un universo continuo (sin detenerlo)")
     sp.add_argument("salida", type=Path)
+    sp = sub.add_parser("estimular", help="le da un estímulo (texto o luz) a un universo continuo mientras corre")
+    sp.add_argument("salida", type=Path)
+    sp.add_argument("--texto", default=None, help="mensaje: cada letra es un pulso de luz")
+    sp.add_argument("--luz", nargs=3, type=float, default=None, metavar=("Y", "X", "RADIO"))
+    sp.add_argument("--intensidad", type=float, default=1.0)
+    sp.add_argument("--repetir", type=int, default=1)
+    sp.add_argument("--cada", type=int, default=0, help="pasos entre repeticiones")
     args = ap.parse_args(argv)
+    if args.cmd == "estimular":
+        from . import estimulos
+
+        if (args.texto is None) == (args.luz is None):
+            ap.error("estimular: indicar --texto o --luz (uno de los dos)")
+        if args.texto is not None:
+            dato = {"tipo": "texto", "texto": args.texto}
+        else:
+            y, x, r = args.luz
+            dato = {"tipo": "luz", "y": int(y), "x": int(x), "radio": r, "intensidad": args.intensidad,
+                    "repetir": args.repetir, "cada": args.cada}
+        print(f"enviado: {estimulos.enviar(args.salida, dato)}")
+        return
     if args.cmd == "mirar":
         from . import continuo
 
