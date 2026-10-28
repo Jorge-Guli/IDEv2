@@ -64,3 +64,11 @@ Cada letra enciende siempre el mismo lugar. Por eso los lugares de las letras fr
 - **Comando:**
   `python experiments/fase12/respuesta_estimulos.py --pasos 200000 --semillas 51 52 53 54 55 56 57 58 --cada 500 --procesos 6 --set estimulos.retraso_luz=200 --set estimulos.pasos_por_letra=10 --set estimulos.acople_luz=1.0 --salida runs/fase12/luz_anticipa_v4.json`
 - **Si R1 sigue negativa con la luz como un cuarto de la comida:** el límite está en el organismo (percepción solo local, sin aprendizaje en vida), no en la señal. Ese sería un resultado informativo por sí mismo.
+
+## Resultado de la versión 4 (2026-10-28): R1 negativa, R2 positiva con la confusión prevista
+- **Validez:** 1 extinción por condición (acoplado 57 en el paso 155 845, desacoplado 51 en el 72 977). Por debajo del límite: el resultado vale. Pares completos: 6.
+- **R1 (peso sobre la luz):** +0,21, +0,18, −0,36, −0,03, +0,22, +0,24; p = 0,22. **No se cumple.**
+- **R2 (enriquecimiento):** +1,03, +0,60, +0,50, +0,31, +0,09, −0,07; p = 0,031. **Se cumple.** En el acoplado, la población está en las celdas con luz entre 1,2 y 3,2 veces más de lo que daría el azar (desacoplado: 1,0 a 2,2).
+- **Exploratorias:** el ruido no sube (p = 0,98), y los signos sobre avanzar y comer no muestran nada.
+- **Lectura, según lo escrito antes de correr:** R2 positiva sola **no prueba anticipación**. Cada letra enciende siempre el mismo lugar, y esos lugares reciben comida una y otra vez. La población puede concentrarse ahí por la historia de la comida (quedarse donde siempre hay) sin leer la luz. R1 nula apoya esa lectura: el genoma no pesa más el sensor de luz. Lo que se observa es que **la población se instala en los lugares donde llega la comida de afuera**, que es una respuesta al mundo, pero no anticipación.
+- **Siguiente (diseño):** separar las dos explicaciones con **lugares al azar**, es decir, cada pulso cae en un sitio sorteado con el rng de la simulación. Así la historia no predice nada y solo la luz anuncia la comida. Si R2 y R1 aparecen ahí, es anticipación. Si R2 desaparece, era geografía.
