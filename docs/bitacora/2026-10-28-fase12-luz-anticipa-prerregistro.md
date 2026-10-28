@@ -83,3 +83,23 @@ Cada letra enciende siempre el mismo lugar. Por eso los lugares de las letras fr
   - **R2 positiva:** la población está en la luz cuando se enciende, aunque la luz caiga en cualquier lado. Eso solo pasa si se la busca o se la aprovecha (quedarse al verla): respuesta a la señal.
   - **R1 positiva además:** la evolución lo escribió en el sensor.
   - **R2 negativa:** lo de la versión 4 era geografía.
+
+## Resultado de la versión 5 (2026-10-28): negativo; lo de la versión 4 era geografía
+- **Validez:** 0 extinciones en 16 corridas. Pares completos: 8.
+- **R2 (enriquecimiento):** el acoplado da 0,86–1,13 y el desacoplado 0,89–1,10. Las dos condiciones quedan en ~1, como el azar; p = 0,31. **No se cumple.** Con lugares al azar, la concentración en la luz de la versión 4 desaparece: era geografía (instalarse donde siempre llega comida), no lectura de la señal.
+- **R1 (peso sobre la luz):** 5 de 8 diferencias negativas; p = 0,86. **No se cumple.**
+- **Exploratorias:**
+  - el ruido no difiere (p = 0,22);
+  - avanzar sobre la luz: 5 de 8 positivas, p = 0,094, un indicio débil de "avanzar cuando hay luz", que no se interpreta;
+  - comer: nada.
+- **La luz sí alimenta:** la población del acoplado es mayor en 7 de 8 pares (1290–3459 contra 1026–2313). Los organismos aprovechan la comida que trae la luz, pero la encuentran con los sensores de comida, no con el de luz.
+
+## Cierre de la serie de la luz (versiones 2 a 5)
+- Con percepción solo local y sin aprendizaje durante la vida, una señal fugaz que anuncia comida en otro momento **no es incorporada por la evolución**. Esto vale incluso cuando esa comida es un cuarto del alimento.
+- La población responde a la luz solo a través de sus efectos: se instala donde la comida llega siempre (versión 4) o la come donde aparece (versión 5).
+- **Lo que haría falta para anticipar:**
+  - una señal que dure lo suficiente para que el organismo actúe sobre ella;
+  - un retraso más corto que el tiempo de llegar;
+  - o un mecanismo de memoria o aprendizaje en vida que asocie "vi luz" con "después hubo comida".
+- La memoria de cerrojo existe en el motor (fase 6), pero en ninguna fase fue seleccionada.
+- **Decisión:** cerrar la serie de la luz como negativa e informativa y pasar al archipiélago (etapa 5). El canal de estímulos queda disponible en el universo del clima.

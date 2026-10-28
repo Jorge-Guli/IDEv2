@@ -114,10 +114,12 @@ El diseño completo está en `docs/06-universo-vivo.md`. Resumen operativo:
 - **Hecho:** 8.0; las etapas 2 y 3 construidas; la etapa 4 construida y con su primer prerregistro (negativo). Detalle en `docs/bitacora/2026-10-27-fase12-*.md`.
 - **El autor vive en Capitán Bermúdez (Santa Fe)** y tiene Docker Desktop. Pidió que Claude alimente el universo e interactúe con él directamente.
 - **Pendiente:**
-  1. evaluar la luz v2 (`runs/fase12/luz_prerregistro_v2.json`);
-  2. probar la especialización trófica para una depredación sostenible;
-  3. un mundo donde anticipar pague (daño al empezar la lluvia, o respuesta lenta);
-  4. el ODD, la hoja de ruta y el cambio de OpenSpec de la fase 12.
+  1. ~~evaluar la luz v2~~: hecho el 2026-10-28. La serie de la luz (v2 a v5) es negativa: ver `docs/bitacora/2026-10-28-fase12-luz-anticipa-prerregistro.md`;
+  2. ~~especialización trófica~~: corregida (atacar creaba energía) y sin nichos. Ver la evaluación de la Reina Roja;
+  3. un mundo donde anticipar pague (daño al empezar la lluvia, o respuesta lenta). La luz mostró que hace falta una señal duradera o aprendizaje en vida;
+  4. **siguiente:** etapa 5, archipiélago (islas con migración contra islas aisladas);
+  5. el ODD, la hoja de ruta y el cambio de OpenSpec de la fase 12.
+- **Equipo:** corridas con 6 procesos como máximo, en prioridad Idle; contenedores con `cpus: 0.5`.
 
 ### 8.0 Al conectarse en el equipo del autor
 1. Ir a `C:\Desarrollo\IDEv2`, activar `.venv`, hacer `git pull --no-edit` y correr `python -m pytest -q`: tiene que dar 160 pasan y 3 omitidos.
