@@ -12,6 +12,7 @@ services:
     network_mode: none          # sin internet: los datos externos entran por una carpeta (etapa 2)
     restart: unless-stopped     # si el equipo se reinicia, el universo retoma desde su último guardado
     stop_grace_period: 60s      # tiempo para guardar al detenerlo
+    cpus: 0.5                   # medio núcleo: el equipo sigue usable (solo cambia la velocidad, no el resultado)
 
   # Universo con el clima real de Capitán Bermúdez (etapa 2). Los datos del clima entran por ./datos, en solo
   # lectura; los trae antes, fuera del contenedor, experiments/herramientas/descargar_clima.py.
@@ -28,3 +29,4 @@ services:
     network_mode: none
     restart: unless-stopped
     stop_grace_period: 60s
+    cpus: 0.5
