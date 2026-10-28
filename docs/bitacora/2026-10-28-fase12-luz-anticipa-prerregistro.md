@@ -32,3 +32,12 @@ Cada letra enciende siempre el mismo lugar. Por eso los lugares de las letras fr
 ## Cómo se interpretará
 - **R1 positiva con E_peso_ruido nula:** primera evidencia de que la evolución incorpora una señal de afuera que *predice* algo. Es anticipación, un paso hacia la inteligencia que buscamos. Siguiente: ablación del sensor en poblaciones evolucionadas, y probar si el orden de las letras importa.
 - **R1 negativa:** con percepción solo local y un genoma sin aprendizaje durante la vida, una señal fugaz que predice comida 200 pasos después puede quedar fuera de alcance. Siguientes opciones: un retraso menor (50) o una luz que dure más.
+
+## Resultado (2026-10-28): válido y negativo
+- **Validez:** 0 extinciones en 16 corridas.
+- **R1 (peso sobre la luz):** 6 de 8 diferencias positivas (−0,16 a +0,64); p = 0,074. **No se cumple.**
+- **E_peso_ruido:** también sube en el acoplado, en 6 de 8 (p = 0,10). La tendencia de R1 no es específica de la luz: los dos pesos derivan juntos, que es lo que hace la deriva cuando cambia la estructura de la población.
+- **R2 (enriquecimiento):** p = 0,11. **No se cumple.** Exploratorias de signo (avanzar, comer): nada.
+- **Lectura:** ni en el momento (versión 2) ni anunciando la comida, la luz es incorporada por la evolución con este diseño. La confusión prevista para R2 no llegó a importar.
+- **Diagnóstico probable (sin probar):** la presión de selección es demasiado débil. Una frase cada 3000 pasos enciende pocas celdas por poco tiempo, así que la comida que trae la luz es una fracción chica de la energía total. Además, los pesos de los sensores derivan con fuerza (|w| ~0,3–0,9 también en el control).
+- **Siguiente:** antes de otro prerregistro, **medir cuánta energía aporta la luz** (fracción de lo comido en celdas con abono). Solo si la luz es una parte importante del alimento tiene sentido esperar que la selección la mire. Si no lo es, subir la frecuencia de los estímulos o el acople, verificando primero esa fracción.
