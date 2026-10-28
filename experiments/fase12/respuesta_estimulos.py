@@ -74,9 +74,9 @@ def evaluar(res: list[dict]) -> dict:
 
 
 def correr(tarea):
-    nombre, semilla, pasos, cada = tarea
+    nombre, semilla, pasos, cada, ajustes = tarea
     cfg = config.cargar(RAIZ / "experiments/configs/clima.toml",
-                        ["estimulos.activo=true", "sim.registrar_cada=500"] + CONDICIONES[nombre])
+                        ["estimulos.activo=true", "sim.registrar_cada=500"] + list(ajustes) + CONDICIONES[nombre])
     cfg.sim.semilla = semilla
     sim = Simulacion(cfg)
     k = 0
@@ -104,9 +104,10 @@ def main() -> None:
     a.add_argument("--semillas", type=int, nargs="+", default=[1, 2, 3, 4])
     a.add_argument("--cada", type=int, default=3000)
     a.add_argument("--procesos", type=int, default=8)
+    a.add_argument("--set", action="append", default=[], help="ajuste para las dos condiciones (p. ej. el retraso)")
     a.add_argument("--salida", default="runs/fase12/respuesta_estimulos.json")
     args = a.parse_args()
-    tareas = [(c, s, args.pasos, args.cada) for c in CONDICIONES for s in args.semillas]
+    tareas = [(c, s, args.pasos, args.cada, tuple(args.set)) for c in CONDICIONES for s in args.semillas]
     with Pool(args.procesos) as pool:
         res = pool.map(correr, tareas)
     for r in res:

@@ -280,6 +280,9 @@ class EstimulosCfg:
     # luz → recrecimiento extra: R += acople_luz · luz · (K − R); 0 (control): la luz se ve pero no alimenta
     acople_luz: float = 0.05
     decaimiento_luz: float = 0.02  # fracción de la luz que se apaga por paso
+    # > 0: la luz anuncia la comida. El recrecimiento lo hace un campo "abono" que recibe los mismos pulsos
+    # retraso_luz pasos después; el sensor ve la luz al instante. 0: la luz alimenta en el momento (etapa 3)
+    retraso_luz: int = 0
     pasos_por_letra: int = 40  # separación entre los pulsos de un texto
     revisar_cada: int = 100  # cada cuántos pasos el modo continuo mira la carpeta de entradas
 

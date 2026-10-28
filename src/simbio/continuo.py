@@ -45,7 +45,8 @@ class _Guardador(pickle.Pickler):
     def persistent_id(self, obj):
         if isinstance(obj, ModuleType):
             return ("modulo", obj.__name__)
-        if type(obj).__module__.startswith("cupy") and hasattr(obj, "get"):
+        modulo = type(obj).__module__  # en tipos de Cython (p. ej. funciones de numpy.random) no es un str
+        if isinstance(modulo, str) and modulo.startswith("cupy") and hasattr(obj, "get"):
             return ("arreglo", obj.get())
         return None
 

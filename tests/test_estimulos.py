@@ -54,6 +54,21 @@ def test_control_sin_acople_no_alimenta():
     assert np.allclose(con.luz, sin.luz)
 
 
+def test_la_luz_anuncia_la_comida_con_retraso():
+    sim = Simulacion(_cfg("estimulos.retraso_luz=30"))
+    sim.estimular({"tipo": "luz", "y": 16, "x": 16, "radio": 3})
+    sim.entorno.R[:] = 0.0
+    sim.entorno.paso(sim.t, 0.0)
+    sim._luz()
+    assert float(sim.luz[16, 16]) > 0.9  # se ve ya
+    assert float(sim.entorno.R.sum()) == 0.0  # pero todavía no alimenta
+    for _ in range(30):
+        sim.t += 1
+        sim._luz()
+    assert float(sim.abono[16, 16]) > 0.9 and float(sim.luz[16, 16]) < 0.6
+    assert float(sim.entorno.R[16, 16]) > 0.0  # llegó la comida
+
+
 def test_canal_por_carpeta_y_reproducible(tmp_path):
     u = tmp_path / "u"
     continuo.vivir(_cfg(), u, guardar_cada=50, pasos=50, verbose=False)

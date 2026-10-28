@@ -38,6 +38,7 @@ class Simulacion:
     clima: Clima | None = None
     n_sens: int = gen.NUM_SENS_SIN_REALIDAD
     luz = None  # campo de luz de los estímulos (etapa 3)
+    abono = None  # con estimulos.retraso_luz: la luz que alimenta, atrasada
     n_prim: int = gen.NUM_PRIM_SIN_ATAQUE
 
     def __init__(self, cfg: Config, genomas: dict[str, np.ndarray] | None = None,
@@ -65,6 +66,7 @@ class Simulacion:
         if cfg.estimulos.activo:  # estímulos desde afuera (etapa 3): campo de luz y pulsos programados
             self.luz = xp.zeros((cfg.mundo.alto, cfg.mundo.ancho))
             self.agenda: list[tuple[int, int, int, float, float]] = []
+            self.agenda_abono: list[tuple[int, int, int, float, float]] = []
         self.pob =Poblacion(cfg.herencia.genes_max, xp)
         self.t = 0
         self.sig_id = 0
@@ -525,11 +527,23 @@ class Simulacion:
         while self.agenda and self.agenda[0][0] <= self.t:
             _, y, x, radio, inten = self.agenda.pop(0)
             self.luz += xp.asarray(inten * mancha(ent.alto, ent.ancho, y, x, radio))
+            if e.retraso_luz > 0:  # el mismo pulso llega al abono más tarde
+                self.agenda_abono.append((self.t + e.retraso_luz, y, x, radio, inten))
         self.luz *= 1.0 - e.decaimiento_luz
         xp.minimum(self.luz, 1.0, out=self.luz)
+        nutre = self.luz
+        if e.retraso_luz > 0:
+            if self.abono is None:
+                self.abono = xp.zeros_like(self.luz)
+            while self.agenda_abono and self.agenda_abono[0][0] <= self.t:
+                _, y, x, radio, inten = self.agenda_abono.pop(0)
+                self.abono += xp.asarray(inten * mancha(ent.alto, ent.ancho, y, x, radio))
+            self.abono *= 1.0 - e.decaimiento_luz
+            xp.minimum(self.abono, 1.0, out=self.abono)
+            nutre = self.abono
         if e.acople_luz > 0:
             K = ent.capacidad(self.t)
-            ent.R += e.acople_luz * self.luz * (K - ent.R)
+            ent.R += e.acople_luz * nutre * (K - ent.R)
 
     def estacion(self) -> float:
         """Estación vigente (fase 7): +1 nutre el tipo A, −1 nutre el tipo B. Con datos reales y lluvia (etapa 2),
