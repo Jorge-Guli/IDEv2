@@ -41,3 +41,26 @@ Cada letra enciende siempre el mismo lugar. Por eso los lugares de las letras fr
 - **Lectura:** ni en el momento (versión 2) ni anunciando la comida, la luz es incorporada por la evolución con este diseño. La confusión prevista para R2 no llegó a importar.
 - **Diagnóstico probable (sin probar):** la presión de selección es demasiado débil. Una frase cada 3000 pasos enciende pocas celdas por poco tiempo, así que la comida que trae la luz es una fracción chica de la energía total. Además, los pesos de los sensores derivan con fuerza (|w| ~0,3–0,9 también en el control).
 - **Siguiente:** antes de otro prerregistro, **medir cuánta energía aporta la luz** (fracción de lo comido en celdas con abono). Solo si la luz es una parte importante del alimento tiene sentido esperar que la selección la mire. Si no lo es, subir la frecuencia de los estímulos o el acople, verificando primero esa fracción.
+
+## Cuánta comida aporta la luz (medición, 2026-10-28)
+- **Cómo se midió:** recrecimiento atribuible al abono sobre el recrecimiento total, semilla 41, pasos 5000 a 30 000, con `retraso_luz = 200` (script de exploración, fuera del repositorio).
+
+| Frase cada | Pasos por letra | Acople | Fracción de la comida que trae la luz |
+|---|---|---|---|
+| 3000 | 40 | 0,05 | **0,003** (el diseño de las versiones 2 y 3) |
+| 500 | 40 | 0,05 | 0,021 |
+| 500 | 40 | 0,2 | 0,070 |
+| 1000 | 10 | 0,5 | 0,071 |
+| 1000 | 10 | 1,0 | 0,126 |
+| 500 | 10 | 1,0 | **0,230** |
+
+- **Lectura:** se confirma el diagnóstico. En los dos prerregistros anteriores, la luz traía el 0,3 % de la comida: para la selección, prácticamente nada. Los negativos dicen que la señal era irrelevante, no que la evolución no pueda usarla.
+
+## Repetición prerregistrada (versión 4), escrita antes de correr
+- **Mismas reglas R1 y R2, mismas exploratorias, misma regla de validez.**
+- **Cambian tres cosas:** `--cada 500`, `estimulos.pasos_por_letra = 10` y `estimulos.acople_luz = 1,0` en el acoplado. El desacoplado sigue con acople 0, porque lo fija la condición después de los ajustes.
+- Con eso, la luz trae ~23 % de la comida.
+- **Semillas nuevas 51–58**, 200 000 pasos, 6 procesos.
+- **Comando:**
+  `python experiments/fase12/respuesta_estimulos.py --pasos 200000 --semillas 51 52 53 54 55 56 57 58 --cada 500 --procesos 6 --set estimulos.retraso_luz=200 --set estimulos.pasos_por_letra=10 --set estimulos.acople_luz=1.0 --salida runs/fase12/luz_anticipa_v4.json`
+- **Si R1 sigue negativa con la luz como un cuarto de la comida:** el límite está en el organismo (percepción solo local, sin aprendizaje en vida), no en la señal. Ese sería un resultado informativo por sí mismo.
