@@ -69,6 +69,17 @@ def test_la_luz_anuncia_la_comida_con_retraso():
     assert float(sim.entorno.R[16, 16]) > 0.0  # llegó la comida
 
 
+def test_lugares_al_azar_iguales_en_ambas_condiciones():
+    fijo = Simulacion(_cfg())
+    a = Simulacion(_cfg("estimulos.lugares_al_azar=true"))
+    b = Simulacion(_cfg("estimulos.lugares_al_azar=true", "estimulos.acople_luz=0.0"))
+    for sim in (fijo, a, b):
+        sim.estimular({"tipo": "texto", "texto": "aaaa"})
+    assert len({p[1:3] for p in fijo.agenda}) == 1  # la letra cae siempre en el mismo lugar
+    assert len({p[1:3] for p in a.agenda}) > 1  # al azar, no
+    assert a.agenda == b.agenda  # el control ve la misma luz en los mismos lugares
+
+
 def test_canal_por_carpeta_y_reproducible(tmp_path):
     u = tmp_path / "u"
     continuo.vivir(_cfg(), u, guardar_cada=50, pasos=50, verbose=False)

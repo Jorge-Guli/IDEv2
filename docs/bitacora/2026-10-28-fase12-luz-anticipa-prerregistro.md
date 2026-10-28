@@ -72,3 +72,14 @@ Cada letra enciende siempre el mismo lugar. Por eso los lugares de las letras fr
 - **Exploratorias:** el ruido no sube (p = 0,98), y los signos sobre avanzar y comer no muestran nada.
 - **Lectura, según lo escrito antes de correr:** R2 positiva sola **no prueba anticipación**. Cada letra enciende siempre el mismo lugar, y esos lugares reciben comida una y otra vez. La población puede concentrarse ahí por la historia de la comida (quedarse donde siempre hay) sin leer la luz. R1 nula apoya esa lectura: el genoma no pesa más el sensor de luz. Lo que se observa es que **la población se instala en los lugares donde llega la comida de afuera**, que es una respuesta al mundo, pero no anticipación.
 - **Siguiente (diseño):** separar las dos explicaciones con **lugares al azar**, es decir, cada pulso cae en un sitio sorteado con el rng de la simulación. Así la historia no predice nada y solo la luz anuncia la comida. Si R2 y R1 aparecen ahí, es anticipación. Si R2 desaparece, era geografía.
+
+## Versión 5: lugares al azar (prerregistro, escrito antes de correr)
+- **Motor:** `estimulos.lugares_al_azar` (por defecto falso). Cada pulso cae en un lugar sorteado con un generador propio, derivado de la semilla y no de la condición: acoplado y desacoplado ven la misma luz en los mismos lugares y pasos. Test: `test_lugares_al_azar_iguales_en_ambas_condiciones`. Las huellas no cambian.
+- **Igual que la versión 4,** más `--set estimulos.lugares_al_azar=true`. **Semillas nuevas 61–68.**
+- **Comando:**
+  `python experiments/fase12/respuesta_estimulos.py --pasos 200000 --semillas 61 62 63 64 65 66 67 68 --cada 500 --procesos 6 --set estimulos.retraso_luz=200 --set estimulos.pasos_por_letra=10 --set estimulos.acople_luz=1.0 --set estimulos.lugares_al_azar=true --salida runs/fase12/luz_azar_v5.json`
+- **Reglas, exploratorias y validez:** las mismas. Acá R2 ya no tiene la confusión de la geografía: el lugar no predice nada.
+- **Cómo se interpretará:**
+  - **R2 positiva:** la población está en la luz cuando se enciende, aunque la luz caiga en cualquier lado. Eso solo pasa si se la busca o se la aprovecha (quedarse al verla): respuesta a la señal.
+  - **R1 positiva además:** la evolución lo escribió en el sensor.
+  - **R2 negativa:** lo de la versión 4 era geografía.

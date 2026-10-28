@@ -67,6 +67,7 @@ class Simulacion:
             self.luz = xp.zeros((cfg.mundo.alto, cfg.mundo.ancho))
             self.agenda: list[tuple[int, int, int, float, float]] = []
             self.agenda_abono: list[tuple[int, int, int, float, float]] = []
+            self.rng_luz = np.random.default_rng(semilla_real.spawn(1)[0])  # lugares al azar
         self.pob =Poblacion(cfg.herencia.genes_max, xp)
         self.t = 0
         self.sig_id = 0
@@ -518,6 +519,10 @@ class Simulacion:
             raise ValueError("este universo no tiene estímulos (estimulos.activo = false)")
         nuevos = [(self.t + dt, y, x, r, i) for dt, y, x, r, i in
                   pulsos(dato, self.cfg.estimulos, self.entorno.alto, self.entorno.ancho)]
+        if self.cfg.estimulos.lugares_al_azar:
+            ys = self.rng_luz.integers(0, self.entorno.alto, len(nuevos))
+            xs = self.rng_luz.integers(0, self.entorno.ancho, len(nuevos))
+            nuevos = [(t, int(y), int(x), r, i) for (t, _, _, r, i), y, x in zip(nuevos, ys, xs)]
         self.agenda = sorted(self.agenda + nuevos, key=lambda p: p[0])
         return len(nuevos)
 

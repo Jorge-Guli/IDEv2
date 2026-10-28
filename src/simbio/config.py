@@ -283,6 +283,9 @@ class EstimulosCfg:
     # > 0: la luz anuncia la comida. El recrecimiento lo hace un campo "abono" que recibe los mismos pulsos
     # retraso_luz pasos después; el sensor ve la luz al instante. 0: la luz alimenta en el momento (etapa 3)
     retraso_luz: int = 0
+    # True: cada pulso cae en un lugar sorteado (no el fijo de su letra), con un generador propio que no depende de
+    # la condición; así el lugar no predice la comida y solo la luz la anuncia
+    lugares_al_azar: bool = False
     pasos_por_letra: int = 40  # separación entre los pulsos de un texto
     revisar_cada: int = 100  # cada cuántos pasos el modo continuo mira la carpeta de entradas
 
