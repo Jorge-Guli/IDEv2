@@ -128,9 +128,11 @@ El diseño completo está en `docs/06-universo-vivo.md`. Resumen operativo:
 
 **El universo vivo de Docker está congelado:** paso ~37 millones, 1 solo perfil genético, μ ≈ 0,00011 (el piso es 0,0001) y acierto 0,545. No cambiarle la física en caliente: dejarlo como registro y arrancar uno nuevo cuando se sepa qué castigo y qué rampa funcionan.
 
-**En curso al cierre de esta nota:** diagnóstico del texto con `texto.pista=vigente` (salida `runs/fase12/texto_diag_vigente.json`). Pregunta: ¿pueden al menos *reaccionar* a letras de 500 pasos?
-- Si aciertan alto, el mundo funciona y lo difícil es predecir.
-- Si no, alargar las letras o revisar la inercia de la digestión y el veneno diferido.
+**Experimento oficial con Asimov (2026-10-29): inválido y nulo** (`docs/bitacora/2026-10-30-fase12-asimov-prerregistro.md`).
+- 7 de 16 poblaciones se extinguieron después de la rampa.
+- En las sobrevivientes, texto y barajado dan lo mismo (p = 0,125; diferencias ≤ 0,007).
+- Superar la frecuencia base no prueba predicción: el barajado también la supera, hasta +0,04, reaccionando dentro de cada letra.
+- No repetir con Asimov. Primero: física sin extinciones tardías (castigo 0,35 o rampa más larga) y un piloto con efecto pareado ≥ 0,05 contra barajado.
 
 Configuración de los pilotos del texto:
 - texto de calibración: `docs/00,01,04,06`;
@@ -143,7 +145,7 @@ Configuración de los pilotos del texto:
 - **Se usan solo en el experimento oficial prerregistrado,** cuando un piloto con el texto de calibración muestre que la predicción es alcanzable. Techos medidos: seguir la pista 0,242; base 0,545; invertir la pista 0,758, igual en los dos textos.
 
 **Plan acordado con el autor (en orden):**
-1. Terminar el diagnóstico del texto y, según el resultado, ajustar el mundo hasta que la predicción sea alcanzable en un piloto. Recién ahí, prerregistro con Asimov (texto contra barajado, semillas nuevas).
+1. ~~Prerregistro con Asimov~~ hecho: inválido y nulo. Siguiente en el texto: física estable (castigo 0,35 o rampa larga) y poblaciones mayores (GPU) antes de otro prerregistro.
 2. Idea de Gemini: probar las poblaciones de la fase 11 con `castigo = 0,5` y rampa larga. ¿Se recluta la memoria cuando discriminar paga?
 3. Arrancar un **universo vivo nuevo** con la física que funcione (castigo y rampa), sin tocar el actual.
 4. **Archipiélago heterogéneo:** islas con selección divergente (clima real, texto o toxicidad alta, depredación). El homogéneo dio nulo.

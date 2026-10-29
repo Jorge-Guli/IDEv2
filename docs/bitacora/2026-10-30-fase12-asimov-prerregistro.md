@@ -44,3 +44,40 @@
   - Pasos siguientes: revisión con `revisor-cientifico`; clases más ricas, donde mirar más atrás pague y la memoria tenga motivo; poblaciones más grandes.
 - **R2 sola:** algunas poblaciones lo logran, pero no de forma general.
 - **Ambas negativas:** la tasa de descubrimiento es demasiado baja en este tamaño de población. Siguiente: poblaciones más grandes (GPU), no más ajustes de la física.
+
+## Resultado (2026-10-29, salida `runs/fase12/asimov.json`)
+
+**Veredicto según el prerregistro: inválido** (texto 4 extinciones, barajado 3; el límite era 2). Aun leyendo lo que sobrevivió, **no hay efecto**.
+
+| Semilla | texto | barajado |
+|---|---|---|
+| 101 | 0,553 | 0,547 |
+| 102 | extinta (t=184 676) | extinta (t=312 054) |
+| 103 | extinta (t=210 318) | extinta (t=390 986) |
+| 104 | extinta (t=254 134) | 0,562 |
+| 105 | **0,578** | **0,572** |
+| 106 | extinta (t=262 582) | extinta (t=258 907) |
+| 107 | 0,558 | 0,558 |
+| 108 | 0,539 | 0,536 |
+
+(`acierto_comida`, media del último tercio.)
+
+- **R1:** 4 pares completos, diferencias +0,007, +0,005, 0,000, +0,003; p = 0,125. **No cumple.** Las diferencias son diez veces menores que lo que daría usar la alternancia.
+- **R2:** texto 1 de 4 sobre 0,56; barajado 2 de 6. **No cumple.**
+- **Exploratorias:** sin diferencias en memoria (p = 0,31), genes (p = 0,25) ni población (p = 0,88).
+
+### Lectura posterior (exploratoria, no prerregistrada)
+En 500 000 pasos de 500 pasos por letra se recorren solo **1 000 letras**. La frecuencia base hay que medirla **en la ventana** del último tercio (letras 667–1 000), no en el texto entero:
+- **texto:** base local 0,530; invertir la pista 0,754. Las 4 sobrevivientes superan la base local por +0,009 a +0,048.
+- **barajado** (cada semilla con su orden): base local 0,518–0,575. Sus poblaciones también la superan, hasta **+0,038** (semilla 104: 0,562 contra 0,524).
+
+Conclusiones:
+- **Superar la base no prueba predicción.** Hay una ganancia de ~0,01–0,04 que no usa la secuencia: reaccionar dentro de cada letra (el sensor `coincide` y el tipo de la celda permiten corregir después de los primeros bocados).
+- **El umbral 0,56 de R2 estaba mal calibrado.** Salió de 3 semillas barajadas del piloto, y la base local varía ±0,03 entre semillas barajadas. R1 (pareado) era la regla correcta y dio nulo.
+- **La física con `castigo = 0,5` y rampa de 150 000 es frágil:** 7 de 16 poblaciones se extinguieron entre t = 185 000 y 391 000, después de la rampa. En el piloto con el texto de calibración había sido 1 de 12. Con estas tasas, cualquier diseño pierde la mitad de la potencia.
+- **Ningún sobreviviente se acerca a 0,754.** El mejor (texto 105, 0,578) está al nivel de su par barajado (0,572). La evolución, con ~200 organismos y 500 000 pasos, **no descubrió la alternancia** en el texto real, igual que en el de calibración, donde el aparente 0,579 tampoco se distinguía de la reacción.
+
+### Qué sigue
+1. **No repetir con Asimov.** El prerregistro se usó; repetirlo con otras semillas sería buscar hasta que salga. Los cuentos se reservan para un diseño nuevo y prerregistrado, cuando un piloto con el texto de calibración muestre un efecto pareado claro (diferencia ≥ 0,05 contra barajado, no contra el techo).
+2. **Antes, arreglar la física:** las extinciones tardías con castigo 0,5. Probar un castigo intermedio (0,35) o una rampa más larga, midiendo supervivencia y acierto con la estación fija.
+3. **Tasa de descubrimiento:** poblaciones mayores (GPU) o letras más largas, para que una mutación que invierte la pista tenga tiempo de pagar.
