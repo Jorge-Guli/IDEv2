@@ -5,3 +5,5 @@ runs/
 *.npz
 !experiments/**/*.npz
 runs_*.log
+# textos de entrada con derechos de autor: solo locales, nunca al repositorio
+datos/textos/
