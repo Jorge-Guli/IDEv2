@@ -40,6 +40,10 @@ def _cupy_disponible() -> ModuleType | None:
         x = cp.arange(16, dtype=cp.float64) * 0.5 + 1.0
         if abs(float(cp.tanh(x).sum()) - float(np.tanh(np.arange(16) * 0.5 + 1.0).sum())) > 1e-9:
             raise RuntimeError("resultado incorrecto en la prueba de GPU")
+        # Sin límite, el pool de CuPy guarda los bloques liberados (de tamaños que cambian con la población) y
+        # crece ~180 MB por paso aunque se usen ~100 MB; en Windows la GPU toma prestada la RAM del sistema y
+        # varias corridas saturaron el equipo (2026-10-29). Con el límite libera su caché y reutiliza.
+        cp.get_default_memory_pool().set_limit(size=int(os.environ.get("SIMBIO_GPU_LIMITE_MB", "2048")) << 20)
         return cp
     except Exception as e:
         _MOTIVO_SIN_GPU = f"la GPU no pudo ejecutar la prueba: {str(e).splitlines()[0][:200]}"

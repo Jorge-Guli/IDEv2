@@ -51,4 +51,6 @@ El cruce está cerca de 300², y de ahí sale el umbral por defecto del modo aut
 3. **Instala un solo paquete de CuPy.** Si instalaste más de uno, desinstálalos todos primero (`pip uninstall cupy-cuda12x cupy-cuda13x`). Comparten la carpeta `cupy`: desinstalar uno solo borra también los archivos del otro, así que después hay que reinstalar el que queda (`pip install --force-reinstall "cupy-cuda13x[ctk]"`).
 4. Verifica con `python -m simbio dispositivo`.
 
+**Memoria de la GPU.** El pool de CuPy queda limitado a 2 048 MB por proceso (`SIMBIO_GPU_LIMITE_MB` para cambiarlo). Sin límite, guardaba los bloques liberados y crecía ~180 MB por paso con ~100 MB en uso real. En Windows la GPU toma prestada la RAM del sistema, así que 4 corridas de 384² (19 GB reservados y 5,5 GB de RAM cada una) colgaron el equipo (2026-10-29). Con el límite cada corrida ocupa ~1,5 GB de GPU y ~0,7 GB de RAM, y además corre más rápido. Correr como mucho 2 procesos de GPU a la vez.
+
 Sin GPU NVIDIA (AMD, Intel, Apple), el simulador funciona igual en CPU.
