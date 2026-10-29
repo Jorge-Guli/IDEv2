@@ -11,6 +11,7 @@ from .entorno import Entorno, generar_parches
 from .poblacion import Poblacion
 from .estimulos import mancha, pulsos
 from .realidad import Clima
+from .texto import Texto
 
 # Las 8 orientaciones: N, NE, E, SE, S, SO, O, NO. La opuesta de k es (k + 4) % 8.
 DY = np.array([-1, -1, 0, 1, 1, 1, 0, -1])
@@ -39,6 +40,7 @@ class Simulacion:
     n_sens: int = gen.NUM_SENS_SIN_REALIDAD
     luz = None  # campo de luz de los estímulos (etapa 3)
     abono = None  # con estimulos.retraso_luz: la luz que alimenta, atrasada
+    texto = None  # mundo del texto (fase 12)
     n_prim: int = gen.NUM_PRIM_SIN_ATAQUE
 
     def __init__(self, cfg: Config, genomas: dict[str, np.ndarray] | None = None,
@@ -62,6 +64,11 @@ class Simulacion:
         if cfg.realidad.activa and cfg.realidad.lluvia and not cfg.estaciones.activa:
             raise ValueError("realidad.lluvia decide qué comida nutre: requiere estaciones.activa")
         self.clima = Clima(cfg.realidad, np.random.default_rng(semilla_real)) if cfg.realidad.activa else None
+        if cfg.texto.activo and not cfg.estaciones.activa:
+            raise ValueError("texto.activo decide qué comida nutre: requiere estaciones.activa")
+        # mundo del texto: generador propio (solo baraja en el control), no consume de los demás
+        self.texto = (Texto(cfg.texto, np.random.default_rng(np.random.SeedSequence([cfg.sim.semilla, 7])))
+                      if cfg.texto.activo else None)
         self.n_sens = gen.NUM_SENS if cfg.realidad.activa or cfg.estimulos.activo else gen.NUM_SENS_SIN_REALIDAD
         if cfg.estimulos.activo:  # estímulos desde afuera (etapa 3): campo de luz y pulsos programados
             self.luz = xp.zeros((cfg.mundo.alto, cfg.mundo.ancho))
@@ -228,6 +235,8 @@ class Simulacion:
             ve = xp.asarray(u[0] < self.p_pista())
             valor = self.estacion() if e.pista_informativa else xp.asarray(np.where(u[1] < 0.5, 1.0, -1.0))
             s[:, gen.S_PISTA] = xp.where(ve, valor, 0.0)
+            if self.texto is not None:  # mundo del texto: todos ven la letra anterior, siempre
+                s[:, gen.S_PISTA] = self.texto.anterior(self.t)
         if self.clima is not None and self.cfg.realidad.sensor_presion:
             s[:, gen.S_PRESION] = self.clima.presion[self.clima.hora(self.t)]
         if self.luz is not None:
@@ -553,6 +562,8 @@ class Simulacion:
     def estacion(self) -> float:
         """Estación vigente (fase 7): +1 nutre el tipo A, −1 nutre el tipo B. Con datos reales y lluvia (etapa 2),
         la estación es el clima: seco (+1) o húmedo (−1)."""
+        if self.texto is not None:  # mundo del texto: vocal +1, consonante −1
+            return self.texto.vigente(self.t)
         if self.clima is not None and self.cfg.realidad.lluvia:
             return float(self.clima.estacion[self.clima.hora(self.t)])
         return 1.0 if (self.t // self.cfg.estaciones.periodo) % 2 == 0 else -1.0

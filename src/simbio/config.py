@@ -291,6 +291,18 @@ class EstimulosCfg:
 
 
 @dataclass
+class TextoCfg:
+    # fase 12, mundo del texto: un texto real pasa letra por letra y decide la estación. Vocal: nutre el tipo A
+    # (+1); consonante: el tipo B (−1). Lo que no es letra se salta. El sensor "pista" muestra siempre la letra
+    # ANTERIOR (no la vigente): para comer bien ahora hay que predecir la letra actual a partir de las pasadas. Un
+    # texto tiene estructura (después de una consonante suele venir una vocal); el control lo baraja
+    activo: bool = False
+    archivos: str = "datos/textos/la_ultima_pregunta.txt"  # uno o varios, separados por comas, uno detrás de otro
+    pasos_por_letra: int = 500
+    barajar: bool = False  # control: las mismas letras en orden al azar (mismas frecuencias, sin secuencia)
+
+
+@dataclass
 class SimCfg:
     semilla: int = 0
     pasos: int = 5000
@@ -316,6 +328,7 @@ class Config:
     realidad: RealidadCfg = field(default_factory=RealidadCfg)
     estimulos: EstimulosCfg = field(default_factory=EstimulosCfg)
     ataque: AtaqueCfg = field(default_factory=AtaqueCfg)
+    texto: TextoCfg = field(default_factory=TextoCfg)
     sim: SimCfg = field(default_factory=SimCfg)
 
     def to_dict(self) -> dict[str, Any]:
