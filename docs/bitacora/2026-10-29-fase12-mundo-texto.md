@@ -67,3 +67,13 @@ Corridas con `reina_roja.py --condiciones sin`, mundo de `vivo.toml`, semillas 1
 - **Lectura:** la rampa larga evita las extinciones con el texto, pero la población se queda en la estrategia de la base.
 - **Pregunta de diagnóstico:** ¿pueden *reaccionar* a letras que cambian cada 500 pasos, aunque sea sin predecir? Para responderla, opción `texto.pista = "vigente"`: la pista muestra la letra vigente y "comer si coincide" resuelve todo con un gen. Si así tampoco pasan la base, el obstáculo es seguir un mundo que cambia tan rápido (digestión, veneno diferido), no la predicción.
 
+## Diagnóstico reactivo (`texto.pista = vigente`, mismo mundo que el piloto 4): tampoco
+- Viendo la letra **vigente**, con un sensor que hace la regla de un solo gen ("comer si coincide"), el acierto queda en 0,53–0,55 en las 6 corridas (1 extinción en el barajado).
+- **Conclusión:** el obstáculo no es predecir, es **seguir una comida buena que cambia cada 500 pasos**. Candidatos:
+  - la inercia de la digestión (100 pasos), que premia quedarse con un tipo;
+  - el veneno diferido, que separa el error de su costo;
+  - una presión todavía débil.
+- **Siguiente diagnóstico:** dos variantes reactivas, cada una cambiando una sola cosa:
+  - (a) sin digestión inducible (`estaciones.induccion = 0`);
+  - (b) letras de 2000 pasos, como las estaciones de la fase 11.
+
