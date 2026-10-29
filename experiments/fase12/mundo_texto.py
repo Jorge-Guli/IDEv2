@@ -92,18 +92,19 @@ def main() -> None:
     a.add_argument("--archivos", default="datos/textos/la_ultima_pregunta.txt,datos/textos/la_ultima_respuesta.txt")
     a.add_argument("--pasos-por-letra", type=int, default=500)
     a.add_argument("--set", action="append", default=[])
+    a.add_argument("--condiciones", nargs="+", default=list(CONDICIONES))
     a.add_argument("--procesos", type=int, default=6)
     a.add_argument("--salida", default="runs/fase12/mundo_texto.json")
     args = a.parse_args()
     tareas = [(c, s, args.pasos, args.archivos, args.pasos_por_letra, tuple(args.set))
-              for c in CONDICIONES for s in args.semillas]
+              for c in args.condiciones for s in args.semillas]
     with Pool(args.procesos) as pool:
         res = pool.map(correr, tareas)
     for r in res:
         f = r["serie"][-1] if r["serie"] else {}
         print(r["condicion"], r["semilla"], "extinta" if r["extinta_en"] else "viva",
               {k: f.get(k) for k in ("t", "poblacion", "acierto_comida", "tiene_memoria_a", "memoria_alineada_a")})
-    informe = evaluar(res, args.pasos - args.pasos // 3)
+    informe = evaluar(res, args.pasos - args.pasos // 3) if set(args.condiciones) == set(CONDICIONES) else {}
     print(json.dumps(informe, ensure_ascii=False, indent=2))
     salida = RAIZ / args.salida
     salida.parent.mkdir(parents=True, exist_ok=True)

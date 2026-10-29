@@ -91,3 +91,9 @@ Corridas con `reina_roja.py --condiciones sin`, mundo de `vivo.toml`, semillas 1
 - **Consecuencia para el diseño:** con `coincide`, la regla reactiva ("comer si coincide") y la predictiva ("comer si NO coincide con la letra anterior") tienen la misma complejidad: un gen. Lo que cambia es el premio (1,0 contra ~0,76).
 - **Siguiente:** piloto 5, la tarea real (`pista = anterior`) con `induccion = 0`, castigo 0,5, rampa 150 000 y 500 000 pasos.
 
+## Piloto 5 (la tarea real: pista anterior, coincide, sin digestión inducible, castigo 0,5, rampa 150 000, 500 000 pasos)
+- **Texto:** acierto final 0,534, **0,579** y 0,549. **Barajado:** 0,548, 0,551 y 0,537. Sin extinciones. R1: p = 0,375.
+- Solo la semilla 2 del texto pasa la base (0,545) y el barajado. Sube de forma sostenida de 0,553 (paso 179 000) a 0,58, que es un aprovechamiento parcial de la alternancia, lejos del techo de 0,758.
+- **Lectura:** el cuello de botella es la **tasa de descubrimiento**. La regla es de un gen, pero aparece en pocas poblaciones. Con 1 de 3 y diferencias chicas, un prerregistro de 8 semillas tendría poca potencia.
+- **Siguiente:** estimar la tasa de descubrimiento con más semillas (texto, semillas 4–9). Opciones para subirla sin tocar los principios: poblaciones más grandes (más mutantes por generación; ahí la GPU sí ayudaría), más tiempo o una presión mayor.
+
