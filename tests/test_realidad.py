@@ -64,13 +64,13 @@ def test_sin_realidad_los_pesos_nuevos_no_mutan():
     g = gen.repetir(gen.luca(config.HerenciaCfg()), 300)
     gen.mutar(g, np.full(300, 0.2), config.HerenciaCfg(), np.random.default_rng(0))
     assert np.all(g["w"][:, :, gen.S_PRESION] == 0.0)
-    gen.mutar(g, np.full(300, 0.2), config.HerenciaCfg(), np.random.default_rng(0), n_sens=gen.NUM_SENS)
+    gen.mutar(g, np.full(300, 0.2), config.HerenciaCfg(), np.random.default_rng(0), n_sens=gen.NUM_SENS_REALIDAD)
     assert np.any(g["w"][:, :, gen.S_PRESION] != 0.0)
 
 
 def test_el_clima_llega_al_mundo(tmp_path):
     sim = Simulacion(_cfg(_serie(tmp_path / "c.npz")))
-    assert sim.n_sens == gen.NUM_SENS
+    assert sim.n_sens == gen.NUM_SENS_REALIDAD
     sim.correr(24 * 2 * 12)  # 12 días
     assert sim.pob.n > 0
     estaciones = {f["estacion"] for f in sim.historial if "estacion" in f}

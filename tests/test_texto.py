@@ -33,6 +33,18 @@ def test_estacion_y_pista_siguen_al_texto(tmp_path):
     assert sim.texto.meta[0]["letras"] == 9 and len(sim.texto.meta[0]["sha256"]) == 64
 
 
+def test_sensor_coincide(tmp_path):
+    sim = Simulacion(_cfg(tmp_path, "texto.sensor_coincide=true"))
+    assert sim.n_sens == gen.NUM_SENS
+    sim.t = 7  # letra vigente: "a"; anterior: "c" (−1)
+    s = sim.sensar(sim.ocupacion(), sim.validar_enlaces(sim.ocupacion()))
+    assert np.array_equal(s[:, gen.S_COINCIDE], s[:, gen.S_TIPO_AQUI] * -1.0)
+    sin = Simulacion(_cfg(tmp_path))
+    assert sin.n_sens == gen.NUM_SENS_SIN_REALIDAD
+    s = sin.sensar(sin.ocupacion(), sin.validar_enlaces(sin.ocupacion()))
+    assert not s[:, gen.S_COINCIDE].any()
+
+
 def test_barajado_conserva_las_letras_y_es_determinista(tmp_path):
     a = Simulacion(_cfg(tmp_path, "texto.barajar=true")).texto.serie
     b = Simulacion(_cfg(tmp_path, "texto.barajar=true")).texto.serie

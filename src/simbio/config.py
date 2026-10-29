@@ -300,6 +300,9 @@ class TextoCfg:
     archivos: str = "datos/textos/la_ultima_pregunta.txt"  # uno o varios, separados por comas, uno detrás de otro
     pasos_por_letra: int = 500
     barajar: bool = False  # control: las mismas letras en orden al azar (mismas frecuencias, sin secuencia)
+    # sensor local "coincide" = tipo_aqui × pista (+1: la comida de acá es la que nutría la letra anterior). Sin él,
+    # "comer el tipo contrario a la pista" es un O exclusivo que un gen lineal no puede expresar solo
+    sensor_coincide: bool = False
 
 
 @dataclass

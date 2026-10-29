@@ -40,12 +40,12 @@ PRIM_NO_ACCION = np.array([SENALAR, MEMORIA_A, MEMORIA_B])
  S_VECINOS, S_BLOQUEADO, S_DELTA_E, S_RUIDO,
  S_ENLACES, S_ENERGIA_SOCIOS, S_SOCIO_FRENTE, S_SIMILITUD_FRENTE, S_COMPLEJO_AQUI,
  S_RUMBO_SOCIOS_SIN, S_RUMBO_SOCIOS_COS, S_EMPUJE_SOCIOS, S_SENAL_SOCIOS, S_SENAL_PROPIA,
- S_MEMORIA_A, S_MEMORIA_B, S_TIPO_AQUI, S_PISTA, S_PRESION, S_LUZ) = range(26)
+ S_MEMORIA_A, S_MEMORIA_B, S_TIPO_AQUI, S_PISTA, S_PRESION, S_LUZ, S_COINCIDE) = range(27)
 SENSORES = ["const", "recurso_aqui", "recurso_frente", "recurso_frente_izq", "recurso_frente_der",
             "energia", "vecinos", "bloqueado", "delta_e", "ruido",
             "enlaces", "energia_socios", "socio_frente", "similitud_frente", "complejo_aqui",
             "rumbo_socios_sin", "rumbo_socios_cos", "empuje_socios", "senal_socios", "senal_propia",
-            "memoria_a", "memoria_b", "tipo_aqui", "pista", "presion", "luz"]
+            "memoria_a", "memoria_b", "tipo_aqui", "pista", "presion", "luz", "coincide"]
 SENS_MEMORIA = np.array([S_MEMORIA_A, S_MEMORIA_B])
 SENS_ESTACIONES = np.array([S_TIPO_AQUI, S_PISTA])
 SENS_RUMBO = np.array([S_RUMBO_SOCIOS_SIN, S_RUMBO_SOCIOS_COS, S_EMPUJE_SOCIOS])
@@ -54,6 +54,8 @@ NUM_SENS = len(SENSORES)
 # sensores de los mundos sin datos reales ni estímulos (fases 1-12): en ellos solo mutan estos pesos, así el azar
 # que se consume y las dinámicas no cambian por haber agregado al final los sensores nuevos (fase 12, etapas 2 y 3)
 NUM_SENS_SIN_REALIDAD = S_PRESION
+# con datos reales o estímulos (etapas 2 y 3) mutan también presión y luz, pero no los posteriores
+NUM_SENS_REALIDAD = S_COINCIDE
 
 CAMPOS = ("activo", "prim", "w", "b", "mu", "sens", "eta", "etiqueta", "cond")
 # condición de expresión de cada gen (fase 9): 0 siempre; 1/2 solo si la memoria A está alta/baja (> 0,5 o ≤ 0,5);

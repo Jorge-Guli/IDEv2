@@ -69,7 +69,9 @@ class Simulacion:
         # mundo del texto: generador propio (solo baraja en el control), no consume de los demás
         self.texto = (Texto(cfg.texto, np.random.default_rng(np.random.SeedSequence([cfg.sim.semilla, 7])))
                       if cfg.texto.activo else None)
-        self.n_sens = gen.NUM_SENS if cfg.realidad.activa or cfg.estimulos.activo else gen.NUM_SENS_SIN_REALIDAD
+        self.n_sens = (gen.NUM_SENS if cfg.texto.activo and cfg.texto.sensor_coincide else
+                       gen.NUM_SENS_REALIDAD if cfg.realidad.activa or cfg.estimulos.activo else
+                       gen.NUM_SENS_SIN_REALIDAD)
         if cfg.estimulos.activo:  # estímulos desde afuera (etapa 3): campo de luz y pulsos programados
             self.luz = xp.zeros((cfg.mundo.alto, cfg.mundo.ancho))
             self.agenda: list[tuple[int, int, int, float, float]] = []
@@ -237,6 +239,8 @@ class Simulacion:
             s[:, gen.S_PISTA] = xp.where(ve, valor, 0.0)
             if self.texto is not None:  # mundo del texto: todos ven la letra anterior, siempre
                 s[:, gen.S_PISTA] = self.texto.anterior(self.t)
+                if self.cfg.texto.sensor_coincide:  # ¿la comida de acá es del tipo que nutría la letra anterior?
+                    s[:, gen.S_COINCIDE] = s[:, gen.S_TIPO_AQUI] * s[:, gen.S_PISTA]
         if self.clima is not None and self.cfg.realidad.sensor_presion:
             s[:, gen.S_PRESION] = self.clima.presion[self.clima.hora(self.t)]
         if self.luz is not None:
