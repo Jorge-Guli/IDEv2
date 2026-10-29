@@ -1,6 +1,6 @@
 # Traspaso: estado del proyecto y cómo seguir
 
-Escrito el 2026-10-27 para que una nueva sesión de Claude (por ejemplo, Claude Desktop en el equipo del autor) retome el trabajo sin perder contexto. **Leer primero este documento**; después, según haga falta, `CLAUDE.md`, `docs/02-hoja-de-ruta.md` y `docs/06-universo-vivo.md`.
+Escrito el 2026-10-27 y actualizado el 2026-10-29 para que una nueva sesión de Claude (por ejemplo, Claude Desktop en el equipo del autor) retome el trabajo sin perder contexto. **Leer primero este documento**; después, según haga falta, `CLAUDE.md`, `docs/02-hoja-de-ruta.md` y `docs/06-universo-vivo.md`.
 
 ---
 
@@ -15,8 +15,9 @@ Escrito el 2026-10-27 para que una nueva sesión de Claude (por ejemplo, Claude 
 - **Autonomía total:** "eres libre de elegir el cómo experimentar y lograr el objetivo". No esperar aprobación para decisiones técnicas. Pedirle solo lo que no se pueda hacer sin él.
 - **Instrucciones concretas y en español.** El autor no es programador: explicar en lenguaje simple, sin jerga, con analogías cuando ayuden. Le interesa entender el *porqué*.
 - **Sigue trabajando mientras conversa:** "no pares a menos que te lo indique". Responder sus preguntas y continuar.
-- **Su equipo:** Windows, carpeta `C:\Desarrollo\IDEv2`, entorno virtual `.venv` (PowerShell: `.\.venv\Scripts\Activate.ps1`), 8 procesos para corridas paralelas (`--procesos 8`). Hasta ahora corría las corridas largas a mano y avisaba "resultados subidos". **Con Claude Desktop, Claude puede correrlas directamente en su equipo.**
-- **Docker Desktop:** consultar si está instalado antes de usar `docker compose`.
+- **Su equipo:** Windows, carpeta `C:\Desarrollo\IDEv2`, Python 3.12 del sistema (también hay `.venv`), 12 núcleos lógicos. **El autor usa la PC mientras corre todo:** corridas con `--procesos 6` como máximo y bajarles la prioridad apenas arrancan (`Get-Process python | % { $_.PriorityClass = 'Idle' }`). Hasta ahora corría las corridas largas a mano y avisaba "resultados subidos". **Con Claude Desktop, Claude puede correrlas directamente en su equipo.**
+- **Docker Desktop:** instalado. Contenedores `idev2-universo-1` e `idev2-clima-1`, con medio núcleo cada uno (`cpus: 0.5`) y `restart: unless-stopped`: tras un corte de luz retoman solos desde su último guardado (verificado el 2026-10-28).
+- **Ciudad:** Capitán Bermúdez, Santa Fe (Argentina).
 
 ## 3. Reglas del proyecto (de `CLAUDE.md`, no negociables)
 - **Idioma:** documentación, specs, comentarios y nombres del dominio en español. SHALL y MUST de OpenSpec en inglés.
@@ -51,7 +52,7 @@ Escrito el 2026-10-27 para que una nueva sesión de Claude (por ejemplo, Claude 
 
 ## 5. Comandos
 ```bash
-python -m pytest -q                       # 160 pasan; 3 se omiten sin GPU NVIDIA con CuPy
+python -m pytest -q                       # 192 pasan; 3 se omiten sin GPU NVIDIA con CuPy
 python -m simbio correr experiments/configs/base.toml --salida runs/x --semilla 1 --pasos 20000 [--set seccion.clave=valor]
 python -m simbio competir luca runs/x/poblacion.npz experiments/configs/base.toml --pasos 3000
 python -m simbio vivir experiments/configs/vivo.toml --salida runs/vivo/universo   # universo continuo (Ctrl+C guarda)
@@ -83,8 +84,10 @@ Detalle completo: `docs/02-hoja-de-ruta.md` (tabla de fases con enlaces), `docs/
 | 12, etapa 0 | Con la tasa de mutación reiniciada, tampoco se recluta |
 | **12, etapa 1** | **Modo continuo:** universo sin plazo, guardado y reanudación exactos, Docker sin red. Hecho y verificado |
 | 12, etapa 2 | **Clima real** de Capitán Bermúdez (2000–2025) regulando el mundo. Viable con `capacidad_max = 20` (el invierno extinguía). **El clima no premia anticipar:** la presión predice mal la lluvia y las rachas duran días (`experiments/fase12/valor_anticipar.py`) |
-| 12, etapa 3 | **Estímulos desde afuera** (luz y texto) por la carpeta `entradas/`, grabados en `estimulos.jsonl`. Claude le habla al universo `clima`. Piloto: indicio de que la selección mira la luz si alimenta (3/4); prerregistro v1 inválido por extinciones en invierno; v2 en curso |
-| 12, etapa 4 | **Depredación evolucionada** (`atacar`): evoluciona sola desde LUCA, pero **negativo prerregistrado**: 5/8 extinciones, monocultivos caníbales, sin más mutación ni diversidad. Próximo: especialización trófica |
+| 12, etapa 3 | **Estímulos desde afuera** (luz y texto) por la carpeta `entradas/`, grabados en `estimulos.jsonl`. **Serie de la luz v2–v5, negativa:** la luz aportaba solo el 0,3 % de la comida; con ~23 % (v4) la población se concentra en la luz (R2 p = 0,031), pero era geografía. Con lugares al azar (v5) desaparece. Sin percepción duradera ni aprendizaje en vida, una señal fugaz no se incorpora |
+| 12, etapa 4 | **Depredación evolucionada** (`atacar`): negativo prerregistrado (5/8 extinciones, monocultivos caníbales). La especialización trófica tenía un error (atacar creaba energía); corregida, no forma nichos |
+| 12, etapa 5 | **Archipiélago** (`src/simbio/archipielago.py`): islas iguales con migración contra aisladas. Negativo en adaptación (p = 0,71) y en tasa de mutación (p = 0,91). La migración solo previene extinciones (3/24 contra 8/24 islas) |
+| **12, texto** | **Mundo del texto** (`src/simbio/texto.py`): la estación la decide un texto (vocal o consonante) y la pista muestra la letra anterior. Cuatro pilotos sin predicción. **Hallazgo:** con `castigo = 0,2` no se selecciona ni siquiera elegir la comida en un mundo fijo; con 0,5 sí (0,997 en 1 de 2 semillas). Ver §8 |
 
 ### Lecciones que guían el diseño
 1. **El mundo tiene que premiar un rasgo antes de esperar que evolucione.** Se verifica con competencias o invasión (hay scripts en `experiments/fase7`, `fase10` y `fase11`).
@@ -94,6 +97,9 @@ Detalle completo: `docs/02-hoja-de-ruta.md` (tabla de fases con enlaces), `docs/
 5. **En un mundo fijo, la evolución se estanca y baja su propia tasa de mutación.** Es el argumento científico del universo vivo.
 6. **Errores típicos de diseño a mano:** genes de prueba que "comen" en celdas vacías por falta de sesgo, o que paralizan al organismo. Diagnosticar siempre las acciones por cepa antes de concluir.
 7. **Métricas:** cuidado con el aliasing de muestreo. El seguimiento de la memoria tenía un máximo práctico de 0,5 por medir cada 500 pasos con estaciones de 2000. Los scripts reportan ahora `seguimiento_corregido`.
+8. **Medir cuánto pesa una presión antes de esperar respuesta.** La luz aportaba el 0,3 % de la comida, y comer mal costaba tan poco (castigo 0,2) que ni en un mundo fijo convenía discriminar. Antes de un prerregistro, medir la fracción de la energía en juego o probar el caso fácil (por ejemplo, la estación fija).
+9. **Conservación:** toda regla que multiplica una transferencia de energía entre organismos debe cumplir ganancia ≤ lo quitado. La especialización trófica con tope 2,5 creaba energía.
+10. **Un O exclusivo no cabe en un gen lineal.** "Comer si el tipo difiere de la pista" exige memoria con genes condicionados, o un sensor que ya combine las dos cosas.
 
 ## 7. Estado actual del motor (opciones relevantes; todas en `src/simbio/config.py`)
 - **Estaciones** (`estaciones.*`): tipos de comida en parches o mosaico, estación oculta, pista, toxicidad inmediata o diferida, rampa de toxicidad, rampa de la pista, digestión inducible con inercia.
@@ -102,27 +108,48 @@ Detalle completo: `docs/02-hoja-de-ruta.md` (tabla de fases con enlaces), `docs/
 - **Decisión** (`fisica.decision`): "argmax" o "softmax", con `temperatura`.
 - **Realidad** (`realidad.*`, `src/simbio/realidad.py`): clima horario (radiación → recrecimiento, temperatura → costo basal, lluvia → qué comida nutre, sensor de presión); controles `barajar_dias` y `presion_desacoplada`. Datos en `datos/clima/` (los baja `experiments/herramientas/descargar_clima.py`).
 - **Estímulos** (`estimulos.*`, `src/simbio/estimulos.py`): campo de luz que alimenta y se percibe con el sensor `luz`; texto como secuencia de pulsos; `python -m simbio estimular <universo> --texto "..."`.
-- **Ataque** (`ataque.*`): primitiva `atacar`, protección por enlaces, especialización trófica (`especializacion_gamma`, junto con `fisica.maquinaria_gamma`).
-- **Neutralidad:** los sensores (`presion`, `luz`) y la primitiva nuevos van al final; en mundos sin ellos no mutan ni consumen azar (`gen.NUM_SENS_SIN_REALIDAD`, `gen.NUM_PRIM_SIN_ATAQUE`). Las huellas siguen idénticas.
-- **Docker:** dos servicios, `universo` (vivo.toml) y `clima` (clima.toml + estímulos; `./datos` en solo lectura).
+- **Estímulos, además:** `retraso_luz` (la luz anuncia la comida N pasos después, mediante un campo "abono") y `lugares_al_azar` (los pulsos caen en lugares sorteados con un generador propio, iguales en las dos condiciones).
+- **Ataque** (`ataque.*`): primitiva `atacar`, protección por enlaces, especialización trófica (`especializacion_gamma`, junto con `fisica.maquinaria_gamma`; factor con tope 1).
+- **Texto** (`texto.*`, `src/simbio/texto.py`): `archivos` (separados por comas), `pasos_por_letra`, `barajar` (control), `sensor_coincide` (sensor `coincide` = tipo_aqui × pista) y `pista` ("anterior" o "vigente", este último para diagnóstico). Requiere `estaciones.activa`.
+- **Archipiélago** (`src/simbio/archipielago.py`): `Archipielago(islas, migrantes, cada, semilla)`, anillo con generador propio. Script: `experiments/fase12/archipielago.py`.
+- **Neutralidad:** los sensores (`presion`, `luz`, `coincide`) y la primitiva nuevos van al final; en mundos sin ellos no mutan ni consumen azar (`gen.NUM_SENS_SIN_REALIDAD` = 24, `gen.NUM_SENS_REALIDAD` = 26, `gen.NUM_PRIM_SIN_ATAQUE`). Las huellas siguen idénticas.
+- **Docker:** dos servicios, `universo` (vivo.toml) y `clima` (clima.toml + estímulos; `./datos` en solo lectura), con `cpus: 0.5` cada uno.
 - **Universo vivo:** `src/simbio/continuo.py` (`vivir`, `mirar`, guardado con pickle portable entre CPU y GPU, volcado incremental de métricas y linaje, resiembra tras una extinción) y `experiments/configs/vivo.toml` (el mundo de la fase 11 desde LUCA puro).
 
 ## 8. Pasos a seguir (en orden)
 El diseño completo está en `docs/06-universo-vivo.md`. Resumen operativo:
 
-### Estado al 2026-10-27 (tarde)
-- **Hecho:** 8.0; las etapas 2 y 3 construidas; la etapa 4 construida y con su primer prerregistro (negativo). Detalle en `docs/bitacora/2026-10-27-fase12-*.md`.
-- **El autor vive en Capitán Bermúdez (Santa Fe)** y tiene Docker Desktop. Pidió que Claude alimente el universo e interactúe con él directamente.
-- **Pendiente:**
-  1. ~~evaluar la luz v2~~: hecho el 2026-10-28. La serie de la luz (v2 a v5) es negativa: ver `docs/bitacora/2026-10-28-fase12-luz-anticipa-prerregistro.md`;
-  2. ~~especialización trófica~~: corregida (atacar creaba energía) y sin nichos. Ver la evaluación de la Reina Roja;
-  3. un mundo donde anticipar pague (daño al empezar la lluvia, o respuesta lenta). La luz mostró que hace falta una señal duradera o aprendizaje en vida;
-  4. ~~archipiélago~~: hecho, negativo en adaptación y variación; la migración solo evita extinciones (3/24 contra 8/24 islas). Ver `docs/bitacora/2026-10-28-fase12-archipielago-prerregistro.md`;
-  - **Siguiente: el mundo del texto.** El texto real pasa letra por letra y quien anticipa la próxima letra consigue comida. Premia la memoria y la predicción, y ofrece patrones sin fin.
-    - Primero se calibra con un texto de dominio público.
-    - Después se corre con "La última pregunta" y "La última respuesta" de Asimov, elegidas por el autor por su simbolismo. Están en `datos/textos/`, con copia propia del autor e ignoradas por Git: **nunca subirlas ni copiar su contenido**. En la bitácora solo van su sha256 (`5a985d7c…` y `d6548766…`) y su tamaño.
-  5. el ODD, la hoja de ruta y el cambio de OpenSpec de la fase 12.
-- **Equipo:** corridas con 6 procesos como máximo, en prioridad Idle; contenedores con `cpus: 0.5`.
+### Estado al 2026-10-29
+**Leer primero.** Detalle de cada punto en la bitácora: `docs/bitacora/2026-10-27-fase12-*`, `2026-10-28-fase12-*` y `2026-10-29-fase12-mundo-texto.md`.
+
+**Hecho en la fase 12:** etapas 1 a 5, la serie de la luz y el motor del mundo del texto. Todo con tests y huellas sin cambios. Resultados en la tabla de §6.
+
+**El hallazgo más importante (2026-10-29):** con `estaciones.castigo = 0,2` (el valor de las fases 7–11 y de `vivo.toml`), comer la comida equivocada cuesta tan poco que **no se selecciona discriminar**, ni siquiera con la estación fija (acierto 0,51–0,53). Con 0,5 sí: 0,997 en 1 de 2 semillas. Con 1,0 se extinguen al terminar la rampa de toxicidad. Esto relee las fases 7–11: la memoria se mantuvo por el bono de la digestión, pero no había presión para usarla al decidir. Lo señaló también una revisión externa (Gemini), que coincide.
+
+**El universo vivo de Docker está congelado:** paso ~37 millones, 1 solo perfil genético, μ ≈ 0,00011 (el piso es 0,0001) y acierto 0,545. No cambiarle la física en caliente: dejarlo como registro y arrancar uno nuevo cuando se sepa qué castigo y qué rampa funcionan.
+
+**En curso al cierre de esta nota:** diagnóstico del texto con `texto.pista=vigente` (salida `runs/fase12/texto_diag_vigente.json`). Pregunta: ¿pueden al menos *reaccionar* a letras de 500 pasos?
+- Si aciertan alto, el mundo funciona y lo difícil es predecir.
+- Si no, alargar las letras o revisar la inercia de la digestión y el veneno diferido.
+
+Configuración de los pilotos del texto:
+- texto de calibración: `docs/00,01,04,06`;
+- `--set texto.sensor_coincide=true --set estaciones.castigo=0.5 --set estaciones.rampa_toxicidad=150000`;
+- 300 000 pasos.
+
+**Asimov:** "La última pregunta" y "La última respuesta", elegidas por el autor por su simbolismo, que aceptó el riesgo legal.
+- Están en `datos/textos/` (copia propia del autor), ignorada por Git.
+- **Nunca subirlas, copiarlas ni mostrar su contenido.** En la bitácora solo van su sha256 (`5a985d7c…` y `d6548766…`) y sus conteos (34 307 letras).
+- **Se usan solo en el experimento oficial prerregistrado,** cuando un piloto con el texto de calibración muestre que la predicción es alcanzable. Techos medidos: seguir la pista 0,242; base 0,545; invertir la pista 0,758, igual en los dos textos.
+
+**Plan acordado con el autor (en orden):**
+1. Terminar el diagnóstico del texto y, según el resultado, ajustar el mundo hasta que la predicción sea alcanzable en un piloto. Recién ahí, prerregistro con Asimov (texto contra barajado, semillas nuevas).
+2. Idea de Gemini: probar las poblaciones de la fase 11 con `castigo = 0,5` y rampa larga. ¿Se recluta la memoria cuando discriminar paga?
+3. Arrancar un **universo vivo nuevo** con la física que funcione (castigo y rampa), sin tocar el actual.
+4. **Archipiélago heterogéneo:** islas con selección divergente (clima real, texto o toxicidad alta, depredación). El homogéneo dio nulo.
+5. Poner al día el ODD (`docs/odd/modelo.md`, anexo de la fase 12 y relectura del castigo), la hoja de ruta, la síntesis y OpenSpec (fases 7–12).
+6. Interfaz web local (§8.2).
+7. Pendiente de diseño: un mundo donde aprender en vida pague (comida buena estable dentro de una vida y cambiante entre generaciones).
 
 ### 8.0 Al conectarse en el equipo del autor
 1. Ir a `C:\Desarrollo\IDEv2`, activar `.venv`, hacer `git pull --no-edit` y correr `python -m pytest -q`: tiene que dar 160 pasan y 3 omitidos.
@@ -167,7 +194,7 @@ Sustrato tipo *Tierra* dentro del contenedor: organismos como programas en un in
   - una condición "inducción sin cerrojo", para separar el peldaño de la persistencia física;
   - que la memoria sin gen decaiga hacia 0,5, o que la inducción actúe solo con un gen de memoria activo, para que la digestión de un organismo sin información quede neutra;
   - efectos laterales de la memoria inicial 0,5: la condición 6 anula el receptor y las condiciones 3 y 4 quedan fijas.
-- **ODD:** agregar el anexo de la fase 12 (modo continuo; después, los datos reales).
+- **ODD:** agregar el anexo de la fase 12 (modo continuo, datos reales, estímulos, ataque, archipiélago, texto) y la relectura del castigo 0,2 en las fases 7–11.
 - **Los scripts de competencias** (`experiments/fase10/*.py`, `experiments/fase11/*.py`) se corren desde la raíz del repo.
 - **Métricas viejas:** las fases 7–9 reportan `seguimiento` con el aliasing de muestreo. Sus conclusiones no cambian (valores ~0), pero conviene recordarlo al citarlas.
 
