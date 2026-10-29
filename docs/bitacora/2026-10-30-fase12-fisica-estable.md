@@ -34,4 +34,5 @@ Base local del texto de calibración en el último tercio (letras 667–1 000): 
 ## Piloto grande en la GPU (en curso)
 - 384² (~9 600 organismos al inicio), `sim.poblacion_inicial=1800`, física C, texto y barajado, semillas 21–22, 500 000 pasos, 2 procesos. Salida `runs/fase12/texto_grande.json`.
 - **Primer intento (2026-10-29, 4 procesos): colgó el equipo.** El pool de memoria de CuPy crecía sin límite (19 GB por proceso, más 5,5 GB de RAM). Corregido en `simbio/dispositivo.py` con un límite de 2 GB por proceso. Detalle en `docs/dispositivos.md`.
-- Un vigilante detiene las corridas si la RAM libre baja de 4 GB.
+- Un vigilante detiene las corridas si la simulación ocupa más de 2 GB con poca memoria disponible, o si la GPU pasa de 12 GB. Un primer vigilante, que miraba solo la RAM libre, frenó por error la corrida a las 2 h: la memoria la ocupaban otros programas del equipo.
+- Cada simulación usa un núcleo de CPU al 99 % y la GPU queda al ~60 %: el límite es la CPU que lanza los cálculos. Para aprovechar la GPU se sumaron las semillas 23–24 en paralelo (`runs/fase12/texto_grande_b.json`, 2 procesos más). Con las 4 simulaciones a la vez, la GPU queda al ~76 % y ocupa 7,2 GB.
