@@ -40,3 +40,19 @@ Motor: `texto.*` (apagado por defecto), `src/simbio/texto.py`, `tests/test_texto
 - Si con un sensor que hace la regla de un solo gen tampoco aparece, el problema no es la predicción: es que **casi no discriminan qué comida comer**.
 - Ese 0,53 es el mismo que en el archipiélago (0,53–0,55, con estaciones y pista rara), y en todo el mundo de la fase 11 el acierto apenas sube de 0,5.
 - **Prueba:** el mundo de la fase 11 con la pista de la estación **vigente** siempre visible (`p_pista = 1`), donde basta reaccionar. Con castigo 0,2 y con castigo 1,0. Si ni así suben de ~0,55, el techo está en la presión para discriminar, no en predecir.
+
+## Resultado del diagnóstico: el castigo de 0,2 casi no selecciona la discriminación
+Corridas con `reina_roja.py --condiciones sin`, mundo de `vivo.toml`, semillas 1–2, 100 000 pasos:
+
+| Mundo | Castigo | Acierto al final |
+|---|---|---|
+| Estación cambiante, pista vigente siempre visible | 0,2 | 0,52 y 0,52 |
+| Ídem | 1,0 | extintas (~31 000, al terminar la rampa de toxicidad) |
+| Estación **fija** (comer bien es "comer el tipo A", un gen lineal) | 0,2 | 0,53 y 0,51 |
+| Estación fija | **0,5** | 0,55 y **0,997** |
+
+- Con castigo 0,2, **ni siquiera con la estación fija** se aprende a elegir la comida: comer la equivocada cuesta tan poco que no conviene buscar otra.
+- Con 0,5, en una de dos semillas la discriminación aparece y se vuelve casi perfecta.
+- **Consecuencia para fases anteriores:** en el mundo de las fases 7 a 11 (castigo 0,2), la presión para distinguir la comida era mínima. Eso explica en parte por qué la memoria y la pista casi no se usaron. Hay que revisarlo al actualizar el ODD.
+- **Siguiente:** piloto 3 del texto con castigo 0,5 y el sensor coincide.
+
