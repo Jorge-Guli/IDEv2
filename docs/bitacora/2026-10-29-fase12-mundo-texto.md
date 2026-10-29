@@ -61,3 +61,9 @@ Corridas con `reina_roja.py --condiciones sin`, mundo de `vivo.toml`, semillas 1
 - **Sobrevivientes (semilla 3):** acierto 0,551 con el texto y 0,540 barajado. Llega a la base, pero no hay predicción todavía.
 - **Siguiente:** piloto 4 con la rampa de toxicidad en 150 000 pasos, para que la discriminación tenga tiempo de aparecer mientras el veneno sube, y 300 000 pasos en total.
 
+## Piloto 4 (castigo 0,5, rampa de toxicidad 150 000, coincide, semillas 1–3, 300 000 pasos): sin predicción
+- **Texto:** 3 de 3 vivas, acierto final 0,536–0,549. Es la base: comer siempre el tipo de las consonantes. Sin predicción.
+- **Barajado:** 2 de 3 extintas (194 811 y 282 635). La semilla 1 llegó a 0,59 antes de extinguirse.
+- **Lectura:** la rampa larga evita las extinciones con el texto, pero la población se queda en la estrategia de la base.
+- **Pregunta de diagnóstico:** ¿pueden *reaccionar* a letras que cambian cada 500 pasos, aunque sea sin predecir? Para responderla, opción `texto.pista = "vigente"`: la pista muestra la letra vigente y "comer si coincide" resuelve todo con un gen. Si así tampoco pasan la base, el obstáculo es seguir un mundo que cambia tan rápido (digestión, veneno diferido), no la predicción.
+

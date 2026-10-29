@@ -238,7 +238,8 @@ class Simulacion:
             valor = self.estacion() if e.pista_informativa else xp.asarray(np.where(u[1] < 0.5, 1.0, -1.0))
             s[:, gen.S_PISTA] = xp.where(ve, valor, 0.0)
             if self.texto is not None:  # mundo del texto: todos ven la letra anterior, siempre
-                s[:, gen.S_PISTA] = self.texto.anterior(self.t)
+                s[:, gen.S_PISTA] = (self.texto.vigente(self.t) if self.cfg.texto.pista == "vigente"
+                                     else self.texto.anterior(self.t))
                 if self.cfg.texto.sensor_coincide:  # ¿la comida de acá es del tipo que nutría la letra anterior?
                     s[:, gen.S_COINCIDE] = s[:, gen.S_TIPO_AQUI] * s[:, gen.S_PISTA]
         if self.clima is not None and self.cfg.realidad.sensor_presion:

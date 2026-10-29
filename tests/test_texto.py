@@ -45,6 +45,13 @@ def test_sensor_coincide(tmp_path):
     assert not s[:, gen.S_COINCIDE].any()
 
 
+def test_pista_vigente_para_diagnostico(tmp_path):
+    sim = Simulacion(_cfg(tmp_path, "texto.pista=vigente"))
+    sim.t = 7
+    s = sim.sensar(sim.ocupacion(), sim.validar_enlaces(sim.ocupacion()))
+    assert np.all(s[:, gen.S_PISTA] == sim.estacion())
+
+
 def test_barajado_conserva_las_letras_y_es_determinista(tmp_path):
     a = Simulacion(_cfg(tmp_path, "texto.barajar=true")).texto.serie
     b = Simulacion(_cfg(tmp_path, "texto.barajar=true")).texto.serie
