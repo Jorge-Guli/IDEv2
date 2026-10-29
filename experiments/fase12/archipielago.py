@@ -46,12 +46,15 @@ def correr(tarea):
         if all(s.pob.n == 0 for s in sims):
             break
     serie = []
-    largo = min(len(s.historial) for s in sims)
+    largo = max(len(s.historial) for s in sims)  # una isla extinta deja de registrar: cuentan las que siguen
     for k in range(20, largo + 1, 20):
-        fila = {"t": sims[0].historial[k - 1]["t"]}
+        con = [s for s in sims if len(s.historial) >= k and s.historial[k - 1].get("poblacion", 0) > 0]
+        if not con:
+            break
+        fila = {"t": con[0].historial[k - 1]["t"], "islas": len(con)}
         for c in CLAVES:
             v = [np.mean([f[c] for f in s.historial[k - 20:k] if c in f and f[c] == f[c]] or [np.nan])
-                 for s in sims if s.historial[k - 1].get("poblacion", 0) > 0]
+                 for s in con]
             v = [x for x in v if x == x]
             if v:
                 fila[c] = round(float(np.mean(v)), 5)
