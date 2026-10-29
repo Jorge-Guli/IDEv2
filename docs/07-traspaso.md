@@ -117,7 +117,10 @@ El diseño completo está en `docs/06-universo-vivo.md`. Resumen operativo:
   1. ~~evaluar la luz v2~~: hecho el 2026-10-28. La serie de la luz (v2 a v5) es negativa: ver `docs/bitacora/2026-10-28-fase12-luz-anticipa-prerregistro.md`;
   2. ~~especialización trófica~~: corregida (atacar creaba energía) y sin nichos. Ver la evaluación de la Reina Roja;
   3. un mundo donde anticipar pague (daño al empezar la lluvia, o respuesta lenta). La luz mostró que hace falta una señal duradera o aprendizaje en vida;
-  4. **siguiente:** etapa 5, archipiélago (islas con migración contra islas aisladas);
+  4. ~~archipiélago~~: hecho, negativo en adaptación y variación; la migración solo evita extinciones (3/24 contra 8/24 islas). Ver `docs/bitacora/2026-10-28-fase12-archipielago-prerregistro.md`;
+  - **Siguiente: el mundo del texto.** El texto real pasa letra por letra y quien anticipa la próxima letra consigue comida. Premia la memoria y la predicción, y ofrece patrones sin fin.
+    - Primero se calibra con un texto de dominio público.
+    - Después se corre con "La última pregunta" y "La última respuesta" de Asimov, elegidas por el autor por su simbolismo. Están en `datos/textos/`, con copia propia del autor e ignoradas por Git: **nunca subirlas ni copiar su contenido**. En la bitácora solo van su sha256 (`5a985d7c…` y `d6548766…`) y su tamaño.
   5. el ODD, la hoja de ruta y el cambio de OpenSpec de la fase 12.
 - **Equipo:** corridas con 6 procesos como máximo, en prioridad Idle; contenedores con `cpus: 0.5`.
 

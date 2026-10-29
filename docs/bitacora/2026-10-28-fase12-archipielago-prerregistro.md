@@ -42,3 +42,14 @@ En casi todas las fases, la población termina en un monocultivo: la tasa de mut
 - **R1 positiva:** primera mejora de la adaptación por estructura de población, sin cambiar la física. Siguiente: islas con físicas distintas (clima real, estímulos, más dura), que es la visión original de la etapa.
 - **R2 sola:** la migración sostiene la variación, pero esa variación no se traduce en mejor adaptación.
 - **Ambas negativas:** con islas homogéneas, la migración solo mezcla poblaciones que ya se parecen. Siguiente: islas heterogéneas, donde cada isla seleccione algo distinto.
+
+## Resultado (2026-10-29): negativo en R1 y R2; menos extinciones con migración
+- **Pares completos:** 7. La semilla 13 aislada perdió sus 3 islas antes del paso 106 475 y no tiene último tercio.
+- **R1 (acierto_comida):** 3 de 7 diferencias positivas (−0,012 a +0,010); p = 0,71. **No se cumple.** Las dos condiciones quedan en ~0,53–0,55.
+- **R2 (tasa_efectiva_media):** 1 de 7 positiva; p = 0,91. **No se cumple.** La tasa colapsa a ~0,001–0,002 en las dos condiciones, es decir, el monocultivo de siempre.
+- **Exploratorias:** perfiles, genes, población y enlazados, todo nulo (p de 0,55 a 0,73).
+- **Extinciones de islas (exploratorio, no prerregistrado como regla):** 3 de 24 con migración contra 8 de 24 aisladas, incluida una semilla con las 3 islas extintas. La migración evita extinciones, sobre todo en el primer tramo (pasos 28 000–35 000, cuando la toxicidad llega a pleno). Ojo: una isla que llega a cero no se repuebla, porque el anillo solo incluye islas con más de un organismo. El efecto es de **prevención**, no de recolonización.
+- **Lectura:** se cumple la expectativa escrita antes de correr. Con islas iguales, la migración mezcla poblaciones que ya se parecen: no aporta variación nueva ni mejora la adaptación. Solo amortigua los malos momentos.
+- **Siguiente:**
+  - islas heterogéneas, cada una seleccionando algo distinto;
+  - y, sobre todo, un mundo donde aprender o predecir pague: el "mundo del texto", con predicción de la próxima letra (ver `07-traspaso.md`).
