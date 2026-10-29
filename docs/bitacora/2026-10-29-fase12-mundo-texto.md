@@ -56,3 +56,8 @@ Corridas con `reina_roja.py --condiciones sin`, mundo de `vivo.toml`, semillas 1
 - **Consecuencia para fases anteriores:** en el mundo de las fases 7 a 11 (castigo 0,2), la presión para distinguir la comida era mínima. Eso explica en parte por qué la memoria y la pista casi no se usaron. Hay que revisarlo al actualizar el ODD.
 - **Siguiente:** piloto 3 del texto con castigo 0,5 y el sensor coincide.
 
+## Piloto 3 (castigo 0,5, sensor coincide, semillas 1–3, 200 000 pasos): extinciones
+- **Extinciones:** 4 de 6, todas al terminar la rampa de toxicidad (pasos 30 878–56 244). Con letras que cambian cada 500 pasos, el veneno a pleno llega antes de que la discriminación evolucione.
+- **Sobrevivientes (semilla 3):** acierto 0,551 con el texto y 0,540 barajado. Llega a la base, pero no hay predicción todavía.
+- **Siguiente:** piloto 4 con la rampa de toxicidad en 150 000 pasos, para que la discriminación tenga tiempo de aparecer mientras el veneno sube, y 300 000 pasos en total.
+
