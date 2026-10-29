@@ -48,7 +48,7 @@ El cruce está cerca de 300², y de ahí sale el umbral por defecto del modo aut
    ```
    Las GPU recientes (serie RTX 50) requieren CUDA 12.8 o superior. Si la instalación para CUDA 13 no está disponible para tu plataforma, prueba la de CUDA 12: el controlador de una versión 13 también ejecuta programas compilados para la 12.
    El extra incluye `[ctk]`, que instala por pip las cabeceras de CUDA que CuPy necesita para compilar. Sin ellas aparece *"Failed to find CUDA headers"*.
-3. **Instala un solo paquete de CuPy.** Si instalaste más de uno, desinstálalos todos primero (`pip uninstall cupy-cuda12x cupy-cuda13x`).
+3. **Instala un solo paquete de CuPy.** Si instalaste más de uno, desinstálalos todos primero (`pip uninstall cupy-cuda12x cupy-cuda13x`). Comparten la carpeta `cupy`: desinstalar uno solo borra también los archivos del otro, así que después hay que reinstalar el que queda (`pip install --force-reinstall "cupy-cuda13x[ctk]"`).
 4. Verifica con `python -m simbio dispositivo`.
 
 Sin GPU NVIDIA (AMD, Intel, Apple), el simulador funciona igual en CPU.
