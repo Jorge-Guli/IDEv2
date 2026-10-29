@@ -3,6 +3,7 @@
 Proyecto de investigación en vida artificial (IDE: Inteligencia Distribuida Emergente; simulador `simbio`): organismos simples que se adaptan y se asocian, para estudiar si evolución tras evolución emergen organizaciones más complejas e inteligencia. **Para retomar el trabajo, leer primero `docs/07-traspaso.md`** (estado actual, cómo trabaja el autor y próximos pasos). Fundamentos: `docs/00-hipotesis-fundacional.md` y `docs/01-metodologia.md`.
 
 ## Idioma
+**Responder al autor siempre en español**: no entiende inglés. Esto incluye resúmenes, preguntas, botones y avisos intermedios.
 Documentación, specs, comentarios y nombres del dominio en **español**. Los encabezados estructurales y las palabras SHALL/MUST de OpenSpec van en inglés.
 
 ## Flujo de trabajo
