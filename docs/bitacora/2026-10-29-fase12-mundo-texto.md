@@ -77,3 +77,17 @@ Corridas con `reina_roja.py --condiciones sin`, mundo de `vivo.toml`, semillas 1
   - (a) sin digestión inducible (`estaciones.induccion = 0`);
   - (b) letras de 2000 pasos, como las estaciones de la fase 11.
 
+## Resultado de los diagnósticos reactivos
+| Variante (pista vigente, coincide, castigo 0,5, rampa 150 000, 300 000 pasos) | Acierto final, texto | Barajado |
+|---|---|---|
+| Base (piloto reactivo) | 0,53–0,54 | 0,53–0,55 |
+| (a) **Sin digestión inducible** (`induccion = 0`) | 0,55, **0,97**, 0,54 | 0,57, 0,56, 0,54 |
+| (b) Letras de 2000 pasos | 0,54, 0,54 (1 extinta) | 0,53–0,54 |
+
+- **Sin la inercia de la digestión,** una población (texto, semilla 2) descubrió cómo seguir la comida: el acierto subió de 0,54 a 0,78 entre los pasos 200 000 y 260 000, y a 0,97 al final.
+- La digestión inducible, que premia quedarse con un tipo, era un freno para seguir cambios rápidos.
+- El descubrimiento es un **evento raro** (1 de 6 en 300 000 pasos, como 1 de 2 con la estación fija). Hacen falta corridas más largas o más semillas.
+- **Alargar las letras no ayuda.**
+- **Consecuencia para el diseño:** con `coincide`, la regla reactiva ("comer si coincide") y la predictiva ("comer si NO coincide con la letra anterior") tienen la misma complejidad: un gen. Lo que cambia es el premio (1,0 contra ~0,76).
+- **Siguiente:** piloto 5, la tarea real (`pista = anterior`) con `induccion = 0`, castigo 0,5, rampa 150 000 y 500 000 pasos.
+
