@@ -35,4 +35,8 @@ Base local del texto de calibración en el último tercio (letras 667–1 000): 
 - 384² (~9 600 organismos al inicio), `sim.poblacion_inicial=1800`, física C, texto y barajado, semillas 21–22, 500 000 pasos, 2 procesos. Salida `runs/fase12/texto_grande.json`.
 - **Primer intento (2026-10-29, 4 procesos): colgó el equipo.** El pool de memoria de CuPy crecía sin límite (19 GB por proceso, más 5,5 GB de RAM). Corregido en `simbio/dispositivo.py` con un límite de 2 GB por proceso. Detalle en `docs/dispositivos.md`.
 - Un vigilante detiene las corridas si la simulación ocupa más de 2 GB con poca memoria disponible, o si la GPU pasa de 12 GB. Un primer vigilante, que miraba solo la RAM libre, frenó por error la corrida a las 2 h: la memoria la ocupaban otros programas del equipo.
+- **Segundo corte (18:41):** una actualización cerró la app de Claude, y con ella las simulaciones, que eran procesos hijos suyos. Desde ahora:
+  - se lanzan desligadas de la app, con `Win32_Process.Create` y prioridad mínima;
+  - `mundo_texto.py` guarda cada corrida al terminar (`*.parcial.json`); si se corta, al relanzar con el mismo comando se saltean las que ya terminaron.
+- Relanzado a las 20:30 en un solo trabajo (semillas 21–24, 8 corridas), con 2 procesos: con 4, la memoria disponible del equipo bajó a 1 GB por los otros programas abiertos.
 - Cada simulación usa un núcleo de CPU al 99 % y la GPU queda al ~60 %: el límite es la CPU que lanza los cálculos. Para aprovechar la GPU se sumaron las semillas 23–24 en paralelo (`runs/fase12/texto_grande_b.json`, 2 procesos más). Con las 4 simulaciones a la vez, la GPU queda al ~76 % y ocupa 7,2 GB.

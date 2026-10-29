@@ -98,16 +98,26 @@ def main() -> None:
     args = a.parse_args()
     tareas = [(c, s, args.pasos, args.archivos, args.pasos_por_letra, tuple(args.set))
               for c in args.condiciones for s in args.semillas]
+    salida = RAIZ / args.salida
+    salida.parent.mkdir(parents=True, exist_ok=True)
+    parcial = salida.with_suffix(".parcial.json")
+    # cada corrida se guarda al terminar: un corte (luz, cierre de la app) no borra las que ya terminaron
+    hechas = json.loads(parcial.read_text(encoding="utf-8")) if parcial.exists() else []
+    listas = {(r["condicion"], r["semilla"]) for r in hechas}
+    res = list(hechas)
     with Pool(args.procesos) as pool:
-        res = pool.map(correr, tareas)
+        for r in pool.imap_unordered(correr, [t for t in tareas if (t[0], t[1]) not in listas]):
+            res.append(r)
+            parcial.write_text(json.dumps(res, ensure_ascii=False), encoding="utf-8")
+            print("terminada", r["condicion"], r["semilla"], flush=True)
+    orden = {(t[0], t[1]): k for k, t in enumerate(tareas)}
+    res.sort(key=lambda r: orden.get((r["condicion"], r["semilla"]), len(orden)))
     for r in res:
         f = r["serie"][-1] if r["serie"] else {}
         print(r["condicion"], r["semilla"], "extinta" if r["extinta_en"] else "viva",
               {k: f.get(k) for k in ("t", "poblacion", "acierto_comida", "tiene_memoria_a", "memoria_alineada_a")})
     informe = evaluar(res, args.pasos - args.pasos // 3) if set(args.condiciones) == set(CONDICIONES) else {}
     print(json.dumps(informe, ensure_ascii=False, indent=2))
-    salida = RAIZ / args.salida
-    salida.parent.mkdir(parents=True, exist_ok=True)
     salida.write_text(json.dumps({"corridas": res, "reglas": informe}, ensure_ascii=False, indent=2),
                       encoding="utf-8")
 
