@@ -97,3 +97,8 @@ Corridas con `reina_roja.py --condiciones sin`, mundo de `vivo.toml`, semillas 1
 - **Lectura:** el cuello de botella es la **tasa de descubrimiento**. La regla es de un gen, pero aparece en pocas poblaciones. Con 1 de 3 y diferencias chicas, un prerregistro de 8 semillas tendría poca potencia.
 - **Siguiente:** estimar la tasa de descubrimiento con más semillas (texto, semillas 4–9). Opciones para subirla sin tocar los principios: poblaciones más grandes (más mutantes por generación; ahí la GPU sí ayudaría), más tiempo o una presión mayor.
 
+## Tasa de descubrimiento (texto, semillas 4–9, mismo mundo que el piloto 5)
+- **Último tercio:** 0,575, extinta (155 692), 0,561, 0,549, 0,555, 0,532.
+- **Junto con el piloto 5 (8 corridas vivas):** 4 superan a todos los barajados (0,555–0,579 contra un máximo barajado de 0,551).
+- Se pasa al prerregistro con los textos de Asimov: `2026-10-30-fase12-asimov-prerregistro.md`.
+
