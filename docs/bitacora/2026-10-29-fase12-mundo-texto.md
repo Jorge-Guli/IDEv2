@@ -33,3 +33,10 @@ Motor: `texto.*` (apagado por defecto), `src/simbio/texto.py`, `tests/test_texto
 - **Es una ayuda de percepción, no una solución dada:** el sensor también existe en el control barajado, donde no sirve, porque ahí la pista no predice nada.
 - Si funciona, el experimento oficial con Asimov mide si la evolución aprovecha la estructura del lenguaje. La memoria queda para clases más ricas (más de dos), donde mirar más atrás sí paga.
 - **Corrida:** semillas 1–3, 200 000 pasos.
+- **Resultado:** igual que sin el sensor. Acierto 0,52–0,54 en las dos condiciones, sin diferencia (p = 0,5). Ninguna llega a 0,545.
+- La memoria A se fija en algunas corridas (texto 2 y 3: 93–99 %) y desaparece en otras, sin relación con el acierto.
+
+## Diagnóstico en curso
+- Si con un sensor que hace la regla de un solo gen tampoco aparece, el problema no es la predicción: es que **casi no discriminan qué comida comer**.
+- Ese 0,53 es el mismo que en el archipiélago (0,53–0,55, con estaciones y pista rara), y en todo el mundo de la fase 11 el acierto apenas sube de 0,5.
+- **Prueba:** el mundo de la fase 11 con la pista de la estación **vigente** siempre visible (`p_pista = 1`), donde basta reaccionar. Con castigo 0,2 y con castigo 1,0. Si ni así suben de ~0,55, el techo está en la presión para discriminar, no en predecir.
