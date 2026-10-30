@@ -143,7 +143,12 @@ El diseño completo está en `docs/06-universo-vivo.md`. Resumen operativo:
 
 **Fase 13, desarrollo (en curso, `openspec/changes/fase-13-desarrollo/`):**
 - **Peldaños 1 y 2 hechos:** red regulatoria de 8 reguladores por célula, heredable, con señal por contacto (`desarrollo.*`, tests en `tests/test_desarrollo.py`). La inhibición lateral diferencia a dos hermanas idénticas.
-- **Piloto prerregistrado en curso:** red contra inerte, semillas 1–6, 300 000 pasos, universo de la fase 3. Script `experiments/fase13/piloto.py`, salida `runs/fase13/piloto.json`.
+- **Piloto en el universo natural (`natural.toml`), nulo.** Red contra inerte, semillas 1–6, 300 000 pasos, sin extinciones.
+  - P1 se satura: por deriva, todos tienen un gen con peso > 0,5. Lección: medir el uso contra el control, no con umbral absoluto.
+  - P2 no se puede evaluar: casi no hay grupos de 3 o más.
+  - Indicio: la selección achica los pesos que leen la red (6 de 6 semillas), así que hoy estorba.
+  - La depredación evolucionó sola en todas las corridas, y la asociación desaparece.
+  - Lectura: falta el cuerpo, no la red. Detalle en `docs/bitacora/2026-10-30-fase13-red-regulatoria-prerregistro.md`.
 - **Siguientes, uno por vez:**
   - el cuerpo como unidad que se reproduce (línea germinal y cuello de botella unicelular);
   - reproducción sexual;

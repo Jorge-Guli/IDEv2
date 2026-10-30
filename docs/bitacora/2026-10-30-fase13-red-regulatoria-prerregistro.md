@@ -40,3 +40,28 @@ Si cada célula tiene una red de genes que se encienden y apagan entre sí, con 
 - **P1 y P2:** la evolución adopta la red y la usa para diferenciar células dentro del grupo. Es el primer tipo celular, y se sigue a la fase siguiente: el cuerpo como unidad que se reproduce.
 - **P1 sin P2:** la red se usa, pero como memoria individual, no para diferenciar.
 - **Ninguno:** en este universo la red no paga. Se registra como dato y no se retoca el universo (principio 7). El paso siguiente sería el que la naturaleza dio antes de los tejidos: el cuerpo como unidad de reproducción, que alinea los intereses de las células.
+
+## Resultado (2026-10-30, 14:14): ninguno de los dos criterios se cumple
+12 corridas de 300 000 pasos (~5 600–10 400 generaciones), **0 extinciones**. Medido desde el paso 200 000.
+
+| | red | inerte | Resultado |
+|---|---|---|---|
+| **P1** `con_gen_regulado` | 1,0 en las 6 | 1,0 en las 6 | diferencias 0, p = 1,0: **no cumple** |
+| **P2** diferenciación relativa | medible en 2 semillas | medible en 2 semillas | solo 1 par comparable, p = 0,5: **no evaluable** |
+| población media | 652–1 047 | 572–1 038 | p = 0,33 |
+
+**Por qué falla P1:** la medida se satura. Los pesos que leen la red mutan en todos los genes activos, y por deriva alguno supera 0,5 enseguida, incluso donde nadie los lee. El umbral se fijó sin ver cuánto deriva el control. Queda como lección: medir el uso contra la deriva del control, no con un umbral absoluto.
+
+**Por qué P2 no se puede evaluar:** casi no hay grupos de 3 o más (≤ 0,6 % de los organismos en 11 de 12 corridas). Sin grupos no hay dónde diferenciarse.
+
+**Exploratorias (sin prerregistrar, solo indicios):**
+- **La red se poda.** El peso medio con que los genes leen la red es menor en la red que en el inerte en las 6 semillas (0,34–0,49 contra 0,50–0,61; p = 1/64 en la dirección contraria a la predicha, calculado después de ver los datos). En el inerte los pesos derivan libres; en la red la selección los achica. Leer la red, tal como está, estorba más de lo que sirve.
+- **La depredación evoluciona sola** (principio 7 en acción): a los 1 000 pasos la tiene el 61–81 % de los organismos, y a los 20 000, todos. Del 50 al 70 % ha comido a otro y ~11 % ataca en cada paso. Nadie la programó: surgió al escasear la comida.
+- **La asociación desaparece.** Los enlazados llegan al 15 % a los 5 000 pasos y caen a 0 en la red; en el inerte se sostienen ~10 %, pero casi todo en una semilla (la 6, con 64 %). Con depredadores por todos lados, pegarse a otro no rinde, o el socio termina siendo comida.
+- La población oscila entre ~530 y ~1 700 siguiendo el clima real y la depredación, sin extinguirse.
+
+**Lectura:**
+- En este universo, la red regulatoria no paga todavía.
+- El cuello de botella de la diferenciación no es la red: es que **no hay cuerpos**. Las células no se quedan juntas, así que no hay dónde ser distintas.
+- Es lo previsto en "Ninguno": el paso que sigue es el que la naturaleza dio antes de los tejidos, **el cuerpo como unidad que se reproduce**: la célula se divide, la hija queda pegada y el grupo nace de una sola célula.
+- No se toca el universo (principio 7).
