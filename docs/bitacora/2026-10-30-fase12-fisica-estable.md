@@ -31,7 +31,25 @@ Base local del texto de calibración en el último tercio (letras 667–1 000): 
 - El acierto queda 0,01–0,03 sobre la base: algo de selección de la comida, ninguna señal de usar la alternancia (máximo 0,557 contra 0,766 posible).
 - **Siguiente:** mundo grande en la GPU con la física C, texto contra barajado. Con 16 veces más superficie hay ~16 veces más organismos, y más chances de que aparezca la mutación que invierte la pista.
 
-## Piloto grande en la GPU (en curso)
+## Piloto grande en la GPU
+### Resultado (2026-10-30 10:36): nulo
+Las 8 corridas llegaron a 500 000 pasos, **sin extinciones** (texto 0, barajado 0). Salida `runs/fase12/texto_grande.json`.
+
+| Semilla | Acierto texto | Acierto barajado | Diferencia | Población texto / barajado |
+|---|---|---|---|---|
+| 21 | 0,5397 | 0,5473 | −0,007 | 2 267 / 2 135 |
+| 22 | 0,5400 | 0,5439 | −0,004 | 2 394 / 2 378 |
+| 23 | 0,5351 | 0,5344 | −0,002 | 2 428 / 2 429 |
+| 24 | 0,5396 | 0,5538 | −0,012 | 1 179 / 1 107 |
+
+(Diferencias del resumen pareado de `evaluar`, sobre el último tercio; la tabla muestra el último punto.)
+
+- **R1 (acierto texto > barajado):** las 4 diferencias son negativas, p = 1,0. Lejos del criterio del piloto (≥ 0,05).
+- **Memoria:** prácticamente no aparece. La fracción de organismos con memoria es de 0,00004 a 0,0015 en las dos condiciones. Sin memoria, nadie puede usar la secuencia de letras; solo reacciona a lo que tiene delante. Eso explica que texto y barajado den lo mismo.
+- **Escala:** 20 veces más organismos que en el mundo chico (1 100–2 400 contra 37–175), con el mismo acierto. **El cuello de botella no es la cantidad de organismos sino que la memoria no se selecciona.**
+- **Conclusión:** la física C es estable (sirve para lo que siga), pero repetir este diseño con más pasos o más semillas no tiene sentido. Antes de volver al texto hay que lograr un mundo donde la memoria pague por sí misma; eso coincide con el punto del plan "un mundo donde aprender en vida pague".
+
+### Cómo se corrió
 - 384² (~9 600 organismos al inicio), `sim.poblacion_inicial=1800`, física C, texto y barajado, semillas 21–22, 500 000 pasos, 2 procesos. Salida `runs/fase12/texto_grande.json`.
 - **Primer intento (2026-10-29, 4 procesos): colgó el equipo.** El pool de memoria de CuPy crecía sin límite (19 GB por proceso, más 5,5 GB de RAM). Corregido en `simbio/dispositivo.py` con un límite de 2 GB por proceso. Detalle en `docs/dispositivos.md`.
 - Un vigilante detiene las corridas si la simulación ocupa más de 2 GB con poca memoria disponible, o si la GPU pasa de 12 GB. Un primer vigilante, que miraba solo la RAM libre, frenó por error la corrida a las 2 h: la memoria la ocupaban otros programas del equipo.
