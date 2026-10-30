@@ -22,6 +22,7 @@ Escrito el 2026-10-27 y actualizado el 2026-10-29 para que una nueva sesión de 
 ## 3. Reglas del proyecto (de `CLAUDE.md`, no negociables)
 - **Idioma:** documentación, specs, comentarios y nombres del dominio en español. SHALL y MUST de OpenSpec en inglés.
 - **La física (primitivas y costos) es fija e igual para todos; qué acciones tiene y usa cada organismo sale de su genoma.**
+- **El universo no se acomoda al organismo** (autor, 2026-10-30): solo se modifica para que sea más fiel a la realidad del autor, con la mayor conexión segura posible con el mundo real. Nunca para facilitar un resultado. Ver principio 7 de `docs/01-metodologia.md`. Esto reemplaza la vieja práctica de "verificar que la física premia el rasgo y, si no, cambiarla".
 - **Sin LLMs ni modelos preentrenados dentro de los organismos. Percepción solo local.**
 - **Toda afirmación se compara con un control y con varias semillas.** Los criterios son numéricos, se prerregistran en `docs/bitacora/` antes de correr y se verifican con un script en `experiments/<fase>/`.
 - **Determinismo:** misma configuración y semilla, mismo resultado. Toda la aleatoriedad pasa por los generadores de la simulación (en CPU).
@@ -90,7 +91,7 @@ Detalle completo: `docs/02-hoja-de-ruta.md` (tabla de fases con enlaces), `docs/
 | **12, texto** | **Mundo del texto** (`src/simbio/texto.py`): la estación la decide un texto (vocal o consonante) y la pista muestra la letra anterior. Cuatro pilotos sin predicción. **Hallazgo:** con `castigo = 0,2` no se selecciona ni siquiera elegir la comida en un mundo fijo; con 0,5 sí (0,997 en 1 de 2 semillas). Ver §8 |
 
 ### Lecciones que guían el diseño
-1. **El mundo tiene que premiar un rasgo antes de esperar que evolucione.** Se verifica con competencias o invasión (hay scripts en `experiments/fase7`, `fase10` y `fase11`).
+1. **El mundo tiene que premiar un rasgo antes de esperar que evolucione.** Se verifica con competencias o invasión (hay scripts en `experiments/fase7`, `fase10` y `fase11`). Desde el 2026-10-30 esto sirve para **entender** por qué algo no aparece, no para retocar el mundo hasta que aparezca (principio 7).
 2. **La evolución toma atajos:** aprender en vida, selección espacial, "recordar" lo que tiene debajo. Cada mundo nuevo se audita y los atajos se bloquean con física, verificando con duelos directos.
 3. **Una población sola engaña:** varias semillas, jardín común y modelos nulos.
 4. **Cada peldaño de una innovación necesita premio propio** (Lenski et al. 2003, Avida: ver `docs/05-estado-del-arte.md`).
@@ -136,8 +137,9 @@ El diseño completo está en `docs/06-universo-vivo.md`. Resumen operativo:
 
 **Física estable (2026-10-29):** `castigo = 0,35` con `rampa_toxicidad = 300 000` da 0 extinciones de 4 (`docs/bitacora/2026-10-30-fase12-fisica-estable.md`).
 
-**En curso:** el mundo del texto con ~10 000 organismos (384²) en la GPU, semillas 21–24, texto contra barajado, salida `runs/fase12/texto_grande.json`. Se guarda cada corrida al terminar (`*.parcial.json`); para reanudar, relanzar el mismo comando.
-- Criterio de piloto: diferencia pareada ≥ 0,05 contra barajado, no contra el techo.
+**Piloto grande del texto (2026-10-30): nulo.** ~2 000 organismos (384²) en la GPU, semillas 21–24, sin extinciones, pero el texto no supera al barajado (las 4 diferencias negativas, p = 1,0). Casi ningún organismo tiene memoria (≤ 0,15 %). Más organismos no cambian nada: la memoria no se selecciona. Detalle en `docs/bitacora/2026-10-30-fase12-fisica-estable.md`.
+
+**Giro acordado con el autor (2026-10-30), principio 7 de la metodología:** el objetivo final es un ser inteligente con el que el autor pueda interactuar. No se diseñan mundos a medida de un rasgo. El universo solo se cambia para acercarlo a la realidad: clima real, cambio climático, El Niño y La Niña, gravedad, espacio continuo en 3D y las acciones del autor como parte del ambiente.
 
 Configuración de los pilotos del texto:
 - texto de calibración: `docs/00,01,04,06`;
@@ -162,7 +164,10 @@ Configuración de los pilotos del texto:
 4. **Archipiélago heterogéneo:** islas con selección divergente (clima real, texto o toxicidad alta, depredación). El homogéneo dio nulo.
 5. ~~ODD (anexo de la fase 12 y relectura del castigo) y hoja de ruta~~ hechos el 2026-10-29. Faltan la síntesis (`docs/03-sintesis.md`) y OpenSpec (fases 7–12).
 6. Interfaz web local (§8.2).
-7. Pendiente de diseño: un mundo donde aprender en vida pague (comida buena estable dentro de una vida y cambiante entre generaciones).
+7. ~~Un mundo a medida donde aprender en vida pague~~ descartado por el principio 7. En su lugar, **universo más fiel a la realidad**, a diseñar con el autor:
+   - clima real con tendencias de largo plazo (cambio climático) y ciclos como El Niño y La Niña, que hoy afectan al mundo;
+   - las acciones del autor como parte del ambiente, por canales seguros;
+   - a largo plazo, espacio continuo en 3D con gravedad, en lugar de la grilla. Es un motor nuevo y un cambio grande: diseñarlo como fase propia.
 
 ### 8.0 Al conectarse en el equipo del autor
 1. Ir a `C:\Desarrollo\IDEv2`, activar `.venv`, hacer `git pull --no-edit` y correr `python -m pytest -q`: tiene que dar 160 pasan y 3 omitidos.

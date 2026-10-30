@@ -14,6 +14,7 @@ Documentación, specs, comentarios y nombres del dominio en **español**. Los en
 
 ## Principios que no se negocian
 - La física (primitivas y costos) es fija; **qué acciones tiene y usa cada organismo sale de su genoma**.
+- **El universo no se acomoda al organismo.** Solo se modifica para que sea más fiel a la realidad del autor (clima, cambio climático, El Niño, gravedad, espacio en 3D, sus propias acciones), nunca para facilitar un resultado buscado. Una extinción es un dato, no algo que corregir. Lo que se amplía es qué permite el genoma. Ver principio 7 de `docs/01-metodologia.md`.
 - Nada de LLMs ni modelos preentrenados dentro de los organismos.
 - Percepción solo local.
 - Toda afirmación se compara con un control y varias semillas.

@@ -34,6 +34,13 @@ Complementamos con el **protocolo ODD** (*Overview, Design concepts, Details*; G
 4. **Nada de inteligencia importada.** No se usan LLMs ni modelos preentrenados dentro de los organismos.
 5. **Toda afirmación se contrasta con un control.** Cada resultado se compara con la misma simulación sin el mecanismo que se pretende estudiar.
 6. **Reproducibilidad.** Misma configuración + misma semilla = mismo resultado.
+7. **El universo no se acomoda al organismo; el organismo se adapta al universo** (pedido del autor, 2026-10-30). Las células de una persona viven en un universo que no se ajusta a su conveniencia: se adaptan, y si no, lo hacen las generaciones siguientes. Por eso:
+   - **El universo solo se modifica para que sea más fiel a la realidad del autor**, nunca para facilitar un resultado buscado (que aparezca la memoria, que no se extingan, que acierten más). Una extinción es un dato, no algo que corregir retocando costos.
+   - **Cuanta más conexión segura con el mundo real, mejor:** clima real, cambio climático, fenómenos como El Niño y La Niña, luz, y las acciones del propio autor. Entran como parte de un ambiente indiferente, no como premio.
+   - **Hacia la física real:** a largo plazo, moverse en un espacio continuo de tres dimensiones con gravedad, en lugar de una grilla plana.
+   - **Lo que sí se amplía es qué pueden llegar a ser los organismos** (qué permite su genoma: memoria, señales, asociarse), no lo que el mundo les regala.
+   - Elegir un universo rico (con regularidades, cambios, escasez y otros seres) no viola esta regla, como no la viola que la Tierra tenga estaciones. La viola cambiarlo después según les vaya.
+   - Los ajustes hechos en las fases 7–12 (castigo, rampa de toxicidad) fueron acomodar el mundo y quedan registrados como tales.
 
 ## 3. Hoja de ruta
 
