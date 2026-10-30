@@ -43,6 +43,22 @@ def test_los_enlaces_protegen():
     assert p["E"][1] == 45.0  # daño / (1 + 1 enlace)
 
 
+def test_el_tamano_importa():
+    # fila 0 1 2 3: 1-2-3 forman un grupo de 3; 0 suelto ataca a 1, y 3 (en el grupo) ataca a otro suelto 4
+    sim = _sim(6, "ataque.tamano=true")
+    p = sim.pob
+    p["x"][:] = [2, 3, 4, 5, 6, 10]
+    for a, b in ((1, 2), (2, 3)):
+        p["socio"][a, 2] = p["id"][b]
+        p["socio"][b, 6] = p["id"][a]
+    _atacan(sim, [0, 3])
+    assert np.isclose(p["E"][1], 50.0 - 10.0 * (1 / 9) / (1 + 1 / 9))  # suelto contra grupo de 3: 0,1
+    assert np.isclose(p["E"][4], 50.0 - 10.0 * 0.9)  # grupo de 3 contra suelto: 0,9
+    sim = _sim(2, "ataque.tamano=true")
+    _atacan(sim, [0])
+    assert sim.pob["E"][1] == 45.0  # entre iguales, la mitad
+
+
 def test_varios_atacantes_se_reparten_y_el_muerto_no_actua():
     sim = _sim(3)
     p = sim.pob

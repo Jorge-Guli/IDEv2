@@ -527,7 +527,12 @@ class Simulacion:
         if i.size == 0:
             return None
         dano = xp.full(i.size, c.fuerza)
-        if c.proteccion_enlaces:
+        if c.tamano:  # el tamaño importa: un grupo chico apenas puede con uno grande (r² / (1 + r²))
+            lab = componentes(dev.a_cpu(socios))
+            tam = xp.asarray(np.bincount(lab, minlength=p.n)[lab].astype(np.float64))
+            r2 = (tam[i] / tam[j]) ** 2
+            dano = dano * r2 / (1.0 + r2)
+        elif c.proteccion_enlaces:
             dano = dano / (1.0 + (socios[j] >= 0).sum(axis=1))
         total = xp.bincount(j, weights=dano, minlength=p.n)
         escala = xp.where(total > 0, xp.minimum(1.0, xp.maximum(p["E"], 0.0) / xp.maximum(total, 1e-12)), 0.0)

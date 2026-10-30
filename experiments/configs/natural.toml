@@ -24,6 +24,9 @@ rumbo = true
 
 [ataque]
 activo = true
+# comerse a otro depende del tamaño (más fiel a la realidad, aprobado por el autor el 2026-10-30, tras el piloto
+# de la red): una célula sola apenas puede con un grupo grande. Antes: el daño solo se dividía por 1 + enlaces
+tamano = true
 
 [realidad]
 activa = true

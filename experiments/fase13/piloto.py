@@ -27,7 +27,8 @@ from simbio.simulacion import Simulacion
 
 RAIZ = Path(__file__).resolve().parents[2]
 BASE = ["sim.registrar_cada=1000"]
-CONDICIONES = {"red": [], "inerte": ["desarrollo.inerte=true"]}
+# sin_tamano: el ataque de antes (daño / (1 + enlaces)), para medir qué cambia la física del tamaño en los cuerpos
+CONDICIONES = {"red": [], "inerte": ["desarrollo.inerte=true"], "sin_tamano": ["ataque.tamano=false"]}
 CLAVES = ["poblacion", "generacion_media", "genes_medios", "grupos_de_3_o_mas", "tamano_grupo_medio",
           "con_gen_regulado", "peso_regulador_medio", "reg_medio_abs", "dispersion_reg_grupos",
           "dispersion_reg_poblacion", "corr_reg_rol_max", "dispersion_roles_grupos", "dispersion_roles_poblacion",
@@ -75,12 +76,17 @@ def evaluar(res, desde):
     medidas = {c: (lambda r, c=c: final(r, c, desde)) for c in ("con_gen_regulado", "peso_regulador_medio",
                                                                 "dispersion_roles_grupos", "poblacion")}
     medidas["diferenciacion_relativa"] = rel
+
+    def comparar(nombre, f, a, b):
+        dif = [round(f(por[(a, s)]) - f(por[(b, s)]), 5) for s in semillas if (a, s) in por and (b, s) in por]
+        return {a: {s: round(f(por[(a, s)]), 4) for s in semillas if (a, s) in por},
+                b: {s: round(f(por[(b, s)]), 4) for s in semillas if (b, s) in por},
+                "diferencias": dif, "p_una_cola": permutacion_pareada(dif)}
+
     for nombre, f in medidas.items():
-        dif = [round(f(por[("red", s)]) - f(por[("inerte", s)]), 5)
-               for s in semillas if ("red", s) in por and ("inerte", s) in por]
-        out[nombre] = {"red": {s: round(f(por[("red", s)]), 4) for s in semillas if ("red", s) in por},
-                       "inerte": {s: round(f(por[("inerte", s)]), 4) for s in semillas if ("inerte", s) in por},
-                       "diferencias": dif, "p_una_cola": permutacion_pareada(dif)}
+        out[nombre] = comparar(nombre, f, "red", "inerte")
+    for nombre in ("frac_enlazados", "grupos_de_3_o_mas", "poblacion", "frac_depredadores"):
+        out["tamano_" + nombre] = comparar(nombre, lambda r, c=nombre: final(r, c, desde), "red", "sin_tamano")
     out["extinciones"] = {c: sum(r["extinta_en"] is not None for r in res if r["condicion"] == c)
                           for c in CONDICIONES}
     return out

@@ -262,6 +262,11 @@ class AtaqueCfg:
     eficiencia: float = 0.6  # fracción de lo quitado que gana el atacante (pérdida trófica)
     # protección por enlaces: el daño se divide por (1 + enlaces del atacado); asociarse defiende
     proteccion_enlaces: bool = True
+    # fase 13, física más fiel (autor, 2026-10-30): comerse a otro depende del tamaño, como en la naturaleza (una
+    # célula casi nunca se traga a otra de su tamaño; los depredadores suelen ser más grandes que su presa). El daño
+    # se multiplica por r² / (1 + r²), con r = tamaño del grupo del atacante / tamaño del grupo del atacado:
+    # 0,5 entre iguales, 0,9 si el atacante es el triple, 0,1 si es un tercio. Reemplaza a proteccion_enlaces
+    tamano: bool = False
     # especialización trófica: lo ganado atacando se multiplica por min(maquinaria_max, (uso / uso_ref)^γ), con
     # uso el promedio móvil de atacar (misma memoria que la maquinaria de la fase 5). Junto con
     # fisica.maquinaria_gamma (comer rinde según el uso de comer), un generalista rinde poco en las dos cosas.
