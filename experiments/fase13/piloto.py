@@ -1,7 +1,8 @@
 """Fase 13, desarrollo (peldaños 1 y 2): ¿la evolución usa la red regulatoria? ¿Aparecen tipos celulares?
 
-Universo de la fase 3 (coordinacion.toml: depredador que solo come grupos chicos, con escalada; movimiento de grupo
-por fuerza, α = 0,5, adoptado en la fase 3c), desde LUCA. Condiciones:
+Universo de la fase 2c (depredacion.toml: depredador que solo come sueltos, desde el paso 2000) con el movimiento de
+grupo por fuerza (α = 0,5) adoptado en la fase 3c, desde LUCA. (El de la fase 3, coordinacion.toml, extingue a LUCA: se
+usó con poblaciones ya evolucionadas.) Condiciones:
     red:    la red regulatoria existe y los genes la leen
     inerte: la red existe, muta y cambia de estado igual, pero los genes no la leen (control de deriva)
 Se mide en el último tercio:
@@ -37,7 +38,7 @@ CLAVES = ["poblacion", "generacion_media", "genes_medios", "grupos_de_3_o_mas", 
 
 def correr(tarea):
     nombre, semilla, pasos, ajustes = tarea
-    cfg = config.cargar(RAIZ / "experiments/configs/coordinacion.toml", [*BASE, *ajustes, *CONDICIONES[nombre]])
+    cfg = config.cargar(RAIZ / "experiments/configs/depredacion.toml", [*BASE, *ajustes, *CONDICIONES[nombre]])
     cfg.sim.semilla = semilla
     sim = Simulacion(cfg)
     for _ in range(pasos):
