@@ -149,3 +149,41 @@ Detalle en `openspec/specs/coordinacion/spec.md`. Cambia la forma del genoma (14
   - "argmax" (por defecto): el impulso mayor; descansar si ninguno es positivo;
   - "softmax": la acción se sortea con probabilidad ∝ exp(impulso/`temperatura`), con descansar siempre disponible con impulso ≥ 0. Truco de Gumbel con el azar de la CPU.
 - **Memoria inicial** (`memoria.inicial`): solo se aplica a los fundadores; los hijos heredan la memoria del progenitor.
+
+## Anexo: fase 12 (universo vivo, realidad y nuevas presiones), en curso al 2026-10-29
+Todas las opciones nuevas están apagadas por defecto. Los sensores y la primitiva nuevos van al final de sus listas: en un mundo sin ellos no mutan ni consumen azar (`gen.NUM_SENS_SIN_REALIDAD` = 24, `NUM_SENS_REALIDAD` = 26, `NUM_SENS` = 27, `NUM_PRIM_SIN_ATAQUE`). Las huellas de determinismo siguen idénticas.
+
+- **Modo continuo** (`src/simbio/continuo.py`; `python -m simbio vivir` y `mirar`):
+  - universo sin plazo;
+  - guardado periódico con pickle portable entre CPU y GPU, y reanudación exacta (mismo estado de los generadores);
+  - volcado incremental de métricas y linaje;
+  - resiembra desde LUCA tras una extinción.
+
+  En Docker corre sin red (`network_mode: none`) y con `cpus: 0.5`.
+- **Realidad** (`realidad.*`, `src/simbio/realidad.py`): una serie horaria del clima real (Capitán Bermúdez, 2000–2025, en `datos/clima/`) regula el mundo, a `pasos_por_hora` pasos por hora:
+  - radiación → recrecimiento: `regeneracion · (1 − a + a · rad/rad_media)`;
+  - temperatura → costo basal: `costo_basal · (1 + k · ((T − T_ópt)/10)²)`;
+  - lluvia acumulada (promedio móvil exponencial) → qué comida nutre; reemplaza a la estación artificial;
+  - sensor local `presion`: tendencia de la presión en desvíos típicos.
+
+  Controles: `barajar_dias` (los días en orden al azar) y `presion_desacoplada`. La simulación solo lee el archivo; nunca toca la red.
+- **Estímulos** (`estimulos.*`, `src/simbio/estimulos.py`): pulsos de luz desde afuera, que llegan como archivos en `<universo>/entradas/` y se graban en `estimulos.jsonl` con su paso. Un texto se vuelve una secuencia de pulsos.
+  - El campo de luz decae (`decaimiento_luz`), se percibe con el sensor local `luz` y alimenta: `R += acople_luz · luz · (K − R)`.
+  - `retraso_luz` > 0: la luz anuncia la comida, porque un campo "abono" recibe los mismos pulsos N pasos después.
+  - `lugares_al_azar`: cada pulso cae en un lugar sorteado, con un generador propio igual en ambas condiciones.
+- **Ataque** (`ataque.*`): primitiva `atacar`, que quita `fuerza` al organismo de enfrente y le pasa una fracción `eficiencia` al atacante.
+  - El daño se divide por (1 + enlaces del atacado).
+  - Especialización trófica: lo ganado se multiplica por `min(1, (uso/uso_ref)^γ)`. **El tope es 1** para conservar la energía: con 2,5, atacar creaba energía y la población llenaba la grilla. Corregido el 2026-10-27.
+- **Archipiélago** (`src/simbio/archipielago.py`): varias islas (simulaciones independientes) en anillo. Cada `cada` pasos, todas eligen sus `migrantes` antes de que ninguna reciba, con un generador propio (`SeedSequence([semilla, 5])`). Solo participan las islas con más de un organismo: una isla extinta no se recoloniza.
+- **Texto** (`texto.*`, `src/simbio/texto.py`): la estación la decide un texto, letra por letra (`pasos_por_letra`).
+  - Vocal: nutre el tipo A (+1). Consonante: nutre el tipo B (−1). La ñ cuenta como consonante, los acentos se quitan y lo que no es letra se salta.
+  - El sensor `pista` muestra la letra **anterior** (la tarea: predecir) o, para diagnóstico, la `vigente`.
+  - Sensor opcional `coincide` = tipo_aqui × pista. Sin él, "comer el tipo contrario a la pista" es un O exclusivo que un gen lineal no puede expresar.
+  - Control `barajar`: las mismas letras en orden al azar, con un generador propio de la semilla.
+  - Requiere `estaciones.activa`.
+- **Dispositivo:** el pool de memoria de CuPy queda limitado a 2 GB por proceso (`SIMBIO_GPU_LIMITE_MB`). Sin límite crecía sin parar y, en Windows, tomaba la RAM del sistema.
+
+### Relectura del castigo en las fases 7–11
+Con `estaciones.castigo = 0,2`, el valor de las fases 7–11 y de `vivo.toml`, comer la comida equivocada cuesta tan poco que **no se selecciona discriminar, ni siquiera con la estación fija** (acierto 0,51–0,53). Con 0,5 sí (0,997 en 1 de 2 semillas). Por lo tanto, en las fases 7–11 la memoria se mantuvo por el bono de la digestión inducible, pero no había presión para usarla al elegir la comida.
+
+En el mundo del texto, la física estable es `castigo = 0,35` con `rampa_toxicidad = 300 000` y `induccion = 0`: 0 extinciones de 4, contra 7 de 16 con 0,5 y una rampa de 150 000. Ver `docs/bitacora/2026-10-30-fase12-fisica-estable.md`.

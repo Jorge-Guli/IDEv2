@@ -134,10 +134,21 @@ El diseño completo está en `docs/06-universo-vivo.md`. Resumen operativo:
 - Superar la frecuencia base no prueba predicción: el barajado también la supera, hasta +0,04, reaccionando dentro de cada letra.
 - No repetir con Asimov. Primero: física sin extinciones tardías (castigo 0,35 o rampa más larga) y un piloto con efecto pareado ≥ 0,05 contra barajado.
 
+**Física estable (2026-10-29):** `castigo = 0,35` con `rampa_toxicidad = 300 000` da 0 extinciones de 4 (`docs/bitacora/2026-10-30-fase12-fisica-estable.md`).
+
+**En curso:** el mundo del texto con ~10 000 organismos (384²) en la GPU, semillas 21–24, texto contra barajado, salida `runs/fase12/texto_grande.json`. Se guarda cada corrida al terminar (`*.parcial.json`); para reanudar, relanzar el mismo comando.
+- Criterio de piloto: diferencia pareada ≥ 0,05 contra barajado, no contra el techo.
+
 Configuración de los pilotos del texto:
 - texto de calibración: `docs/00,01,04,06`;
-- `--set texto.sensor_coincide=true --set estaciones.castigo=0.5 --set estaciones.rampa_toxicidad=150000`;
-- 300 000 pasos.
+- `--set texto.sensor_coincide=true --set estaciones.induccion=0 --set estaciones.castigo=0.35 --set estaciones.rampa_toxicidad=300000`;
+- en la GPU, además: `--set mundo.alto=384 --set mundo.ancho=384 --set sim.poblacion_inicial=1800`;
+- 500 000 pasos.
+
+**Cuidados del equipo** (el autor usa la PC mientras corre):
+- lanzar las corridas largas desligadas de la app de Claude (`Win32_Process.Create`, prioridad Idle), porque si la app se cierra o se actualiza las mata;
+- como mucho 4 procesos de GPU, y solo si queda memoria disponible;
+- tener un vigilante que frene si la memoria disponible baja de 0,4 GB o la GPU pasa de 12 GB.
 
 **Asimov:** "La última pregunta" y "La última respuesta", elegidas por el autor por su simbolismo, que aceptó el riesgo legal.
 - Están en `datos/textos/` (copia propia del autor), ignorada por Git.
@@ -149,7 +160,7 @@ Configuración de los pilotos del texto:
 2. Idea de Gemini: probar las poblaciones de la fase 11 con `castigo = 0,5` y rampa larga. ¿Se recluta la memoria cuando discriminar paga?
 3. Arrancar un **universo vivo nuevo** con la física que funcione (castigo y rampa), sin tocar el actual.
 4. **Archipiélago heterogéneo:** islas con selección divergente (clima real, texto o toxicidad alta, depredación). El homogéneo dio nulo.
-5. Poner al día el ODD (`docs/odd/modelo.md`, anexo de la fase 12 y relectura del castigo), la hoja de ruta, la síntesis y OpenSpec (fases 7–12).
+5. ~~ODD (anexo de la fase 12 y relectura del castigo) y hoja de ruta~~ hechos el 2026-10-29. Faltan la síntesis (`docs/03-sintesis.md`) y OpenSpec (fases 7–12).
 6. Interfaz web local (§8.2).
 7. Pendiente de diseño: un mundo donde aprender en vida pague (comida buena estable dentro de una vida y cambiante entre generaciones).
 
@@ -196,7 +207,7 @@ Sustrato tipo *Tierra* dentro del contenedor: organismos como programas en un in
   - una condición "inducción sin cerrojo", para separar el peldaño de la persistencia física;
   - que la memoria sin gen decaiga hacia 0,5, o que la inducción actúe solo con un gen de memoria activo, para que la digestión de un organismo sin información quede neutra;
   - efectos laterales de la memoria inicial 0,5: la condición 6 anula el receptor y las condiciones 3 y 4 quedan fijas.
-- **ODD:** agregar el anexo de la fase 12 (modo continuo, datos reales, estímulos, ataque, archipiélago, texto) y la relectura del castigo 0,2 en las fases 7–11.
+- ~~**ODD:** anexo de la fase 12 y relectura del castigo~~ hecho el 2026-10-29.
 - **Los scripts de competencias** (`experiments/fase10/*.py`, `experiments/fase11/*.py`) se corren desde la raíz del repo.
 - **Métricas viejas:** las fases 7–9 reportan `seguimiento` con el aliasing de muestreo. Sus conclusiones no cambian (valores ~0), pero conviene recordarlo al citarlas.
 
