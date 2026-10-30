@@ -1,0 +1,37 @@
+# Universo natural (fase 13, principio 7 de la metodología): nada de fuerzas diseñadas.
+# - Física base: comer da energía, moverse y vivir cuestan, dividirse reparte. Todos empiezan como LUCA y comen lo mismo.
+# - Mundo real: el clima horario de Capitán Bermúdez (2000-2025). La radiación hace crecer la comida y la temperatura
+#   cambia el costo de vivir. La presión se percibe como sensor local. La lluvia NO decide qué comida nutre: eso era
+#   una regla inventada.
+# - Sin depredador externo ni estaciones artificiales: la depredación solo existe si evoluciona. La primitiva atacar
+#   está disponible para el genoma, pero LUCA no la tiene; aparece por mutación cuando, al escasear la comida,
+#   comerse a otro rinde.
+# - El genoma puede ganar todo lo que la física permite: asociarse (movimiento de grupo por fuerza, α = 0,5, el de la
+#   fase 3c), percibir el rumbo de los socios, atacar y la red regulatoria del desarrollo.
+# - capacidad_max = 20: un mundo rico, elegido una vez (con 10, el invierno real extinguía; ver clima.toml). No se
+#   retoca según los resultados.
+[mundo]
+alto = 128
+ancho = 128
+capacidad_max = 20.0
+
+[asociacion]
+movimiento = "fuerza"
+exponente_arrastre = 0.5
+
+[coordinacion]
+rumbo = true
+
+[ataque]
+activo = true
+
+[realidad]
+activa = true
+lluvia = false
+
+[desarrollo]
+activo = true
+
+[sim]
+poblacion_inicial = 200
+registrar_cada = 1000

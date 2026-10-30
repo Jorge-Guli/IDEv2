@@ -41,6 +41,7 @@ Complementamos con el **protocolo ODD** (*Overview, Design concepts, Details*; G
    - **Lo que sí se amplía es qué pueden llegar a ser los organismos** (qué permite su genoma: memoria, señales, asociarse), no lo que el mundo les regala.
    - Elegir un universo rico (con regularidades, cambios, escasez y otros seres) no viola esta regla, como no la viola que la Tierra tenga estaciones. La viola cambiarlo después según les vaya.
    - Los ajustes hechos en las fases 7–12 (castigo, rampa de toxicidad) fueron acomodar el mundo y quedan registrados como tales.
+   - **Nada de fuerzas diseñadas** (autor, 2026-10-30): no se programan depredadores externos, estaciones artificiales, comida tóxica por turnos ni premios pensados para un rasgo. Las presiones tienen que **surgir de la propia población**: al principio todos comen lo mismo; cuando crecen y la comida escasea, aparecen por mutación la competencia, la depredación (`atacar`, que el genoma puede ganar) y el parasitismo, y todo se autorregula. O tienen que **venir del mundo real** (clima). El depredador externo de las fases 2c–4 (`depredacion.*`), las estaciones y la toxicidad de las fases 7–12 (`estaciones.*`) y el mundo del texto fueron fuerzas diseñadas: sus resultados se leen como tales, y no se usan en los universos nuevos.
 
 ## 3. Hoja de ruta
 

@@ -1,8 +1,7 @@
 """Fase 13, desarrollo (peldaños 1 y 2): ¿la evolución usa la red regulatoria? ¿Aparecen tipos celulares?
 
-Universo de la fase 2c (depredacion.toml: depredador que solo come sueltos, desde el paso 2000) con el movimiento de
-grupo por fuerza (α = 0,5) adoptado en la fase 3c, desde LUCA. (El de la fase 3, coordinacion.toml, extingue a LUCA: se
-usó con poblaciones ya evolucionadas.) Condiciones:
+Universo natural (natural.toml), desde LUCA: clima real, sin depredador externo ni estaciones artificiales; la
+depredación solo existe si evoluciona (atacar). Principio 7: nada de fuerzas diseñadas. Condiciones:
     red:    la red regulatoria existe y los genes la leen
     inerte: la red existe, muta y cambia de estado igual, pero los genes no la leen (control de deriva)
 Se mide en el último tercio:
@@ -27,18 +26,17 @@ from simbio import config
 from simbio.simulacion import Simulacion
 
 RAIZ = Path(__file__).resolve().parents[2]
-BASE = ['asociacion.movimiento="fuerza"', "asociacion.exponente_arrastre=0.5", "desarrollo.activo=true",
-        "sim.registrar_cada=1000"]
+BASE = ["sim.registrar_cada=1000"]
 CONDICIONES = {"red": [], "inerte": ["desarrollo.inerte=true"]}
 CLAVES = ["poblacion", "generacion_media", "genes_medios", "grupos_de_3_o_mas", "tamano_grupo_medio",
           "con_gen_regulado", "peso_regulador_medio", "reg_medio_abs", "dispersion_reg_grupos",
           "dispersion_reg_poblacion", "corr_reg_rol_max", "dispersion_roles_grupos", "dispersion_roles_poblacion",
-          "tasa_efectiva_media"]
+          "tasa_efectiva_media", "tiene_atacar", "usa_atacar", "frac_depredadores", "frac_enlazados"]
 
 
 def correr(tarea):
     nombre, semilla, pasos, ajustes = tarea
-    cfg = config.cargar(RAIZ / "experiments/configs/depredacion.toml", [*BASE, *ajustes, *CONDICIONES[nombre]])
+    cfg = config.cargar(RAIZ / "experiments/configs/natural.toml", [*BASE, *ajustes, *CONDICIONES[nombre]])
     cfg.sim.semilla = semilla
     sim = Simulacion(cfg)
     for _ in range(pasos):
