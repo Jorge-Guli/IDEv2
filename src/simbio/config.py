@@ -267,6 +267,12 @@ class AtaqueCfg:
     # se multiplica por r² / (1 + r²), con r = tamaño del grupo del atacante / tamaño del grupo del atacado:
     # 0,5 entre iguales, 0,9 si el atacante es el triple, 0,1 si es un tercio. Reemplaza a proteccion_enlaces
     tamano: bool = False
+    # sensibilidad (revisión de la fase 13): "r2" es r² / (1 + r²); "suave" es r / (1 + r), con el mismo 0,5 entre
+    # iguales pero menos pendiente (0,75 si el atacante es el triple). La forma no se ajusta: solo se compara
+    forma: str = "r2"
+    # control (no es universo): False anula los ataques entre miembros de un mismo grupo, para ver si los cuerpos
+    # dependen del canibalismo interno
+    intragrupo: bool = True
     # especialización trófica: lo ganado atacando se multiplica por min(maquinaria_max, (uso / uso_ref)^γ), con
     # uso el promedio móvil de atacar (misma memoria que la maquinaria de la fase 5). Junto con
     # fisica.maquinaria_gamma (comer rinde según el uso de comer), un generalista rinde poco en las dos cosas.

@@ -1,6 +1,7 @@
 """Fase 13, desarrollo: red regulatoria (estado interno heredable que los genes leen) y señal por contacto."""
 import numpy as np
 
+from simbio import config
 from simbio import genoma as gen
 from simbio.simulacion import Simulacion
 
@@ -152,3 +153,13 @@ def test_genomas_viejos_se_completan():
     g = gen.compatibilizar(g)
     assert g["R"].shape == (3, gen.NUM_REG, gen.ENTRADAS_REG) and not g["R"].any()
     assert g["v"].shape == (3, 24, gen.NUM_REG)
+
+
+def test_medidas_de_la_revision():
+    cfg = config.cargar(None, ["mundo.alto=24", "mundo.ancho=24", "sim.poblacion_inicial=80", "ataque.activo=true",
+                               "ataque.tamano=true", "desarrollo.activo=true", "sim.registrar_cada=50"])
+    sim = Simulacion(cfg)
+    sim.correr(150)
+    f = sim.historial[-1]
+    assert "frac_ataques_intragrupo" in f and 0.0 <= f["frac_ataques_intragrupo"] <= 1.0
+    assert {"parentesco_relativo", "corr_reg_rol_intra"} <= set(f) or f.get("grupos_de_3_o_mas", 0) == 0

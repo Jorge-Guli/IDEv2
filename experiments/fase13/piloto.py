@@ -28,11 +28,14 @@ from simbio.simulacion import Simulacion
 RAIZ = Path(__file__).resolve().parents[2]
 BASE = ["sim.registrar_cada=1000"]
 # sin_tamano: el ataque de antes (daño / (1 + enlaces)), para medir qué cambia la física del tamaño en los cuerpos
-CONDICIONES = {"red": [], "inerte": ["desarrollo.inerte=true"], "sin_tamano": ["ataque.tamano=false"]}
+# suave y sin_intra (revisión): otra forma de la curva del tamaño y un control sin canibalismo dentro del cuerpo
+CONDICIONES = {"red": [], "inerte": ["desarrollo.inerte=true"], "sin_tamano": ["ataque.tamano=false"],
+               "suave": ['ataque.forma="suave"'], "sin_intra": ["ataque.intragrupo=false"]}
 CLAVES = ["poblacion", "generacion_media", "genes_medios", "grupos_de_3_o_mas", "tamano_grupo_medio",
           "con_gen_regulado", "peso_regulador_medio", "reg_medio_abs", "dispersion_reg_grupos",
           "dispersion_reg_poblacion", "corr_reg_rol_max", "dispersion_roles_grupos", "dispersion_roles_poblacion",
-          "tasa_efectiva_media", "tiene_atacar", "usa_atacar", "frac_depredadores", "frac_enlazados"]
+          "tasa_efectiva_media", "tiene_atacar", "usa_atacar", "frac_depredadores", "frac_enlazados",
+          "frac_ataques_intragrupo", "parentesco_relativo", "corr_reg_rol_intra"]
 
 
 def correr(tarea):
@@ -87,6 +90,12 @@ def evaluar(res, desde):
         out[nombre] = comparar(nombre, f, "red", "inerte")
     for nombre in ("frac_enlazados", "grupos_de_3_o_mas", "poblacion", "frac_depredadores"):
         out["tamano_" + nombre] = comparar(nombre, lambda r, c=nombre: final(r, c, desde), "red", "sin_tamano")
+    out["corr_reg_rol_intra"] = comparar("", lambda r: final(r, "corr_reg_rol_intra", desde), "red", "inerte")
+    for cond in ("suave", "sin_intra"):
+        out[cond + "_frac_enlazados"] = comparar("", lambda r: final(r, "frac_enlazados", desde), "red", cond)
+    for clave in ("parentesco_relativo", "frac_ataques_intragrupo"):
+        out[clave] = {c: {s: round(final(por[(c, s)], clave, desde), 4) for s in semillas if (c, s) in por}
+                      for c in CONDICIONES if any((c, s) in por for s in semillas)}
     out["extinciones"] = {c: sum(r["extinta_en"] is not None for r in res if r["condicion"] == c)
                           for c in CONDICIONES}
     return out

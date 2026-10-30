@@ -149,6 +149,14 @@ El diseño completo está en `docs/06-universo-vivo.md`. Resumen operativo:
   - Indicio: la selección achica los pesos que leen la red (6 de 6 semillas), así que hoy estorba.
   - La depredación evolucionó sola en todas las corridas, y la asociación desaparece.
   - Lectura: falta el cuerpo, no la red. Detalle en `docs/bitacora/2026-10-30-fase13-red-regulatoria-prerregistro.md`.
+- **Diagnóstico de los grupos:** se forman (por división unida), pero se los comen; cualquier célula mataba a otra de su tamaño en 1–3 ataques (`docs/bitacora/2026-10-30-fase13-diagnostico-grupos.md`).
+- **Física más fiel, aprobada por el autor:** `ataque.tamano`, el daño × r²/(1+r²), con r el tamaño del grupo del atacante sobre el del atacado. Activa en `natural.toml`.
+- **Piloto del cuerpo (semillas 7–12):**
+  - aparecen cuerpos: 80–96 % enlazados, contra ~0 sin el tamaño (p = 1/64);
+  - sin tipos celulares (P2 con p = 0,22).
+  - La revisión escéptica pidió matizar: el tamaño protege por construcción física. Faltaban el parentesco y el canibalismo interno (16–37 % de los ataques), y una medida de diferenciación que no mezcle clones.
+- **En curso:** controles del cuerpo, con las semillas 13–18 y las condiciones red, inerte, suave y sin_intra (`docs/bitacora/2026-10-30-fase13-cuerpo-controles-prerregistro.md`, salida `runs/fase13/controles.json`).
+- **El autor dio libertad expresa** para ensayar, crear y destruir sin pedir permiso en cada paso.
 - **Siguientes, uno por vez:**
   - el cuerpo como unidad que se reproduce (línea germinal y cuello de botella unicelular);
   - reproducción sexual;

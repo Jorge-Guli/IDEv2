@@ -167,7 +167,7 @@ class Simulacion:
                      "comido_libre_sec": 0.0, "comido_libre_nosec": 0.0, "depredados": 0,
                      "depredados_en_refugio": 0, "enlaces_por_union": 0, "enlaces_por_division": 0,
                      "grupos_empujan": 0, "grupos_mueven": 0, "grupos3_empujan": 0, "grupos3_mueven": 0,
-                     "grupos_bloqueados": 0, "difundido": 0.0, "ataques": 0, "robado": 0.0, "muertes_por_ataque": 0, "comida_buena": 0.0, "comida_mala": 0.0, "conjugaciones": 0, "enlaces_creados": 0,
+                     "grupos_bloqueados": 0, "difundido": 0.0, "ataques": 0, "ataques_intragrupo": 0, "robado": 0.0, "muertes_por_ataque": 0, "comida_buena": 0.0, "comida_mala": 0.0, "conjugaciones": 0, "enlaces_creados": 0,
                      "acciones": xp.zeros(gen.NUM_PRIM, dtype=xp.int64)}
 
     def vecinos_enlazados(self, occ: np.ndarray) -> np.ndarray:
@@ -530,8 +530,14 @@ class Simulacion:
         if c.tamano:  # el tamaño importa: un grupo chico apenas puede con uno grande (r² / (1 + r²))
             lab = componentes(dev.a_cpu(socios))
             tam = xp.asarray(np.bincount(lab, minlength=p.n)[lab].astype(np.float64))
-            r2 = (tam[i] / tam[j]) ** 2
-            dano = dano * r2 / (1.0 + r2)
+            r = tam[i] / tam[j]
+            r = r ** 2 if c.forma == "r2" else r
+            dano = dano * r / (1.0 + r)
+            lab = xp.asarray(lab)  # canibalismo dentro del cuerpo (revisión de la fase 13): se cuenta aparte
+            intra = (lab[i] == lab[j]) & (tam[i] > 1)
+            self.cont["ataques_intragrupo"] += int(intra.sum())
+            if not c.intragrupo:
+                dano = xp.where(intra, 0.0, dano)
         elif c.proteccion_enlaces:
             dano = dano / (1.0 + (socios[j] >= 0).sum(axis=1))
         total = xp.bincount(j, weights=dano, minlength=p.n)
@@ -1053,6 +1059,23 @@ class Simulacion:
             cs = [abs(float(np.corrcoef(reg[m, k], rol[m])[0, 1])) for k in range(gen.NUM_REG)
                   if m.sum() > 10 and reg[m, k].std() > 1e-9 and rol[m].std() > 0]
             extra["corr_reg_rol_max"] = max(cs) if cs else float("nan")
+            # revisión de la fase 13: la correlación anterior mezcla diferencias entre clones; esta resta la media de
+            # cada grupo (estado y rol), así solo queda la diferencia entre células del mismo cuerpo
+            if m.sum() > 10:
+                _, inv = np.unique(lab[m], return_inverse=True)
+                cnt = np.bincount(inv).astype(float)
+                rc = rol[m] - (np.bincount(inv, weights=rol[m]) / cnt)[inv]
+                regc = reg[m] - np.stack([np.bincount(inv, weights=reg[m, k]) / cnt for k in range(gen.NUM_REG)],
+                                         axis=1)[inv]
+                ci = [abs(float(np.corrcoef(regc[:, k], rc)[0, 1])) for k in range(gen.NUM_REG)
+                      if regc[:, k].std() > 1e-9 and rc.std() > 0]
+                extra["corr_reg_rol_intra"] = max(ci) if ci else float("nan")
+            # parentesco (revisión de la fase 13): desvío de la etiqueta heredable (neutra) dentro de los grupos de 3
+            # o más, relativo al de la población. Cerca de 0: cuerpos clonales; cerca de 1: mezcla al azar
+            et = dev.a_cpu(p["etiqueta"])
+            de = [float(et[(tam >= 3) & (lab == g)].std(axis=0).mean()) for g in np.unique(lab[tam >= 3])]
+            dpob = float(et.std(axis=0).mean()) if et.size else 0.0
+            extra["parentesco_relativo"] = media(de) / dpob if de and dpob > 1e-12 else float("nan")
         return {**extra, "concentracion_reproductiva": media(conc), "corr_avanzar_dividir": media(corr),
                 "frac_nunca_dividio": media(nunca), "frac_refractarios": float((dev.a_cpu(p["refractario"]) > 0).mean())}
 
@@ -1175,6 +1198,8 @@ class Simulacion:
                     fila[f"libre_por_{nombre}"] = c[clave] / max(k, 1) / max(self.cfg.sim.registrar_cada, 1)
         if self.cfg.ataque.activo:  # depredación evolucionada (etapa 4)
             fila["ataques"] = c["ataques"]
+            if self.cfg.ataque.tamano:
+                fila["frac_ataques_intragrupo"] = c["ataques_intragrupo"] / max(c["ataques"], 1)
             fila["robado_por_org_paso"] = c["robado"] / org_pasos
             fila["muertes_por_ataque"] = c["muertes_por_ataque"]
             if n:  # especialización: depredadores (atacan > 5 % del tiempo) y presas, y cuánto come cada grupo

@@ -78,3 +78,17 @@ Escrito antes de correr. Antecedentes:
 - **Siguiente:**
   - mirar por dentro los cuerpos de las semillas 8 y 9: si las células en distinto estado hacen cosas distintas;
   - llevar el universo natural, con cuerpos, a corridas más largas.
+
+## Revisión escéptica (`revisor-cientifico`, 2026-10-30) y correcciones
+- **C1 está bien calculado, pero "emergen cuerpos" está sobredicho.** Que estar en grupo proteja es una consecuencia directa de la física del tamaño, que premia el tamaño del conjunto tanto al defenderse como al atacar.
+  - **No es el factor 0,5 entre iguales:** el revisor corrió un control con la depredación a la mitad y sin dependencia del tamaño (64², semillas 1–3). Dio 0–0,005 enlazados, contra 0,74–0,85 con el tamaño.
+  - **La lectura correcta:** la evolución aprovecha el refugio que ofrece la física y forma grupos que se sostienen. El tamaño como protección es un **supuesto físico declarado**, no un hallazgo.
+- **"Clonales" no está demostrado:** no se midió parentesco dentro de los grupos. Se corrige y se agrega la medida `parentesco_relativo`.
+- **Canibalismo dentro del cuerpo:** según la medición del revisor, del 16 % al 37 % de los ataques van a un miembro del propio grupo, y crece con el tiempo. Los "cuerpos" son en parte colonias que se comen entre sí. Se agrega la medida `frac_ataques_intragrupo` y un control sin canibalismo interno.
+- **Forma de la curva:** r²/(1+r²) fue una elección hecha después de ver el fracaso de los grupos. Se agrega una prueba de sensibilidad con r/(1+r), sin ajustar nada.
+- **Las exploratorias de la red son ruido o artefacto:**
+  - `corr_reg_rol_max` mezcla diferencias entre clones distintos y toma el máximo de 8 reguladores;
+  - "la red deja de estorbar" (p = 0,44) no debe citarse.
+  - Se agrega `corr_reg_rol_intra`, que resta la media de cada grupo y deja solo la diferencia entre células del mismo cuerpo.
+- **Estado estacionario no demostrado:** los cuerpos seguían creciendo a los 300 000 pasos.
+- **Código:** sin errores graves. `componentes` corre en CPU dentro del ataque, como ya hacía el movimiento de grupos.

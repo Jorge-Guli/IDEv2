@@ -59,6 +59,25 @@ def test_el_tamano_importa():
     assert sim.pob["E"][1] == 45.0  # entre iguales, la mitad
 
 
+def _par_enlazado(*ajustes):
+    sim = _sim(3, "ataque.tamano=true", *ajustes)
+    p = sim.pob
+    p["socio"][0, 2], p["socio"][1, 6] = p["id"][1], p["id"][0]  # 0 y 1 enlazados; 2 suelto
+    return sim
+
+
+def test_forma_suave_y_canibalismo_interno():
+    sim = _par_enlazado('ataque.forma="suave"')
+    _atacan(sim, [1])  # el grupo de 2 ataca al suelto: r = 2, r / (1 + r) = 2/3
+    assert np.isclose(sim.pob["E"][2], 50.0 - 10.0 * 2 / 3)
+    sim = _par_enlazado()
+    _atacan(sim, [0])  # 0 ataca a su socio 1: canibalismo interno, cuenta aparte
+    assert sim.pob["E"][1] == 45.0 and sim.cont["ataques_intragrupo"] == 1
+    sim = _par_enlazado("ataque.intragrupo=false")
+    _atacan(sim, [0])  # control: el ataque al socio no tiene efecto
+    assert sim.pob["E"][1] == 50.0 and sim.pob["E"][0] == 50.0
+
+
 def test_varios_atacantes_se_reparten_y_el_muerto_no_actua():
     sim = _sim(3)
     p = sim.pob

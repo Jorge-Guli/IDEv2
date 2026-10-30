@@ -10,7 +10,10 @@
 ## 2. Piloto
 - [x] 2.1 Prerregistro (`docs/bitacora/2026-10-30-fase13-red-regulatoria-prerregistro.md`) y `experiments/fase13/piloto.py`
 - [x] 2.2 Correr (semillas 1–6, 300 000 pasos), evaluar y registrar: nulo (P1 saturada, P2 sin grupos)
-- [ ] 2.3 Revisión con `revisor-cientifico` (se hace al cerrar la fase, con el peldaño del cuerpo)
+- [x] 2.3 Diagnóstico de los grupos y física del tamaño (`ataque.tamano`), con tests
+- [x] 2.4 Piloto del cuerpo (semillas 7–12): C1 se cumple, P2 no
+- [x] 2.5 Revisión con `revisor-cientifico`; medidas nuevas (parentesco, canibalismo interno, correlación dentro del cuerpo) y controles (`forma`, `intragrupo`)
+- [ ] 2.6 Controles del cuerpo (semillas 13–18): evaluar y registrar
 
 ## 3. Peldaños siguientes (diseño pendiente, uno por vez)
 - [ ] 3.1 El cuerpo como unidad que se reproduce (línea germinal, cuello de botella unicelular)
