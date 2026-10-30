@@ -57,7 +57,14 @@ NUM_SENS_SIN_REALIDAD = S_PRESION
 # con datos reales o estímulos (etapas 2 y 3) mutan también presión y luz, pero no los posteriores
 NUM_SENS_REALIDAD = S_COINCIDE
 
-CAMPOS = ("activo", "prim", "w", "b", "mu", "sens", "eta", "etiqueta", "cond")
+# fase 13, red regulatoria: cada célula tiene NUM_REG reguladores (estado interno en [−1, 1]). Cada regulador lee
+# los reguladores propios, los NUM_MORF primeros de los socios enlazados (señal por contacto, como Notch–Delta) y
+# los sensores: R (n, NUM_REG, ENTRADAS_REG) y rb (n, NUM_REG). Los genes de acción leen el estado con v (n, G, NUM_REG)
+NUM_REG = 8
+NUM_MORF = 2
+ENTRADAS_REG = NUM_REG + NUM_MORF + NUM_SENS
+CAMPOS_REG = ("R", "rb", "v")
+CAMPOS = ("activo", "prim", "w", "b", "mu", "sens", "eta", "etiqueta", "cond") + CAMPOS_REG
 # condición de expresión de cada gen (fase 9): 0 siempre; 1/2 solo si la memoria A está alta/baja (> 0,5 o ≤ 0,5);
 # 3/4 ídem con la memoria B. Solo actúa con la memoria activa
 NUM_COND = 5
@@ -95,6 +102,16 @@ def compatibilizar(g: dict[str, np.ndarray]) -> dict[str, np.ndarray]:
     if "cond" not in g:
         g = dict(g)
         g["cond"] = np.zeros(g["activo"].shape, dtype=np.int8)
+    if any(k not in g for k in CAMPOS_REG):  # genomas anteriores a la fase 13: red regulatoria en cero
+        g = dict(g)
+        n, G = g["activo"].shape
+        vacios = vacio(n, G)
+        for k in CAMPOS_REG:
+            g.setdefault(k, vacios[k])
+    faltan = ENTRADAS_REG - g["R"].shape[-1]
+    if faltan > 0:  # los sensores van al final de las entradas de R
+        g = dict(g)
+        g["R"] = np.concatenate([g["R"], np.zeros(g["R"].shape[:-1] + (faltan,))], axis=-1)
     return g
 
 
@@ -109,6 +126,9 @@ def vacio(n: int, genes_max: int, xp=np) -> dict[str, np.ndarray]:
         "eta": xp.zeros(n),
         "etiqueta": xp.zeros((n, 2)),
         "cond": xp.zeros((n, genes_max), dtype=np.int8),
+        "R": xp.zeros((n, NUM_REG, ENTRADAS_REG)),
+        "rb": xp.zeros((n, NUM_REG)),
+        "v": xp.zeros((n, genes_max, NUM_REG)),
     }
 
 
@@ -158,11 +178,13 @@ def tasa_efectiva(mu: np.ndarray, sens: np.ndarray, estres: np.ndarray, cfg: Her
 
 def mutar(g: dict[str, np.ndarray], m: np.ndarray, cfg: HerenciaCfg,
           rng: np.random.Generator, permitidas: np.ndarray | None = None,
-          n_sens: int = NUM_SENS_SIN_REALIDAD) -> dict[str, np.ndarray]:
+          n_sens: int = NUM_SENS_SIN_REALIDAD, regulacion: bool = False) -> dict[str, np.ndarray]:
     """Aplica los operadores de mutación in situ con tasa efectiva m (n,) y devuelve g.
 
     `permitidas`: primitivas que pueden aparecer por mutación (por defecto, todas).
     `n_sens`: cuántos sensores (los primeros) tienen pesos que mutan; los demás quedan como están.
+    `regulacion`: muta también la red regulatoria (fase 13). Apagada no consume azar: las corridas anteriores
+    no cambian.
     """
     n, G = g["activo"].shape
     if n == 0 or not cfg.mutacion:
@@ -212,6 +234,7 @@ def mutar(g: dict[str, np.ndarray], m: np.ndarray, cfg: HerenciaCfg,
             g["w"][i, k] = g["w"][i, j]
             g["b"][i, k] = g["b"][i, j]
             g["cond"][i, k] = g["cond"][i, j]
+            g["v"][i, k] = g["v"][i, j]
 
     # gen nuevo aleatorio
     nuevos = np.flatnonzero(rng.random(n) < a_cpu(cfg.k_gen_nuevo * G * m))
@@ -229,6 +252,7 @@ def mutar(g: dict[str, np.ndarray], m: np.ndarray, cfg: HerenciaCfg,
             g["w"][i, k, :n_sens] = A(rng.normal(0.0, 1.0, n_sens))
             g["b"][i, k] = float(rng.normal(0.0, 1.0))
             g["cond"][i, k] = 0
+            g["v"][i, k] = 0.0
 
     # rasgos heredables
     rasgos = [("mu", cfg.mu_min, cfg.mu_max), ("eta", 0.0, cfg.eta_max)]
@@ -243,4 +267,17 @@ def mutar(g: dict[str, np.ndarray], m: np.ndarray, cfg: HerenciaCfg,
     mask = A(rng.random(n)) < xp.minimum(1.0, cfg.k_rasgo * m)
     ruido = A(rng.normal(0.0, cfg.sigma_etiqueta, (n, 2)))
     g["etiqueta"] = xp.where(mask[:, None], xp.clip(g["etiqueta"] + ruido, 0.0, 1.0), g["etiqueta"])
+
+    # red regulatoria (fase 13): mutación puntual de sus pesos, con la misma tasa y el mismo tamaño que los genes.
+    # En R mutan las entradas de los reguladores, de los morfógenos y de los sensores que existen en este mundo
+    if regulacion:
+        n_ent = NUM_REG + NUM_MORF + n_sens
+        forma_r = (n, NUM_REG, n_ent)
+        mask_r = A(rng.random(forma_r)) < m[:, None, None]
+        g["R"][:, :, :n_ent] += mask_r * A(rng.normal(0.0, cfg.sigma_peso, forma_r))
+        mask_rb = A(rng.random((n, NUM_REG))) < mm
+        g["rb"] += mask_rb * A(rng.normal(0.0, cfg.sigma_peso, (n, NUM_REG)))
+        forma_v = (n, G, NUM_REG)
+        mask_v = (A(rng.random(forma_v)) < m[:, None, None]) & activo[:, :, None]
+        g["v"] += mask_v * A(rng.normal(0.0, cfg.sigma_peso, forma_v))
     return g

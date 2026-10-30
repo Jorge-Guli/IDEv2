@@ -186,4 +186,21 @@ Todas las opciones nuevas están apagadas por defecto. Los sensores y la primiti
 ### Relectura del castigo en las fases 7–11
 Con `estaciones.castigo = 0,2`, el valor de las fases 7–11 y de `vivo.toml`, comer la comida equivocada cuesta tan poco que **no se selecciona discriminar, ni siquiera con la estación fija** (acierto 0,51–0,53). Con 0,5 sí (0,997 en 1 de 2 semillas). Por lo tanto, en las fases 7–11 la memoria se mantuvo por el bono de la digestión inducible, pero no había presión para usarla al elegir la comida.
 
-En el mundo del texto, la física estable es `castigo = 0,35` con `rampa_toxicidad = 300 000` y `induccion = 0`: 0 extinciones de 4, contra 7 de 16 con 0,5 y una rampa de 150 000. Ver `docs/bitacora/2026-10-30-fase12-fisica-estable.md`.
+En el mundo del texto, la física estable es `castigo = 0,35` con `rampa_toxicidad = 300 000` y `induccion = 0`: 0 extinciones de 4, contra 7 de 16 con 0,5 y una rampa de 150 000. Ver `docs/bitacora/2026-10-30-fase12-fisica-estable.md`. Con ~2 000 organismos en la GPU, el texto no superó al barajado: la memoria no se selecciona.
+
+## Anexo: fase 13 (desarrollo), en curso al 2026-10-30
+- **Principio 7** (`docs/01-metodologia.md`): el universo no se acomoda al organismo. Solo se modifica para que sea más fiel a la realidad del autor.
+- **Red regulatoria** (`desarrollo.*`, peldaños 1 y 2):
+  - **Estado:** 8 reguladores por célula, en [−1, 1] (`reg`), que hacen de "tipo celular".
+  - **Actualización:** antes de decidir, reg ← (1 − τ)·reg + τ·tanh(R·u + rb), con τ = `tasa` (0,2).
+  - **Entradas u:**
+    - los reguladores propios;
+    - la media de los 2 primeros reguladores (morfógenos) de los socios enlazados, que es una señal por contacto como Notch–Delta;
+    - los sensores.
+  - **Lectura:** cada gen de acción suma v·reg a su activación.
+  - **Pesos:** R (8 × 37), rb (8) y v (genes × 8) son heredables. Mutan con la tasa efectiva y el tamaño de los pesos de los genes, y empiezan en 0.
+  - **Herencia:** el hijo hereda el estado, con ruido normal de desvío `asimetria` (división asimétrica; 0 por defecto).
+  - **Control `inerte`:** la red funciona y muta igual, pero los genes no la leen.
+  - **Apagada** no consume azar: las huellas no cambian.
+- **Métricas:** `con_gen_regulado`, `peso_regulador_medio`, `reg_medio_abs`, `dispersion_reg_grupos`, `dispersion_reg_poblacion` y `corr_reg_rol_max`.
+- Detalle en `openspec/changes/fase-13-desarrollo/`.

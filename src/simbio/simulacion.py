@@ -276,12 +276,30 @@ class Simulacion:
                 otro = enl[xp.asarray(self.rng.permutation(int(enl.size)))]
                 s[enl[:, None], cols[None, :]] = s[otro[:, None], cols[None, :]]
 
-    def decidir(self, s: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
-        """Devuelve la primitiva elegida por cada organismo y la activación de cada gen."""
+    def regular(self, s: np.ndarray, socios: np.ndarray | None = None) -> None:
+        """Red regulatoria (fase 13): cada regulador sigue a tanh(R·entradas + rb), con entradas = reguladores
+        propios, media de los morfógenos (los primeros reguladores) de los socios enlazados, y sensores."""
+        xp, p, d = self.xp, self.pob, self.cfg.desarrollo
+        M = gen.NUM_MORF
+        morf = xp.zeros((p.n, M))
+        if socios is not None:
+            enl = socios >= 0
+            hay = xp.maximum(enl.sum(axis=1), 1)[:, None]
+            morf = xp.where(enl[:, :, None], p["reg"][xp.maximum(socios, 0)][:, :, :M], 0.0).sum(axis=1) / hay
+        u = xp.concatenate([p["reg"], morf, s], axis=1)
+        p["reg"] = (1.0 - d.tasa) * p["reg"] + d.tasa * xp.tanh(xp.einsum("nku,nu->nk", p["R"], u) + p["rb"])
+
+    def decidir(self, s: np.ndarray, socios: np.ndarray | None = None) -> tuple[np.ndarray, np.ndarray]:
+        """Devuelve la primitiva elegida por cada organismo y la activación de cada gen. `socios` (vecinos
+        enlazados) solo hace falta con la red regulatoria, para la señal por contacto."""
         xp = self.xp
         p = self.pob
         w = p["w"] + p["P"]
         ws = xp.einsum("ngs,ns->ng", w, s)
+        if self.cfg.desarrollo.activo:  # fase 13: los genes leen el estado regulatorio, ya actualizado
+            self.regular(s, socios)
+            if not self.cfg.desarrollo.inerte:
+                ws = ws + xp.einsum("ngk,nk->ng", p["v"], p["reg"])
         if self.cfg.memoria.activa and self.cfg.herencia.modulacion:
             # modulación (fase 11): en los genes con condición 5 o 6, la memoria A o B cambia el signo de la
             # respuesta a los receptores químicos (gen.SENS_MODULABLES): z = b + w·s + (2m − 1 − 1)·w_q·s_q.
@@ -745,7 +763,7 @@ class Simulacion:
             occ = self.ocupacion()
             socios = self.validar_enlaces(occ)
             s = self.sensar(occ, socios)
-            act, a = self.decidir(s)
+            act, a = self.decidir(s, socios)
             p["ult_s"], p["ult_a"], p["ult_act"] = s, a, act
             p["E_prev"] = p["E"].copy()
 
@@ -902,7 +920,7 @@ class Simulacion:
                     if h.estres_modo == "barajado":  # control: rompe el vínculo con la condición propia
                         estres = estres[xp.asarray(self.rng.permutation(p.n))]
                     m = gen.tasa_efectiva(hijos["mu"], hijos["sens"], estres[padres], h)
-                    gen.mutar(hijos, m, h, self.rng, self.permitidas, self.n_sens)
+                    gen.mutar(hijos, m, h, self.rng, self.permitidas, self.n_sens, cfg.desarrollo.activo)
                     nuevos = self._nuevos(hijos, celdas // W, celdas % W, p["E"][padres],
                                           padre=p["id"][padres], generacion=p["generacion"][padres] + 1,
                                           cepa=p["cepa"][padres], estres=xp.zeros(padres.size))
@@ -922,6 +940,12 @@ class Simulacion:
                     nuevos["uso_comer"] = p["uso_comer"][padres].copy()  # el hijo hereda la maquinaria
                     nuevos["uso_avanzar"] = p["uso_avanzar"][padres].copy()
                     nuevos["uso_atacar"] = p["uso_atacar"][padres].copy()
+                    if cfg.desarrollo.activo:  # el hijo hereda el estado regulatorio, con ruido si es asimétrica
+                        nuevos["reg"] = p["reg"][padres].copy()
+                        if cfg.desarrollo.asimetria > 0:
+                            ruido = xp.asarray(self.rng.normal(0.0, cfg.desarrollo.asimetria,
+                                                               (padres.size, gen.NUM_REG)))
+                            nuevos["reg"] = xp.clip(nuevos["reg"] + ruido, -1.0, 1.0)
                     T = f.refractario_division
                     if T > 0 and f.refractario_modo == "division":
                         p["refractario"][padres] = T
@@ -1013,6 +1037,17 @@ class Simulacion:
             m = tam >= 3
             extra["corr_memoria_rol"] = (float(np.corrcoef(mem[m, 0], rol[m])[0, 1])
                                          if m.sum() > 10 and mem[m, 0].std() > 0 and rol[m].std() > 0 else float("nan"))
+        if self.cfg.desarrollo.activo:
+            # diferenciación (fase 13): desvío del estado regulatorio dentro de los grupos de 3 o más (media de los
+            # desvíos por regulador) contra el de toda la población, y correlación del regulador más ligado al rol
+            reg = dev.a_cpu(p["reg"])
+            dr = [float(reg[(tam >= 3) & (lab == g)].std(axis=0).mean()) for g in np.unique(lab[tam >= 3])]
+            extra["dispersion_reg_grupos"] = media(dr)
+            extra["dispersion_reg_poblacion"] = float(reg.std(axis=0).mean()) if reg.size else float("nan")
+            m = tam >= 3
+            cs = [abs(float(np.corrcoef(reg[m, k], rol[m])[0, 1])) for k in range(gen.NUM_REG)
+                  if m.sum() > 10 and reg[m, k].std() > 1e-9 and rol[m].std() > 0]
+            extra["corr_reg_rol_max"] = max(cs) if cs else float("nan")
         return {**extra, "concentracion_reproductiva": media(conc), "corr_avanzar_dividir": media(corr),
                 "frac_nunca_dividio": media(nunca), "frac_refractarios": float((dev.a_cpu(p["refractario"]) > 0).mean())}
 
@@ -1060,6 +1095,11 @@ class Simulacion:
                 cond = (p["cond"] > 0) & activo
                 fila["con_gen_condicionado"] = float(cond.any(axis=1).mean())
                 fila["frac_genes_condicionados"] = float(cond.sum() / max(int(activo.sum()), 1))
+            if self.cfg.desarrollo.activo:  # fase 13: ¿los genes leen el estado regulatorio?
+                lee = (xp.abs(p["v"]).max(axis=2) > 0.5) & activo
+                fila["con_gen_regulado"] = float(lee.any(axis=1).mean())
+                fila["peso_regulador_medio"] = float(xp.abs(p["v"])[activo].mean()) if bool(activo.any()) else 0.0
+                fila["reg_medio_abs"] = float(xp.abs(p["reg"]).mean())
             # organización
             lab, ii, jj = self.grupos()
             tam = xp.bincount(lab, minlength=n)[lab]

@@ -35,6 +35,7 @@ ESTADO = {
     "veneno": (np.float64, ()),  # veneno pendiente de descontar (fase 7, toxicidad diferida)
     "digestion": (np.float64, ()),  # estado digestivo, sigue lento a la memoria A (fase 10)
     "uso_atacar": (np.float64, ()),  # promedio móvil del uso de atacar (fase 12, etapa 4)
+    "reg": (np.float64, (gen.NUM_REG,)),  # estado de la red regulatoria: el "tipo celular" (fase 13)
 }
 
 
@@ -62,6 +63,13 @@ class Poblacion:
         for k, (dt, forma) in ESTADO.items():  # atributos nuevos: en cero
             if k not in self.d:
                 self.d[k] = xp.zeros((self.n, *forma), dtype=dt)
+        vacios = gen.vacio(self.n, self.genes_max, xp)
+        for k in gen.CAMPOS:  # campos del genoma nuevos (red regulatoria, fase 13): en cero
+            if k not in self.d:
+                self.d[k] = vacios[k]
+        faltan = gen.ENTRADAS_REG - self.d["R"].shape[-1]
+        if faltan > 0:
+            self.d["R"] = xp.concatenate([self.d["R"], xp.zeros(self.d["R"].shape[:-1] + (faltan,))], axis=-1)
         for k in ("w", "P", "ult_s"):
             faltan = gen.NUM_SENS - self.d[k].shape[-1]
             if faltan > 0:

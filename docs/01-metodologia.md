@@ -56,6 +56,8 @@ Complementamos con el **protocolo ODD** (*Overview, Design concepts, Details*; G
 | 5 | Asociación entre colectivos | ¿Se apilan niveles o el sistema se estanca? |
 | 6 | Problemas del entorno que exijan coordinación y anticipación | ¿Los colectivos resuelven lo que los individuos no? |
 | — | Mundo 3D (si alguna fase lo justifica) | ¿La geometría (superficie/volumen, interior) habilita organizaciones nuevas? |
+| 13 | **Desarrollo:** red de genes con señal por contacto, cuerpo como unidad, sexo (lo que hace la naturaleza del cigoto a las neuronas) | ¿Aparecen tipos celulares, tejidos y células mensajeras? |
+| — | **Universo fiel a la realidad** (principio 7): clima con cambio climático y El Niño, acciones del autor, espacio continuo en 3D con gravedad | ¿Lo que evoluciona se adapta a un mundo que no lo favorece? |
 
 ## 4. Herramientas
 

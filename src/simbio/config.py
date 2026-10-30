@@ -308,6 +308,23 @@ class TextoCfg:
 
 
 @dataclass
+class DesarrolloCfg:
+    # fase 13, desarrollo (peldaños 1 y 2): red regulatoria. Cada célula tiene 8 reguladores (estado interno en
+    # [−1, 1]) que se influyen entre sí, leen los sensores y los 2 primeros reguladores de los socios enlazados
+    # (señal por contacto, como Notch–Delta). Los genes de acción leen el estado, que se hereda al dividirse: con el
+    # mismo genoma, cada célula puede quedar en un estado distinto (un "tipo celular") según su historia y sus
+    # vecinas. Qué hace la red lo decide la evolución: al inicio sus pesos valen 0 y LUCA se comporta como sin ella
+    activo: bool = False
+    tasa: float = 0.2  # reg ← (1 − tasa)·reg + tasa·tanh(R·entradas + rb)
+    # desvío del ruido que recibe el estado del hijo al dividirse (división asimétrica: rompe la simetría entre
+    # hermanas, como el reparto desigual de determinantes en las células madre). 0: el hijo copia el estado
+    asimetria: float = 0.0
+    # control: la red existe, muta y cambia de estado igual, pero los genes no la leen (como asociacion.inerte). Lo que
+    # la red "hace" ahí es pura deriva: la referencia para decir si la evolución la usa
+    inerte: bool = False
+
+
+@dataclass
 class SimCfg:
     semilla: int = 0
     pasos: int = 5000
@@ -334,6 +351,7 @@ class Config:
     estimulos: EstimulosCfg = field(default_factory=EstimulosCfg)
     ataque: AtaqueCfg = field(default_factory=AtaqueCfg)
     texto: TextoCfg = field(default_factory=TextoCfg)
+    desarrollo: DesarrolloCfg = field(default_factory=DesarrolloCfg)
     sim: SimCfg = field(default_factory=SimCfg)
 
     def to_dict(self) -> dict[str, Any]:

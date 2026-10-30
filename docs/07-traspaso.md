@@ -139,6 +139,16 @@ El diseño completo está en `docs/06-universo-vivo.md`. Resumen operativo:
 
 **Piloto grande del texto (2026-10-30): nulo.** ~2 000 organismos (384²) en la GPU, semillas 21–24, sin extinciones, pero el texto no supera al barajado (las 4 diferencias negativas, p = 1,0). Casi ningún organismo tiene memoria (≤ 0,15 %). Más organismos no cambian nada: la memoria no se selecciona. Detalle en `docs/bitacora/2026-10-30-fase12-fisica-estable.md`.
 
+**Objetivo final del autor:** un ser inteligente con el que pueda interactuar, como con un asistente o mejor. Pidió no reinventar la rueda: copiar lo que la naturaleza ya resolvió, del cigoto a las neuronas, y confía en que se puede lograr.
+
+**Fase 13, desarrollo (en curso, `openspec/changes/fase-13-desarrollo/`):**
+- **Peldaños 1 y 2 hechos:** red regulatoria de 8 reguladores por célula, heredable, con señal por contacto (`desarrollo.*`, tests en `tests/test_desarrollo.py`). La inhibición lateral diferencia a dos hermanas idénticas.
+- **Piloto prerregistrado en curso:** red contra inerte, semillas 1–6, 300 000 pasos, universo de la fase 3. Script `experiments/fase13/piloto.py`, salida `runs/fase13/piloto.json`.
+- **Siguientes, uno por vez:**
+  - el cuerpo como unidad que se reproduce (línea germinal y cuello de botella unicelular);
+  - reproducción sexual;
+  - tipos celulares y células mensajeras (primeras neuronas).
+
 **Giro acordado con el autor (2026-10-30), principio 7 de la metodología:** el objetivo final es un ser inteligente con el que el autor pueda interactuar. No se diseñan mundos a medida de un rasgo. El universo solo se cambia para acercarlo a la realidad: clima real, cambio climático, El Niño y La Niña, gravedad, espacio continuo en 3D y las acciones del autor como parte del ambiente.
 
 Configuración de los pilotos del texto:
