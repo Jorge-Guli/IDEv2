@@ -45,3 +45,36 @@ Escrito antes de correr. Antecedentes:
 - **C1 y P2:** la física real del tamaño sostiene cuerpos y la red diferencia sus células. Son los primeros tipos celulares, y lo siguiente es la reproducción sexual o las células mensajeras.
 - **C1 sin P2:** hay cuerpos, pero sin tipos celulares. Lo siguiente sería un cuerpo con línea germinal o más tiempo evolutivo (universo continuo).
 - **Ninguno:** el tamaño no alcanza para sostener cuerpos. Se registra y se busca la próxima diferencia con la realidad, sin premiar a los grupos.
+
+## Resultado (2026-10-30, 19:47): C1 se cumple; P2 no
+18 corridas de 300 000 pasos y **0 extinciones**. Medido desde el paso 200 000.
+
+| | red | control | Diferencias | p | |
+|---|---|---|---|---|---|
+| **C1** `frac_enlazados` | 0,80–0,96 | sin_tamano: 0,0001–0,0003 | +0,80 a +0,96, 6 de 6 | **1/64 = 0,016** | ✅ |
+| **P2** diferenciación relativa | 0,25–0,75 | inerte: 0,16–0,75 | 4 de 6 positivas (−0,38 a +0,52) | 0,22 | ❌ |
+
+**Exploratorias:**
+- **Cuerpos:**
+  - con el tamaño, el 51–85 % de los organismos vive en grupos de 3 o más, con un tamaño medio de 3–10 células;
+  - sin el tamaño, nadie: los enlazados caen a 0 antes del paso 10 000;
+  - los cuerpos se forman despacio: 38 % enlazados a los 10 000 pasos, 64 % a los 50 000 y 90 % a los 300 000.
+- **Ecología:**
+  - más población con el tamaño (+36 a +669 en las 6 semillas);
+  - menos depredadores (24–41 % contra 56–69 %);
+  - vidas más largas: ~2 000 generaciones en 300 000 pasos, contra ~8 300 sin el tamaño.
+- **La red:**
+  - el peso de lectura ya no es menor que en el inerte (4 de 6 mayores, p = 0,44): con cuerpos, la red deja de estorbar;
+  - correlación entre estado regulatorio y rol: máxima 0,78–0,80 en las semillas 8 y 9 con red, contra 0,20–0,54 en todas las del inerte;
+  - dispersión de roles en los grupos: mayor con red en 3 de 6.
+  - **Indicio en 2–3 semillas, no un resultado.**
+
+**Lectura:**
+- Corregir una sola cosa para que se pareciera más a la realidad (una célula casi no puede comerse a otra de su tamaño) bastó para que aparecieran **cuerpos multicelulares**: grupos clonales que dominan la población. No se programó ningún premio para los grupos.
+- Es lo mismo que se observa en el laboratorio: la depredación hizo evolucionar la multicelularidad en *Chlamydomonas* (Herron et al. 2019).
+- **Límites:**
+  - el efecto de la física es directo: estar en grupo protege por definición del ataque según el tamaño. Lo que emerge es que la evolución lo aprovecha formando grupos clonales que crecen y se mantienen;
+  - todavía no hay tipos celulares consistentes, solo indicios en 2 semillas.
+- **Siguiente:**
+  - mirar por dentro los cuerpos de las semillas 8 y 9: si las células en distinto estado hacen cosas distintas;
+  - llevar el universo natural, con cuerpos, a corridas más largas.
