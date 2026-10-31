@@ -189,7 +189,8 @@ Configuración de los pilotos del texto:
 
 **Plan vigente (2026-10-31):** seguir la fase 13 en el universo natural.
 1. ~~Fundamentar la curva del tamaño con la realidad~~ hecho (`docs/bitacora/2026-10-31-fase13-curva-tamano-prerregistro.md`): los protistas comen presas 3–10 veces menores en diámetro (Hansen et al. 1994). La realidad es más empinada que las dos curvas; **se queda r²/(1+r²)**, del lado conservador.
-2. Siguiente peldaño: reproducción del cuerpo, sexo y tipos celulares.
+2. **En curso (peldaño 3):** ¿hay línea germinal con el genoma actual? Medidas `exceso_germinal` (contra un azar según la oportunidad física de dividirse), red contra inerte, semillas 19–24, en Docker (`fase13-germinal`, salida `runs/fase13/germinal.json`). Prerregistro: `docs/bitacora/2026-10-31-fase13-linea-germinal-prerregistro.md`. Si da nulo, buscar qué capacidad real le falta al genoma (por ejemplo, puentes citoplasmáticos regulados por genes).
+3. Después: sexo y tipos celulares.
 3. Universo continuo con `natural.toml` (corridas de semanas).
 4. Más realismo: cambio climático, El Niño y La Niña, acciones del autor, y espacio 3D con gravedad.
 

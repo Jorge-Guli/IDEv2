@@ -17,7 +17,7 @@
 - [x] 2.7 Fundamentar la forma de la curva del tamaño con datos reales de depredadores unicelulares: se queda r²/(1+r²) (la realidad es aún más empinada)
 
 ## 3. Peldaños siguientes (diseño pendiente, uno por vez)
-- [ ] 3.1 El cuerpo como unidad que se reproduce (línea germinal, cuello de botella unicelular)
+- [ ] 3.1 El cuerpo como unidad que se reproduce (línea germinal, cuello de botella unicelular): medidas y prerregistro hechos; piloto en Docker (`fase13-germinal`)
 - [ ] 3.2 Reproducción sexual
 - [ ] 3.3 Tipos celulares y células mensajeras
 
