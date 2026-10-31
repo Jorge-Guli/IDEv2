@@ -31,6 +31,33 @@ Este documento es **el camino que sigue el proyecto, en orden**, con el porqué 
 | H | **Horizonte: simbiosis humano–organismo** (visión del usuario) | horizonte | Una inteligencia que crece con su usuario en su dispositivo, en lugar de un modelo entrenado y congelado. Para que acompañe y no compita, el bienestar o las interacciones del usuario tendrían que ser parte del ambiente que nutre a los organismos (como en la domesticación). Siempre en modo solo lectura y dentro de un entorno aislado |
 | U | **Universos abiertos** (propuesta del usuario) | → fase 12 | Desarrollado en [06-universo-vivo.md](06-universo-vivo.md) |
 
+## La naturaleza como inspiración, no como receta (decisión del autor, 2026-10-31)
+"No quiero que sea el camino literal, quiero que lo uses como inspiración; si un paso puede saltearse, si encontrás otra forma de lograr la vida inteligente digital, adelante." El objetivo es la inteligencia, no repetir la historia de la Tierra. Los principios (sin fuerzas diseñadas, sin LLMs, percepción local, controles, determinismo) siguen firmes.
+
+### Atajo en estudio: un cerebro antes que un cuerpo (fase 14, en diseño)
+**Diagnóstico de 13 fases:** el límite para la inteligencia no parece ser la falta de cuerpos. Es que **el mundo casi no premia procesar información más allá del reflejo**:
+- la memoria nunca evolucionó (fase 9): su primer peldaño no se premia;
+- la red regulatoria de 8 unidades, que ya es una pequeña red neuronal recurrente dentro de cada célula, no se usa (fase 13);
+- cada organismo percibe solo la celda de enfrente y las vecinas, y con tan poca información no hay nada que recordar ni anticipar.
+
+**En la naturaleza, los cerebros empezaron a pagar cuando:**
+- se pudo **percibir a distancia**: ojos y olfato, en la explosión del Cámbrico;
+- hubo **otros a quienes anticipar**: la carrera entre depredador y presa.
+
+Las dos cosas son fidelidad a la realidad, no premios.
+
+**Plan:**
+- Usar la red regulatoria de cada organismo **como cerebro, sin esperar cuerpos**.
+- Ampliar lo que el genoma permite con **órganos de percepción a distancia, con costo**:
+  - el alcance lo decide el genoma y la física cobra energía por alcance;
+  - con un tope de pocas celdas, así la percepción sigue siendo local.
+- Medir la inteligencia con pruebas, no con impresiones:
+  - ¿la red guarda información útil (memoria)?
+  - ¿anticipa (predice la lluvia, el movimiento de una presa)?
+  - ¿un organismo evolucionado le gana a su ancestro en un mundo nuevo?
+
+**Cuándo:** después de leer el experimento de respuesta al ataque, que está en curso. Si los cuerpos no muestran ni defensa ni reproducción como unidad, la fase 14 pasa al frente y la fase 13 queda como base.
+
 ## El camino, en orden
 
 ### Paso E: ¿la asociación es inestable o solo difícil de descubrir?
@@ -76,6 +103,7 @@ Este documento es **el camino que sigue el proyecto, en orden**, con el porqué 
 |---|---|---|
 | 2026-10-23 | Usar OpenSpec + ODD + criterios numéricos por fase | Ver `01-metodologia.md` |
 | 2026-10-30 | Principio 7: el universo no se acomoda al organismo; solo se acerca a la realidad del autor | Pedido del autor. Un ser criado en un mundo que lo favorece no sirve en el mundo real |
+| 2026-10-31 | La naturaleza es inspiración, no receta: se pueden saltear pasos (por ejemplo, un cerebro antes que un cuerpo) | Pedido del autor. El objetivo es la inteligencia; 13 fases muestran que el límite es que el mundo no premia procesar información, no la falta de cuerpos |
 | 2026-10-30 | Fase 13: el desarrollo como en la naturaleza (red de genes, cuerpo, sexo, tipos celulares) | El cuello de botella es el genoma (fases 5–12). Se amplía lo que el genoma permite, no lo que el mundo regala |
 | 2026-10-23 | Agregar adhesión y movimiento de grupo a la fase 2 | La revisión mostró que la física inicial hacía imposible sostener un grupo |
 | 2026-10-23 | Cerrar la fase 2 con resultado "la asociación no rinde" e insertar la fase 2b antes de la 3 | Los controles (inerte, sin beneficio, positivo) descartan bug, falta de detección y sesgo mutacional |

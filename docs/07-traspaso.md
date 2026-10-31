@@ -141,7 +141,7 @@ El diseño completo está en `docs/06-universo-vivo.md`. Resumen operativo:
 
 **Piloto grande del texto (2026-10-30): nulo.** ~2 000 organismos (384²) en la GPU, semillas 21–24, sin extinciones, pero el texto no supera al barajado (las 4 diferencias negativas, p = 1,0). Casi ningún organismo tiene memoria (≤ 0,15 %). Más organismos no cambian nada: la memoria no se selecciona. Detalle en `docs/bitacora/2026-10-30-fase12-fisica-estable.md`.
 
-**Objetivo final del autor:** un ser inteligente con el que pueda interactuar, como con un asistente o mejor. Pidió no reinventar la rueda: copiar lo que la naturaleza ya resolvió, del cigoto a las neuronas, y confía en que se puede lograr.
+**Objetivo final del autor:** un ser inteligente con el que pueda interactuar, como con un asistente o mejor. Pidió no reinventar la rueda: copiar lo que la naturaleza ya resolvió, del cigoto a las neuronas, y confía en que se puede lograr. **Aclaración del autor (2026-10-31): la naturaleza es inspiración, no camino literal.** Si un paso puede saltearse o hay otra forma de llegar a la inteligencia digital, adelante. Ver "La naturaleza como inspiración" en `docs/02-hoja-de-ruta.md`, con el atajo en estudio: un cerebro antes que un cuerpo (fase 14).
 
 **Fase 13, desarrollo (en curso, `openspec/changes/fase-13-desarrollo/`):**
 - **Peldaños 1 y 2 hechos:** red regulatoria de 8 reguladores por célula, heredable, con señal por contacto (`desarrollo.*`, tests en `tests/test_desarrollo.py`). La inhibición lateral diferencia a dos hermanas idénticas.
