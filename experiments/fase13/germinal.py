@@ -8,7 +8,7 @@ cuerpo hacen los propágulos, más de lo que daría el azar (exceso_germinal > 0
 Preregistro: docs/bitacora/2026-10-31-fase13-linea-germinal-prerregistro.md
 
 Uso (en Docker): docker compose --profile experimentos run -d --name fase13-germinal experimento \
-    experiments/fase13/germinal.py --pasos 300000 --semillas 19 20 21 22 23 24 --procesos 4
+    experiments/fase13/germinal.py --pasos 300000 --semillas 19 20 21 22 23 24 25 26 27 28 --procesos 4
 """
 
 from __future__ import annotations
@@ -21,7 +21,7 @@ from piloto import RAIZ, correr, final, permutacion_pareada
 
 MEDIDAS = ["exceso_germinal", "concentracion_propagulos", "concentracion_propagulos_azar",
            "concentracion_propagulos_lugar", "frac_sin_propagulos",
-           "frac_propagulos_de_cuerpo", "frac_enlazados", "poblacion", "frac_depredadores", "parentesco_relativo"]
+           "frac_propagulos_de_cuerpo", "frac_enlazados", "poblacion", "frac_depredadores", "parentesco_relativo", "eta_media"]
 
 
 def evaluar(res, desde):
@@ -42,7 +42,7 @@ def evaluar(res, desde):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--pasos", type=int, default=300_000)
-    ap.add_argument("--semillas", type=int, nargs="+", default=[19, 20, 21, 22, 23, 24])
+    ap.add_argument("--semillas", type=int, nargs="+", default=list(range(19, 29)))
     ap.add_argument("--procesos", type=int, default=4)
     ap.add_argument("--salida", default="runs/fase13/germinal.json")
     args = ap.parse_args()

@@ -1,12 +1,30 @@
-# Universo vivo (fase 12). Uso:
-#   docker compose up -d --build     arranca el universo en segundo plano (retoma solo si ya existía)
-#   docker compose logs -f           muestra su avance
+# Universo vivo. Uso:
+#   docker compose up -d --build     arranca el universo natural en segundo plano (retoma solo si ya existía)
+#   docker compose logs -f natural   muestra su avance
 #   docker compose stop              lo detiene: termina el paso, guarda y sale
-# Los datos quedan en ./runs/vivo/universo (estado.pkl, metricas.jsonl, eventos.jsonl, linaje/, poblacion.npz).
+# Los datos quedan en ./runs/vivo/natural (estado.pkl, metricas.jsonl, eventos.jsonl, linaje/, poblacion.npz).
 services:
-  universo:
+  # Universo natural (desde 2026-10-31, principio 7): clima real de Capitán Bermúdez y nada de fuerzas diseñadas.
+  # Sin resembrar: si se extingue, se detiene; una extinción es un dato, no algo que corregir.
+  natural:
     build: .
     image: simbio-vivo
+    volumes:
+      - ./runs/vivo:/datos
+      - ./datos:/simbio/datos:ro
+    command: ["experiments/configs/natural.toml", "--salida", "/datos/natural", "--guardar-cada", "10000",
+              "--sin-resembrar"]
+    network_mode: none
+    restart: unless-stopped
+    stop_grace_period: 60s
+    cpus: 0.5
+
+  # Universos de la fase 12, retirados el 2026-10-31: tenían fuerzas diseñadas (depredador externo, estaciones y
+  # la lluvia decidiendo qué comida nutre). Sus datos quedan en ./runs/vivo/universo y ./runs/vivo/clima. Solo
+  # arrancan a pedido: docker compose --profile historico up -d universo clima
+  universo:
+    image: simbio-vivo
+    profiles: ["historico"]
     volumes:
       - ./runs/vivo:/datos
     network_mode: none          # sin internet: los datos externos entran por una carpeta (etapa 2)
@@ -20,7 +38,7 @@ services:
   # Datos en ./runs/vivo/clima.
   clima:
     image: simbio-vivo
-    depends_on: [universo]      # misma imagen: se construye con el servicio universo
+    profiles: ["historico"]
     volumes:
       - ./runs/vivo:/datos
       - ./datos:/simbio/datos:ro

@@ -18,7 +18,7 @@ Escrito el 2026-10-27 y actualizado el 2026-10-29 para que una nueva sesión de 
 - **Su equipo:** Windows, carpeta `C:\Desarrollo\IDEv2`, Python 3.12 del sistema (también hay `.venv`), 12 núcleos lógicos. **El autor usa la PC mientras corre todo:** corridas con `--procesos 6` como máximo y bajarles la prioridad apenas arrancan (`Get-Process python | % { $_.PriorityClass = 'Idle' }`). Hasta ahora corría las corridas largas a mano y avisaba "resultados subidos". **Con Claude Desktop, Claude puede correrlas directamente en su equipo.**
 - **Los experimentos largos corren en Docker** (pedido del autor, 2026-10-30): `docker compose --profile experimentos run -d --name <nombre> experimento experiments/<fase>/<script>.py --procesos 4 ...`, con 4 CPU, sin red y sin abrir ventanas en su escritorio. Se espera el final con `docker wait <nombre>`. Cada experimento corre entero en una sola plataforma, porque Linux y Windows dan huellas distintas. Lanzarlos en Windows por WMI abría una consola, y cerrarla cortó un piloto.
 - **Libertad expresa** (2026-10-30): "ensayar, probar, validar, crear, destruir, plantear hipótesis... sin pedir permiso ante cada paso".
-- **Docker Desktop:** instalado. Contenedores `idev2-universo-1` e `idev2-clima-1`, con medio núcleo cada uno (`cpus: 0.5`) y `restart: unless-stopped`: tras un corte de luz retoman solos desde su último guardado (verificado el 2026-10-28).
+- **Docker Desktop:** instalado. Desde el 2026-10-31 corre el contenedor `idev2-natural-1`: el universo natural (`natural.toml`), con medio núcleo (`cpus: 0.5`), `restart: unless-stopped` y `--sin-resembrar`; datos en `runs/vivo/natural`. Los universos de la fase 12 (`idev2-universo-1` e `idev2-clima-1`) quedaron retirados por tener fuerzas diseñadas; sus datos siguen en `runs/vivo/universo` y `runs/vivo/clima` (perfil `historico`).
 - **Ciudad:** Capitán Bermúdez, Santa Fe (Argentina).
 
 ## 3. Reglas del proyecto (de `CLAUDE.md`, no negociables)
@@ -59,9 +59,8 @@ Escrito el 2026-10-27 y actualizado el 2026-10-29 para que una nueva sesión de 
 python -m pytest -q                       # 192 pasan; 3 se omiten sin GPU NVIDIA con CuPy
 python -m simbio correr experiments/configs/base.toml --salida runs/x --semilla 1 --pasos 20000 [--set seccion.clave=valor]
 python -m simbio competir luca runs/x/poblacion.npz experiments/configs/base.toml --pasos 3000
-python -m simbio vivir experiments/configs/vivo.toml --salida runs/vivo/universo   # universo continuo (Ctrl+C guarda)
-python -m simbio mirar runs/vivo/universo                                         # resumen sin detenerlo
-docker compose up -d --build                                                      # el universo en Docker, sin red
+docker compose up -d --build                      # universo natural en Docker, sin red (servicio natural)
+python -m simbio mirar runs/vivo/natural          # resumen sin detenerlo
 python experiments/herramientas/huellas.py --comparar                             # determinismo
 python experiments/<fase>/evaluar.py --salida runs/<fase> --procesos 8            # evaluación de una fase
 openspec validate --all --strict
@@ -189,7 +188,7 @@ Configuración de los pilotos del texto:
 
 **Plan vigente (2026-10-31):** seguir la fase 13 en el universo natural.
 1. ~~Fundamentar la curva del tamaño con la realidad~~ hecho (`docs/bitacora/2026-10-31-fase13-curva-tamano-prerregistro.md`): los protistas comen presas 3–10 veces menores en diámetro (Hansen et al. 1994). La realidad es más empinada que las dos curvas; **se queda r²/(1+r²)**, del lado conservador.
-2. **En curso (peldaño 3):** ¿hay línea germinal con el genoma actual? Medidas `exceso_germinal` (contra un azar según la oportunidad física de dividirse), red contra inerte, semillas 19–24, en Docker (`fase13-germinal`, salida `runs/fase13/germinal.json`). Prerregistro: `docs/bitacora/2026-10-31-fase13-linea-germinal-prerregistro.md`. Si da nulo, buscar qué capacidad real le falta al genoma (por ejemplo, puentes citoplasmáticos regulados por genes).
+2. **En curso (peldaño 3):** ¿hay línea germinal con el genoma actual? Medidas `exceso_germinal` (contra un azar según la oportunidad física de dividirse), red contra inerte, semillas 19–24, en Docker (`fase13-germinal`, salida `runs/fase13/germinal.json`). Prerregistro: `docs/bitacora/2026-10-31-fase13-linea-germinal-prerregistro.md`. Ampliado a 10 semillas (19–28) antes de ver resultados: al terminar `fase13-germinal`, sigue `fase13-germinal10`. Si da nulo, buscar qué capacidad real le falta al genoma (por ejemplo, puentes citoplasmáticos regulados por genes).
 3. Después: sexo y tipos celulares.
 3. Universo continuo con `natural.toml` (corridas de semanas).
 4. Más realismo: cambio climático, El Niño y La Niña, acciones del autor, y espacio 3D con gravedad.

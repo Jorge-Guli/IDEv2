@@ -41,3 +41,8 @@ Tests: 209 pasan, 1 omitido. Huellas iguales a la referencia.
 - **G1 y G2:** hay línea germinal y nace de la red regulatoria: el cuerpo empieza a ser la unidad de reproducción.
 - **G1 sin G2:** la división del trabajo reproductivo existe, pero alcanza con los sensores (por ejemplo, la posición).
 - **Ninguno:** cada célula se reproduce por su cuenta; el cuerpo todavía es una colonia clonal. El paso siguiente sería buscar qué capacidad real le falta al genoma: por ejemplo, que el flujo de energía entre células unidas dependa del genoma, como los puentes citoplasmáticos de *Volvox*. Sin fuerzas diseñadas.
+
+## Enmienda (2026-10-31, antes de ver ningún resultado)
+Por un comentario de Gemini sobre la potencia: con 6 semillas, una sola semilla ruidosa deja p en 0,078, como pasó con P2' en los controles. **Se amplía a 10 semillas (19–28).** Cuando terminan las 12 corridas de 19–24, el mismo script retoma y agrega 25–28, sin abrir el resultado parcial. Los criterios no cambian; se evalúan sobre las 10.
+
+También se agrega como exploratoria `eta_media`, la tasa de aprendizaje en vida (heredable). Pregunta: ¿el refuerzo individual en vida (premia la energía propia) se apaga en los cuerpos o frena la línea germinal? Si G1 da nulo, un control sin aprendizaje (`aprendizaje.activo=false`) es candidato.

@@ -28,6 +28,6 @@ Documentación, specs, comentarios y nombres del dominio en **español**. Los en
 - Evaluación de la fase 1: `python experiments/fase1/evaluar.py --salida runs/fase1`
 - Validar specs: `openspec validate --all --strict`
 - Dispositivo: `python -m simbio dispositivo`
-- Universo continuo: `python -m simbio vivir experiments/configs/vivo.toml --salida runs/vivo/universo` y `python -m simbio mirar runs/vivo/universo` (o `docker compose up -d --build`)
+- Universo continuo (natural, principio 7): `docker compose up -d --build` (servicio `natural`, datos en `runs/vivo/natural`) y `python -m simbio mirar runs/vivo/natural`. Los universos de la fase 12 (`universo`, `clima`) quedaron retirados por tener fuerzas diseñadas (perfil `historico`)
 - Experimentos largos (siempre en Docker, sin ventanas en el escritorio del autor): `docker compose --profile experimentos run -d --name <nombre> experimento experiments/<fase>/<script>.py --procesos 4 ...`; esperar con `docker wait <nombre>`
 - Huellas de determinismo: `python experiments/herramientas/huellas.py --comparar`

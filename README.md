@@ -8,9 +8,11 @@ Todas las poblaciones parten de **LUCA** (*Last Universal Common Ancestor*, "úl
 
 Las acciones que tiene y usa cada organismo salen de su genoma: genes-regla que conectan lo que percibe (solo localmente) con acciones primitivas de una física fija. No hay modelos preentrenados dentro de los organismos. Toda afirmación se compara con un control y con varias semillas, y las corridas son deterministas.
 
-## Estado (2026-10-26)
+## Estado (2026-10-31)
 
-**Próxima fase: 12, universo vivo.** Un universo que corre sin parar, alimentado con datos reales, con una interfaz para estimularlo, organismos que se comen entre sí y varios universos conectados ([diseño](docs/06-universo-vivo.md)).
+**Fase 13 en curso: desarrollo, como en la naturaleza.** El objetivo final es un ser inteligente con el que se pueda interactuar. El camino es copiar lo que la naturaleza ya resolvió: del cigoto a las células, los tejidos y las neuronas.
+
+**Principio 7: el universo no se acomoda al organismo.** Solo se cambia para hacerlo más fiel a la realidad: clima real, cambio climático, El Niño, gravedad, espacio en 3D y las acciones del autor. Nada de fuerzas diseñadas: ni depredador externo, ni estaciones o toxicidad artificiales, ni premios para un rasgo. Las presiones salen de la propia población o del mundo real. El universo de referencia es `experiments/configs/natural.toml`. Muchos mundos de las fases 2c–12 tenían fuerzas programadas, y sus resultados se leen como tales.
 
 ### Lo que encontramos hasta ahora
 - **La evolución básica funciona.** Los organismos se adaptan y la evolución inventa conductas nuevas (el giro, fase 1).
@@ -22,6 +24,7 @@ Las acciones que tiene y usa cada organismo salen de su genoma: genes-regla que 
 - **Sin peldaños, la memoria no evoluciona.**
   - Aun en un mundo donde recordar es la única forma de pasar del azar y un módulo de memoria armado a mano gana siempre, la memoria no apareció en ~3000 generaciones (fases 6 a 9), ni siquiera con genes cuya expresión depende de la memoria.
   - El camino existe, pero su primer paso no se premia: lo mismo que mostraron Lenski y colegas en Avida (2003).
+- **En el universo natural aparecen cuerpos clonales (fase 13).** La depredación evoluciona sola. Con la física de comer según el tamaño (una célula casi no puede tragarse a otra de su tamaño, respaldada por datos reales de protistas), 80–96 % de los organismos viven en cuerpos que nacen de una sola célula. Todavía no hay tipos celulares significativos.
 - **La evolución encuentra atajos.** Aprender en vida, selección espacial o "recordar" lo que tiene debajo: cada mundo nuevo se verifica primero con competencias.
 
 ### Fases
@@ -39,7 +42,8 @@ Las acciones que tiene y usa cada organismo salen de su genoma: genes-regla que 
 | 9 | Genes condicionados a la memoria | ✅ La memoria sigue sin evolucionar; falta el primer peldaño | [evaluación](docs/bitacora/2026-10-26-fase9-evaluacion.md) |
 | 10 | Peldaños para la memoria | ✅ Memoria sembrada **sostenida por selección** (6/8 contra 0/8 sin peldaño); no se usa para decidir | [evaluación](docs/bitacora/2026-10-26-fase10-evaluacion.md) |
 | 11 | Modulación por el estado interno | ✅ La memoria no se recluta; la tasa de mutación había colapsado | [evaluación](docs/bitacora/2026-10-26-fase11-evaluacion.md) |
-| 12 | Universo vivo | ▶ Siguiente | [diseño](docs/06-universo-vivo.md) |
+| 12 | Universo vivo, clima real, depredación evolucionada | ✅ La memoria no se selecciona, tampoco con 20 veces más organismos | [diseño](docs/06-universo-vivo.md) |
+| 13 | Desarrollo: red de genes, cuerpo, línea germinal | ▶ En curso: cuerpos clonales; se mide la línea germinal | [traspaso](docs/07-traspaso.md) |
 
 Detalle, decisiones y próximos pasos: **[hoja de ruta viva](docs/02-hoja-de-ruta.md)** y **[síntesis](docs/03-sintesis.md)**.
 
@@ -60,7 +64,7 @@ Detalle, decisiones y próximos pasos: **[hoja de ruta viva](docs/02-hoja-de-rut
 
 ```bash
 pip install -e ".[dev]"
-python -m pytest -q          # 160 pasan; 3 se omiten sin GPU NVIDIA con CuPy
+python -m pytest -q          # 209 pasan; los de GPU se omiten sin NVIDIA con CuPy
 
 # una corrida (genera métricas, población, linaje, imágenes)
 python -m simbio correr experiments/configs/base.toml --salida runs/demo --semilla 1 --pasos 20000
@@ -68,16 +72,16 @@ python -m simbio correr experiments/configs/base.toml --salida runs/demo --semil
 # evolucionados contra LUCA
 python -m simbio competir luca runs/demo/poblacion.npz experiments/configs/base.toml --pasos 3000 --set herencia.mutacion=false
 
-# evaluación de una fase (cada script documenta sus condiciones y las reglas prerregistradas)
-python experiments/fase9/evaluar.py --salida runs/fase9 --pasos 300000 --semillas 8 --procesos 8
+# experimentos largos: siempre en Docker, sin ventanas en el escritorio
+docker compose --profile experimentos run -d --name fase13-germinal experimento experiments/fase13/germinal.py --procesos 4
 ```
 
-**Universo vivo (fase 12):** un universo que corre sin plazo y retoma tras un corte.
+**Universo vivo:** el universo natural corre sin plazo y retoma tras un corte. Si se extingue, se detiene: una extinción es un dato.
 
 ```bash
-python -m simbio vivir experiments/configs/vivo.toml --salida runs/vivo/universo   # Ctrl+C guarda y sale
-python -m simbio mirar runs/vivo/universo                                         # resumen, sin detenerlo
-docker compose up -d --build                                                      # lo mismo en Docker, sin red
+docker compose up -d --build                                     # universo natural en Docker, sin red, medio núcleo
+python -m simbio mirar runs/vivo/natural                         # resumen, sin detenerlo
+python -m simbio vivir experiments/configs/natural.toml --salida runs/vivo/natural --sin-resembrar   # sin Docker
 ```
 
 Cualquier parámetro se puede cambiar con `--set seccion.clave=valor` (ver `src/simbio/config.py`). Los scripts de cada fase están en `experiments/<fase>/`.
