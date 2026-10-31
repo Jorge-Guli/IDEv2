@@ -163,3 +163,29 @@ def test_medidas_de_la_revision():
     f = sim.historial[-1]
     assert "frac_ataques_intragrupo" in f and 0.0 <= f["frac_ataques_intragrupo"] <= 1.0
     assert {"parentesco_relativo", "corr_reg_rol_intra"} <= set(f) or f.get("grupos_de_3_o_mas", 0) == 0
+
+
+def test_linea_germinal():
+    """Peldaño 3: si una sola célula del cuerpo hace todos los propágulos, el exceso sobre el azar es grande; si
+    todas hacen los mismos, no hay exceso."""
+    cfg = config.cargar(None, ["mundo.alto=16", "mundo.ancho=16", "sim.poblacion_inicial=6", "desarrollo.activo=true"])
+    sim = Simulacion(cfg)
+    lab, tam, edad = np.zeros(6, dtype=int), np.full(6, 6), np.full(6, 200.0)
+    sim.pob["n_lugar"][:] = 100
+    sim.pob["n_propagulos"][:] = sim.xp.asarray(np.array([12, 0, 0, 0, 0, 0], dtype=np.int32))
+    f = sim._linea_germinal(lab, tam, edad)
+    assert f["concentracion_propagulos"] == 1.0 and f["exceso_germinal"] > 0.3
+    assert abs(f["frac_sin_propagulos"] - 5 / 6) < 1e-12
+    sim.pob["n_propagulos"][:] = 2
+    f = sim._linea_germinal(lab, tam, edad)
+    assert abs(f["concentracion_propagulos"] - 1 / 3) < 1e-12 and f["exceso_germinal"] <= 0.0
+
+
+def test_propagulos_se_cuentan():
+    cfg = config.cargar(None, ["mundo.alto=24", "mundo.ancho=24", "sim.poblacion_inicial=80", "ataque.activo=true",
+                               "ataque.tamano=true", "desarrollo.activo=true", "sim.registrar_cada=50"])
+    sim = Simulacion(cfg)
+    sim.correr(150)
+    f = sim.historial[-1]
+    assert {"exceso_germinal", "frac_sin_propagulos", "frac_propagulos_de_cuerpo"} <= set(f)
+    assert int(sim.pob["n_propagulos"].sum()) > 0

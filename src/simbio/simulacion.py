@@ -167,7 +167,7 @@ class Simulacion:
                      "comido_libre_sec": 0.0, "comido_libre_nosec": 0.0, "depredados": 0,
                      "depredados_en_refugio": 0, "enlaces_por_union": 0, "enlaces_por_division": 0,
                      "grupos_empujan": 0, "grupos_mueven": 0, "grupos3_empujan": 0, "grupos3_mueven": 0,
-                     "grupos_bloqueados": 0, "difundido": 0.0, "ataques": 0, "ataques_intragrupo": 0, "robado": 0.0, "muertes_por_ataque": 0, "comida_buena": 0.0, "comida_mala": 0.0, "conjugaciones": 0, "enlaces_creados": 0,
+                     "grupos_bloqueados": 0, "difundido": 0.0, "ataques": 0, "ataques_intragrupo": 0, "propagulos": 0, "propagulos_de_cuerpo": 0, "robado": 0.0, "muertes_por_ataque": 0, "comida_buena": 0.0, "comida_mala": 0.0, "conjugaciones": 0, "enlaces_creados": 0,
                      "acciones": xp.zeros(gen.NUM_PRIM, dtype=xp.int64)}
 
     def vecinos_enlazados(self, occ: np.ndarray) -> np.ndarray:
@@ -911,6 +911,11 @@ class Simulacion:
             hambre = xp.clip((h.umbral_hambre - p["E"]) / h.umbral_hambre, 0.0, 1.0)
             p["estres"] = (1 - h.memoria_estres) * p["estres"] + h.memoria_estres * hambre
 
+            if cfg.desarrollo.activo:  # peldaño 3: oportunidad de dividirse, para separar geometría de línea germinal
+                vy = (p["y"][:, None] + self.DY[None, :]) % H
+                vx = (p["x"][:, None] + self.DX[None, :]) % W
+                p["n_lugar"] += (occ[vy, vx] < 0).any(axis=1).astype(xp.int32)
+
             # dividirse (suelto o unido)
             nuevos = None
             divide = (act == gen.DIVIDIRSE) | (act == gen.DIVIDIRSE_UNIDO)
@@ -942,6 +947,15 @@ class Simulacion:
                     self.cont["enlaces_creados"] += int(unido.sum())
                     self.cont["enlaces_por_division"] += int(unido.sum())
                     self.cont["nacimientos"] += padres.size
+                    if cfg.desarrollo.activo:
+                        # peldaño 3: propágulos (hijos que nacen sueltos) y si salen de un cuerpo de 3 o más
+                        suelto = ~unido
+                        p["n_propagulos"][padres[suelto]] += 1
+                        if bool(suelto.any()):
+                            lab = componentes(dev.a_cpu(socios))
+                            tam_p = np.bincount(lab, minlength=p.n)[lab][dev.a_cpu(padres[suelto])]
+                            self.cont["propagulos"] += int(suelto.sum())
+                            self.cont["propagulos_de_cuerpo"] += int((tam_p >= 3).sum())
                     p["n_divisiones"][padres] += 1
                     nuevos["memoria"] = p["memoria"][padres].copy()  # memoria epigenética
                     nuevos["digestion"] = p["digestion"][padres].copy()
@@ -1076,8 +1090,50 @@ class Simulacion:
             de = [float(et[(tam >= 3) & (lab == g)].std(axis=0).mean()) for g in np.unique(lab[tam >= 3])]
             dpob = float(et.std(axis=0).mean()) if et.size else 0.0
             extra["parentesco_relativo"] = media(de) / dpob if de and dpob > 1e-12 else float("nan")
+            extra.update(self._linea_germinal(lab, tam, edad))
         return {**extra, "concentracion_reproductiva": media(conc), "corr_avanzar_dividir": media(corr),
                 "frac_nunca_dividio": media(nunca), "frac_refractarios": float((dev.a_cpu(p["refractario"]) > 0).mean())}
+
+    def _linea_germinal(self, lab, tam, edad) -> dict[str, float]:
+        """Peldaño 3 de la fase 13: ¿pocas células de cada cuerpo fundan los cuerpos nuevos?
+        - concentración: fracción de los propágulos del cuerpo hecha por el tercio más fértil de sus miembros (edad
+          ≥ 100), en cuerpos de 3 o más con al menos 3 propágulos;
+        - la misma medida si los propágulos se repartieran al azar entre los miembros, en proporción a su edad
+          (20 sorteos por cuerpo, con un generador propio: medir no altera la simulación);
+        - ídem en proporción a su oportunidad física (pasos con una celda vecina libre): las del interior del
+          cuerpo no tienen dónde dividirse, y eso concentra los propágulos sin que haya línea germinal;
+        - exceso = concentración − azar por oportunidad: > 0 indica una línea germinal más allá de la geometría;
+        - fracción de miembros sin ningún propágulo (soma)."""
+        npg = dev.a_cpu(self.pob["n_propagulos"]).astype(float)
+        lugar = dev.a_cpu(self.pob["n_lugar"]).astype(float)
+        ok = (tam >= 3) & (edad >= 100)
+        azar = np.random.default_rng(self.t + 1)
+        conc, nulo, nulo_lugar, soma = [], [], [], []
+
+        def sortear(tot, pesos, k):
+            sorteo = azar.multinomial(tot, pesos / pesos.sum(), size=20)
+            return float((np.sort(sorteo, axis=1)[:, ::-1][:, :k].sum(axis=1) / tot).mean())
+
+        for g in np.unique(lab[ok]):
+            m = ok & (lab == g)
+            k_m, tot = int(m.sum()), int(npg[m].sum())
+            if k_m < 3:
+                continue
+            soma.append(float((npg[m] == 0).mean()))
+            if tot < 3:
+                continue
+            k = int(np.ceil(k_m / 3))
+            conc.append(float(np.sort(npg[m])[::-1][:k].sum() / tot))
+            nulo.append(sortear(tot, edad[m], k))
+            nulo_lugar.append(sortear(tot, lugar[m] if lugar[m].sum() > 0 else edad[m], k))
+        media = lambda v: float(np.mean(v)) if v else float("nan")  # noqa: E731
+        c = self.cont
+        return {"concentracion_propagulos": media(conc), "concentracion_propagulos_azar": media(nulo),
+                "concentracion_propagulos_lugar": media(nulo_lugar),
+                "exceso_germinal": media(conc) - media(nulo_lugar) if conc else float("nan"),
+                "frac_sin_propagulos": media(soma), "cuerpos_medidos_germinal": len(conc),
+                "frac_propagulos_de_cuerpo": c["propagulos_de_cuerpo"] / c["propagulos"] if c["propagulos"]
+                else float("nan")}
 
     def medir(self) -> dict[str, float]:
         xp = self.xp

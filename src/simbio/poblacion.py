@@ -36,6 +36,8 @@ ESTADO = {
     "digestion": (np.float64, ()),  # estado digestivo, sigue lento a la memoria A (fase 10)
     "uso_atacar": (np.float64, ()),  # promedio móvil del uso de atacar (fase 12, etapa 4)
     "reg": (np.float64, (gen.NUM_REG,)),  # estado de la red regulatoria: el "tipo celular" (fase 13)
+    "n_propagulos": (np.int32, ()),  # hijos que nacieron sueltos en la vida (fase 13, peldaño 3)
+    "n_lugar": (np.int32, ()),  # pasos con alguna celda vecina libre: oportunidad física de dividirse (peldaño 3)
 }
 
 

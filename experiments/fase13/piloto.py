@@ -35,7 +35,11 @@ CLAVES = ["poblacion", "generacion_media", "genes_medios", "grupos_de_3_o_mas", 
           "con_gen_regulado", "peso_regulador_medio", "reg_medio_abs", "dispersion_reg_grupos",
           "dispersion_reg_poblacion", "corr_reg_rol_max", "dispersion_roles_grupos", "dispersion_roles_poblacion",
           "tasa_efectiva_media", "tiene_atacar", "usa_atacar", "frac_depredadores", "frac_enlazados",
-          "frac_ataques_intragrupo", "parentesco_relativo", "corr_reg_rol_intra"]
+          "frac_ataques_intragrupo", "parentesco_relativo", "corr_reg_rol_intra",
+          # peldaño 3: línea germinal
+          "concentracion_propagulos", "concentracion_propagulos_azar", "concentracion_propagulos_lugar",
+          "exceso_germinal", "frac_sin_propagulos",
+          "cuerpos_medidos_germinal", "frac_propagulos_de_cuerpo"]
 
 
 def correr(tarea):
