@@ -191,3 +191,44 @@ def test_propagulos_se_cuentan():
     assert int(sim.pob["n_propagulos"].sum()) > 0
     assert 0.0 <= f["frac_frente_hermana"] <= 1.0
     assert abs(f["supresion_cancer"] - (f["frac_frente_hermana"] - f["frac_ataques_intragrupo"])) < 1e-12
+
+
+def test_fragmentacion():
+    """Peldaño 3.2: dos pedazos de varias células con el mismo fundador cuentan como un cuerpo partido; pedazos de
+    fundadores distintos, no. El hijo unido hereda el fundador; el suelto funda uno nuevo."""
+    cfg = config.cargar(None, ["mundo.alto=16", "mundo.ancho=16", "sim.poblacion_inicial=6", "desarrollo.activo=true"])
+    sim = Simulacion(cfg)
+    lab, tam = np.array([0, 0, 1, 1, 2, 2]), np.full(6, 2)
+    sim.pob["fundador"][:] = sim.xp.asarray(np.array([7, 7, 7, 7, 9, 9]))
+    f = sim._fragmentacion(lab, tam)
+    assert abs(f["frac_pedazos_fragmentados"] - 2 / 3) < 1e-12 and f["fundadores_partidos"] == 1.0
+    sim.pob["fundador"][:] = sim.pob["id"]
+    assert sim._fragmentacion(lab, tam)["fundadores_partidos"] == 0.0
+
+    cfg = config.cargar(None, ["mundo.alto=24", "mundo.ancho=24", "sim.poblacion_inicial=80",
+                               "desarrollo.activo=true", "sim.registrar_cada=50"])
+    sim = Simulacion(cfg)
+    sim.correr(150)
+    p = sim.pob
+    fund, ids = np.asarray(p["fundador"]), np.asarray(p["id"])
+    assert (fund <= ids).all()  # nadie es fundado por alguien posterior
+    assert "frac_pedazos_fragmentados" in sim.historial[-1]
+
+
+def test_respuesta_ataque():
+    """Si las células atacadas reciben más energía de sus socias que las no atacadas con los mismos enlaces,
+    ayuda_herida es positiva; sin heridas, no hay dato."""
+    cfg = config.cargar(None, ["mundo.alto=16", "mundo.ancho=16", "sim.poblacion_inicial=8", "desarrollo.activo=true",
+                               "ataque.activo=true"])
+    sim = Simulacion(cfg)
+    p, xp = sim.pob, sim.xp
+    lab, tam = np.zeros(8, dtype=int), np.full(8, 8)
+    ii, jj = np.array([0, 1]), np.array([1, 0])
+    p["socio"][:] = -1  # todas con 0 enlaces: un solo estrato
+    sim.t = 1000
+    f = sim._respuesta_ataque(lab, tam, ii, jj)
+    assert f["frac_heridas"] == 0.0 and f["ayuda_herida"] != f["ayuda_herida"]
+    p["ultimo_ataque"][:4] = 995
+    p["recibido_paso"][:] = xp.asarray(np.array([2.0, 2, 2, 2, 0, 0, 0, 0]))
+    f = sim._respuesta_ataque(lab, tam, ii, jj)
+    assert f["frac_heridas"] == 0.5 and abs(f["ayuda_herida"] - 2.0) < 1e-12

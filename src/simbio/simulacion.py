@@ -137,6 +137,8 @@ class Simulacion:
         d["uso_comer"][:] = self.cfg.fisica.maquinaria_ref  # maquinaria de un generalista (fase 5)
         d["uso_avanzar"][:] = self.cfg.fisica.maquinaria_ref
         d["id"] = xp.arange(self.sig_id, self.sig_id + n)
+        d["fundador"] = d["id"].copy()  # un hijo suelto funda un cuerpo nuevo; el unido hereda el del progenitor
+        d["ultimo_ataque"][:] = -1_000_000  # nunca atacada
         self.sig_id += n
         d["padre"] = padre
         d["generacion"] = generacion
@@ -546,6 +548,7 @@ class Simulacion:
         quitado = xp.bincount(j, weights=efectivo, minlength=p.n)
         antes = p["E"] > 0.0
         p["E"] = p["E"] - quitado
+        p["ultimo_ataque"][j[efectivo > 0]] = self.t
         ganancia = c.eficiencia * efectivo
         if c.especializacion_gamma > 0:  # especialización trófica: el que ataca poco rinde menos
             # tope 1: con tope mayor (maquinaria_max) eficiencia × factor superaba 1 y atacar creaba energía
@@ -942,6 +945,7 @@ class Simulacion:
                                           cepa=p["cepa"][padres], estres=xp.zeros(padres.size))
                     unido = (act[padres] == gen.DIVIDIRSE_UNIDO) & (not cfg.asociacion.inerte)
                     nuevos["dir"][unido] = p["dir"][padres[unido]]  # el clon pegado nace orientado como su progenitor
+                    nuevos["fundador"][unido] = p["fundador"][padres[unido]]
                     p["socio"][padres[unido], dirs[unido]] = nuevos["id"][unido]
                     nuevos["socio"][xp.flatnonzero(unido), self.OPUESTA[dirs[unido]]] = p["id"][padres[unido]]
                     self.cont["enlaces_creados"] += int(unido.sum())
@@ -1091,8 +1095,72 @@ class Simulacion:
             dpob = float(et.std(axis=0).mean()) if et.size else 0.0
             extra["parentesco_relativo"] = media(de) / dpob if de and dpob > 1e-12 else float("nan")
             extra.update(self._linea_germinal(lab, tam, edad))
+            extra.update(self._fragmentacion(lab, tam))
         return {**extra, "concentracion_reproductiva": media(conc), "corr_avanzar_dividir": media(corr),
                 "frac_nunca_dividio": media(nunca), "frac_refractarios": float((dev.a_cpu(p["refractario"]) > 0).mean())}
+
+    def _respuesta_ataque(self, lab, tam, ii, jj, ventana: int = 20) -> dict[str, float]:
+        """¿El cuerpo responde cuando atacan a una de sus células? (pregunta del autor, 2026-10-31)
+        En cuerpos de 3 o más, compara las células atacadas en los últimos `ventana` pasos con las no atacadas que
+        tienen la misma cantidad de enlaces (las del borde se atacan más y ya son distintas por estar en el borde):
+            ayuda_herida:   energía recibida de las socias en el último paso (¿le llevan energía a la herida?)
+            senal_herida:   desvío de sus morfógenos (la señal por contacto) respecto de la media de su cuerpo
+            senal_vecinas:  lo mismo en las socias no atacadas de una herida contra el resto (¿el aviso se propaga?)
+            soltarse_herida: fracción que eligió soltarse en su última acción (¿se sacrifica o se separa la parte?)
+        Cada una es una diferencia (atacadas − no atacadas), promediada sobre los estratos de enlaces con al menos 3
+        células en cada lado y pesada por las atacadas. 0: sin respuesta."""
+        p = self.pob
+        lab, tam = dev.a_cpu(lab), dev.a_cpu(tam)
+        ii, jj = dev.a_cpu(ii), dev.a_cpu(jj)
+        cuerpo = tam >= 3
+        herida = cuerpo & (self.t - dev.a_cpu(p["ultimo_ataque"]) <= ventana)
+        nan = float("nan")
+        if not herida.any():
+            return {"frac_heridas": 0.0 if cuerpo.any() else nan, "ayuda_herida": nan, "senal_herida": nan,
+                    "senal_vecinas": nan, "soltarse_herida": nan}
+        k = dev.a_cpu((p["socio"] >= 0).sum(axis=1))
+        morf = dev.a_cpu(p["reg"])[:, :gen.NUM_MORF]
+        _, inv = np.unique(lab, return_inverse=True)
+        cnt = np.bincount(inv).astype(float)
+        media = np.stack([np.bincount(inv, weights=morf[:, m]) / cnt for m in range(gen.NUM_MORF)], axis=1)[inv]
+        desvio = np.abs(morf - media).mean(axis=1)
+        vecina = np.zeros(p.n, dtype=bool)
+        vecina[jj[herida[ii]]] = True
+        vecina &= cuerpo & ~herida
+
+        def contraste(a, b, valor):
+            dif, peso = [], []
+            for kk in np.unique(k[a]):
+                ma, mb = a & (k == kk), b & (k == kk)
+                if ma.sum() >= 3 and mb.sum() >= 3:
+                    dif.append(valor[ma].mean() - valor[mb].mean())
+                    peso.append(ma.sum())
+            return float(np.average(dif, weights=peso)) if dif else nan
+
+        sana = cuerpo & ~herida
+        return {"frac_heridas": float(herida.sum() / cuerpo.sum()),
+                "ayuda_herida": contraste(herida, sana, dev.a_cpu(p["recibido_paso"])),
+                "senal_herida": contraste(herida, sana, desvio),
+                "senal_vecinas": contraste(vecina, sana & ~vecina, desvio),
+                "soltarse_herida": contraste(herida, sana, (dev.a_cpu(p["ult_act"]) == gen.SOLTARSE).astype(float))}
+
+    def _fragmentacion(self, lab, tam) -> dict[str, float]:
+        """Peldaño 3.2 de la fase 13: ¿los cuerpos se parten en pedazos de varias células?
+        Cada pedazo (grupo de 2 o más) se asigna al fundador de la mayoría de sus células. Un fundador con dos o más
+        pedazos vivos indica que su cuerpo se partió (por soltarse o porque murió una célula del medio): un cuerpo
+        solo crece pegado, así que dos pedazos del mismo fundador no pueden salir de otro modo."""
+        fund = dev.a_cpu(self.pob["fundador"])
+        m = tam >= 2
+        if not m.any():
+            return {"frac_pedazos_fragmentados": float("nan"), "fundadores_partidos": 0.0}
+        par, cnt = np.unique(np.stack([lab[m], fund[m]], axis=1), axis=0, return_counts=True)
+        orden = np.lexsort((-cnt, par[:, 0]))  # por grupo, el fundador con más células primero
+        par = par[orden]
+        primero = np.r_[True, par[1:, 0] != par[:-1, 0]]
+        f_grupo = par[primero, 1]  # fundador mayoritario de cada pedazo
+        _, inv, n_ped = np.unique(f_grupo, return_inverse=True, return_counts=True)
+        partido = n_ped[inv] >= 2
+        return {"frac_pedazos_fragmentados": float(partido.mean()), "fundadores_partidos": float((n_ped >= 2).sum())}
 
     def _linea_germinal(self, lab, tam, edad) -> dict[str, float]:
         """Peldaño 3 de la fase 13: ¿pocas células de cada cuerpo fundan los cuerpos nuevos?
@@ -1210,6 +1278,8 @@ class Simulacion:
                                                   if c[f"{nombre}_empujan"] else float("nan"))
             fila["grupos_bloqueados"] = c["grupos_bloqueados"]
             fila.update(self._especializacion(lab, tam))
+            if self.cfg.desarrollo.activo and self.cfg.ataque.activo:
+                fila.update(self._respuesta_ataque(lab, tam, ii, jj))
             if self.cfg.estaciones.activa:
                 tot = c["comida_buena"] + c["comida_mala"]
                 fila["acierto_comida"] = c["comida_buena"] / tot if tot > 0 else float("nan")
