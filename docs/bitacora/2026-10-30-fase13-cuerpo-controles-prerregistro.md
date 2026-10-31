@@ -37,4 +37,4 @@ Escrito antes de correr. Responde a la [revisión del piloto del cuerpo](2026-10
 
 ## Ejecución
 - **Primer lanzamiento:** en Windows. Se cortó a las 21:02 (se cerró la ventana de comando que el lanzamiento abría en el escritorio), con 1 corrida terminada. Ese parcial queda en `runs/fase13/controles.windows-parcial.json` y no se usa.
-- **Relanzamiento:** desde cero, entero en Docker (Linux, 4 procesos, contenedor `fase13-controles`). Así las 24 corridas son de la misma plataforma. No se miró ninguna medida.
+- **Relanzamiento:** desde cero, entero en Docker (Linux, 4 procesos, contenedor `fase13-controles`). Así las 24 corridas son de la misma plataforma. Del lanzamiento cortado se vio la única corrida terminada (red, semilla 15: 92 % enlazados, parentesco 0,006, 45 % de ataques dentro del grupo). Los criterios no cambian.
