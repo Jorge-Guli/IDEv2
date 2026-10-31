@@ -188,8 +188,8 @@ Configuración de los pilotos del texto:
 - **Se usan solo en el experimento oficial prerregistrado,** cuando un piloto con el texto de calibración muestre que la predicción es alcanzable. Techos medidos: seguir la pista 0,242; base 0,545; invertir la pista 0,758, igual en los dos textos.
 
 **Plan vigente (2026-10-31):** seguir la fase 13 en el universo natural.
-1. **Fundamentar la curva del tamaño con la realidad**, no con el resultado: buscar en la literatura cuánto más grande que su presa es un depredador unicelular (razones de tamaño depredador/presa en protistas). Escribir antes la regla de decisión (qué dato elige r² y cuál la suave). Hasta entonces, los cuerpos se reportan como condicionados a esa suposición.
-2. Con la curva fundamentada, siguiente peldaño: reproducción del cuerpo, sexo y tipos celulares.
+1. ~~Fundamentar la curva del tamaño con la realidad~~ hecho (`docs/bitacora/2026-10-31-fase13-curva-tamano-prerregistro.md`): los protistas comen presas 3–10 veces menores en diámetro (Hansen et al. 1994). La realidad es más empinada que las dos curvas; **se queda r²/(1+r²)**, del lado conservador.
+2. Siguiente peldaño: reproducción del cuerpo, sexo y tipos celulares.
 3. Universo continuo con `natural.toml` (corridas de semanas).
 4. Más realismo: cambio climático, El Niño y La Niña, acciones del autor, y espacio 3D con gravedad.
 

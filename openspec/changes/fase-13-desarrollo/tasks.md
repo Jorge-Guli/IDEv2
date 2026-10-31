@@ -14,7 +14,7 @@
 - [x] 2.4 Piloto del cuerpo (semillas 7–12): C1 se cumple, P2 no
 - [x] 2.5 Revisión con `revisor-cientifico`; medidas nuevas (parentesco, canibalismo interno, correlación dentro del cuerpo) y controles (`forma`, `intragrupo`)
 - [x] 2.6 Controles del cuerpo (semillas 13–18): S2 y K se cumplen; S1 (curva suave) y P2' no
-- [ ] 2.7 Fundamentar la forma de la curva del tamaño con datos reales de depredadores unicelulares
+- [x] 2.7 Fundamentar la forma de la curva del tamaño con datos reales de depredadores unicelulares: se queda r²/(1+r²) (la realidad es aún más empinada)
 
 ## 3. Peldaños siguientes (diseño pendiente, uno por vez)
 - [ ] 3.1 El cuerpo como unidad que se reproduce (línea germinal, cuello de botella unicelular)

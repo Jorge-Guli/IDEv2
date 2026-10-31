@@ -214,7 +214,7 @@ En el mundo del texto, la física estable es `castigo = 0,35` con `rampa_toxicid
   - **Controles, que no son universos:**
     - `ataque.forma = "suave"` usa r/(1+r);
     - `ataque.intragrupo = false` anula los ataques dentro del propio grupo.
-  - **Sensibilidad (2026-10-31):** con la forma suave no se forman cuerpos. La forma de la curva es un supuesto del que depende el resultado y está pendiente de fundamentar con datos reales de depredadores unicelulares.
+  - **Sensibilidad (2026-10-31):** con la forma suave no se forman cuerpos. La forma de la curva es un supuesto del que depende el resultado. Se fundamentó con datos reales (Hansen et al. 1994: los protistas comen presas 3–10 veces menores en diámetro): la realidad es más empinada que r²/(1+r²), así que la curva elegida es la más cercana y del lado conservador.
 - **Métricas de la revisión:**
   - `frac_ataques_intragrupo`: canibalismo dentro del cuerpo;
   - `parentesco_relativo`: desvío de la etiqueta neutra dentro de los grupos de 3 o más, sobre el de la población. Cerca de 0 significa cuerpos clonales;

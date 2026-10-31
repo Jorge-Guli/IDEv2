@@ -73,6 +73,6 @@ Con modulación por la memoria y con decisión estocástica, la memoria se manti
   - La red no se usó, y los grupos desaparecían: las células se comían a su propio clon.
   - Con una física más fiel (**comer según el tamaño**: una célula casi no puede tragarse a otra de su tamaño) aparecen **cuerpos**: 80–96 % de los organismos enlazados, contra ~0.
   - **Matiz de la revisión:** que el grupo proteja es un supuesto de la física, no un hallazgo. Lo emergente es que la evolución lo aprovecha.
-  - **Controles (2026-10-31):** los cuerpos son clonales y no dependen del canibalismo interno. Pero son **frágiles**: con una curva de tamaño menos empinada (r/(1+r)) no aparece ninguno. Tampoco hay tipos celulares (5 de 6 semillas a favor, p = 0,078).
+  - **Controles (2026-10-31):** los cuerpos son clonales y no dependen del canibalismo interno. Pero son **frágiles**: con una curva de tamaño menos empinada (r/(1+r)) no aparece ninguno. Los datos reales (los protistas comen presas 3–10 veces menores en diámetro) respaldan la curva empinada: la realidad es todavía más empinada. Tampoco hay tipos celulares (5 de 6 semillas a favor, p = 0,078).
 
 **Lección:** antes de concluir que "la evolución no lo encuentra", buscar en qué se aparta el mundo de la realidad. Un solo detalle físico irreal (comerse a un igual de un bocado) bastaba para impedir la multicelularidad. Y la otra cara: cuando un resultado depende de un supuesto físico, ese supuesto se fija con datos de la realidad, no con el resultado.
