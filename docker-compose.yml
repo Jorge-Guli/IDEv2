@@ -30,3 +30,25 @@ services:
     restart: unless-stopped
     stop_grace_period: 60s
     cpus: 0.5
+
+  # Experimentos (pilotos de las fases): corren en un contenedor, sin ventanas en el escritorio y sin depender de la
+  # app de Claude. No arranca con "up" (perfil propio). Usa el código del repositorio montado (no hace falta
+  # reconstruir la imagen) y guarda en ./runs. Ejemplo:
+  #   docker compose --profile experimentos run -d --name fase13-controles experimento experiments/fase13/piloto.py --procesos 4 ...
+  # Cada script guarda su avance en *.parcial.json: el mismo comando retoma donde quedó.
+  experimento:
+    image: simbio-vivo
+    profiles: ["experimentos"]
+    working_dir: /repo
+    entrypoint: ["python"]
+    environment:
+      - PYTHONPATH=/repo/src
+      - PYTHONUNBUFFERED=1
+      - SIMBIO_DISPOSITIVO=cpu
+    volumes:
+      - ./src:/repo/src:ro
+      - ./experiments:/repo/experiments:ro
+      - ./datos:/repo/datos:ro
+      - ./runs:/repo/runs
+    network_mode: none
+    cpus: 4                     # un tercio del equipo: el autor sigue usando la PC (con --procesos 4)

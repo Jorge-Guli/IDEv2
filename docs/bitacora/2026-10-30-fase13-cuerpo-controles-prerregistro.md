@@ -34,3 +34,7 @@ Escrito antes de correr. Responde a la [revisión del piloto del cuerpo](2026-10
 - **Falla S2:** los "cuerpos" se sostienen comiéndose entre sí, más colonia caníbal que organismo.
 - **K:** los cuerpos nacen de una célula y comparten genoma, la base para que la selección actúe sobre el cuerpo entero.
 - **P2':** la red diferencia a las células de un mismo cuerpo: tipos celulares.
+
+## Ejecución
+- **Primer lanzamiento:** en Windows. Se cortó a las 21:02 (se cerró la ventana de comando que el lanzamiento abría en el escritorio), con 1 corrida terminada. Ese parcial queda en `runs/fase13/controles.windows-parcial.json` y no se usa.
+- **Relanzamiento:** desde cero, entero en Docker (Linux, 4 procesos, contenedor `fase13-controles`). Así las 24 corridas son de la misma plataforma. No se miró ninguna medida.

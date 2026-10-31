@@ -29,4 +29,5 @@ Documentación, specs, comentarios y nombres del dominio en **español**. Los en
 - Validar specs: `openspec validate --all --strict`
 - Dispositivo: `python -m simbio dispositivo`
 - Universo continuo: `python -m simbio vivir experiments/configs/vivo.toml --salida runs/vivo/universo` y `python -m simbio mirar runs/vivo/universo` (o `docker compose up -d --build`)
+- Experimentos largos (siempre en Docker, sin ventanas en el escritorio del autor): `docker compose --profile experimentos run -d --name <nombre> experimento experiments/<fase>/<script>.py --procesos 4 ...`; esperar con `docker wait <nombre>`
 - Huellas de determinismo: `python experiments/herramientas/huellas.py --comparar`
