@@ -21,7 +21,30 @@ Los pesos de la red empiezan en 0 y mutan con la misma tasa y el mismo tamaño q
 Para separar uso de deriva, el control tiene la red funcionando y mutando, con el mismo consumo de azar, pero sin efecto sobre los genes (como `asociacion.inerte`).
 
 ### D7. Universo del piloto
-Es el de la fase 3, donde los grupos evolucionan solos por un depredador que come grupos chicos. Se elige antes de correr y no se ajusta según el resultado (principio 7).
+**Versión vigente: `natural.toml`.** Clima real y nada de fuerzas diseñadas. La depredación solo existe si evoluciona con `atacar`.
+
+Historia:
+- primero se usó el universo de la fase 3, que extinguía a LUCA;
+- después, el de la fase 2c;
+- los dos tenían un depredador externo programado, una fuerza diseñada que el autor objetó (principio 7). Se descartaron sin evaluar.
+
+### D8. Comer según el tamaño
+El piloto de la red en `natural.toml` dio nulo y casi sin grupos. Un diagnóstico mostró por qué: los grupos se formaban, pero cualquier célula mataba a otra de su tamaño en 1–3 ataques. En la naturaleza una célula casi nunca se traga a otra de su tamaño.
+
+Se agregó `ataque.tamano` (daño × r²/(1+r²), con r la razón de tamaños de los grupos):
+- es un cambio por fidelidad, aprobado por el autor;
+- se decidió **después** de ver el fracaso, y queda declarado así;
+- la forma funcional no se ajusta;
+- reemplaza a la protección por enlaces.
+
+### D9. Controles pedidos por la revisión
+- **`ataque.forma = "suave"`:** sensibilidad a la forma de la curva.
+- **`ataque.intragrupo = false`:** sin canibalismo interno.
+- **Medidas que no mezclan clones:** `corr_reg_rol_intra` y `parentesco_relativo`.
+- Los dos controles son referencias de comparación, no universos.
+
+### D10. Dónde corren los experimentos
+Corren en Docker, en el servicio `experimento` con perfil propio: 4 CPU, sin red y con el código montado. Así no se abren ventanas en el escritorio del autor y no dependen de la app. Cada experimento corre entero en una plataforma, porque Linux y Windows dan huellas distintas.
 
 ## Risks
 - **La red no se recluta, como la memoria en las fases 6–12.** Diferencias con aquello que le dan más chances:

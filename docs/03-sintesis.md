@@ -64,3 +64,15 @@ La memoria **no se recluta para la conducta**. Encender o apagar un gen (±1) no
 Con modulación por la memoria y con decisión estocástica, la memoria se mantiene, pero **no se recluta para decidir**. La revisión independiente encontró por qué podría ser: **la tasa de mutación había colapsado** de 0,02 a ~0,0006. En un mundo estable, la selección favorece copiarse con menos errores, y el sistema deja de explorar.
 
 **Lección:** un mundo fijo no solo deja de presionar, sino que **apaga la capacidad de innovar**. Es el argumento científico para el universo vivo ([06-universo-vivo.md](06-universo-vivo.md)): un ambiente que cambia siempre, con datos reales y con otros organismos que evolucionan.
+
+## Actualización (fases 12 y 13, 2026-10-30)
+- **Fase 12 (universo vivo, clima real, estímulos, depredación evolucionada y el mundo del texto):** la memoria no se selecciona, tampoco con 20 veces más organismos (piloto grande del texto, nulo).
+- **Giro de método (principio 7, pedido del autor):** el universo no se acomoda al organismo, y nada de fuerzas diseñadas. Muchos mundos de las fases 2c–12 tenían fuerzas programadas (depredador externo, estaciones, toxicidad), y sus resultados se leen como tales.
+- **Fase 13 (desarrollo, como en la naturaleza):** red regulatoria con señal por contacto.
+  - En el universo natural (clima real y nada diseñado) la **depredación evolucionó sola** en todas las corridas.
+  - La red no se usó, y los grupos desaparecían: las células se comían a su propio clon.
+  - Con una física más fiel (**comer según el tamaño**: una célula casi no puede tragarse a otra de su tamaño) aparecen **cuerpos**: 80–96 % de los organismos enlazados, contra ~0.
+  - **Matiz de la revisión:** que el grupo proteja es un supuesto de la física, no un hallazgo. Lo emergente es que la evolución lo aprovecha.
+  - Todavía no hay tipos celulares. Hay canibalismo dentro de los cuerpos y se está midiendo el parentesco.
+
+**Lección:** antes de concluir que "la evolución no lo encuentra", buscar en qué se aparta el mundo de la realidad. Un solo detalle físico irreal (comerse a un igual de un bocado) bastaba para impedir la multicelularidad.

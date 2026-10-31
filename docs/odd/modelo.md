@@ -203,4 +203,19 @@ En el mundo del texto, la física estable es `castigo = 0,35` con `rampa_toxicid
   - **Control `inerte`:** la red funciona y muta igual, pero los genes no la leen.
   - **Apagada** no consume azar: las huellas no cambian.
 - **Métricas:** `con_gen_regulado`, `peso_regulador_medio`, `reg_medio_abs`, `dispersion_reg_grupos`, `dispersion_reg_poblacion` y `corr_reg_rol_max`.
-- Detalle en `openspec/changes/fase-13-desarrollo/`.
+- **Universo natural** (`experiments/configs/natural.toml`), el de referencia desde la fase 13. No tiene fuerzas diseñadas:
+  - **clima real:** la radiación hace crecer la comida, la temperatura cambia el costo basal y la presión es un sensor;
+  - **sin** depredador externo ni estaciones artificiales;
+  - **disponibles para el genoma:** `atacar`, la asociación por fuerza (α = 0,5), el rumbo de los socios y la red regulatoria;
+  - **mundo:** 128², `capacidad_max` 20.
+- **Comer según el tamaño** (`ataque.tamano`, física más fiel aprobada por el autor el 2026-10-30):
+  - el daño de un ataque se multiplica por r²/(1+r²), con r = tamaño del grupo del atacante / tamaño del grupo del atacado (componente conexa de enlaces);
+  - vale 0,5 entre iguales y reemplaza a la protección por enlaces. Es un **supuesto físico declarado**: un grupo protege porque así es la física, no por un hallazgo.
+  - **Controles, que no son universos:**
+    - `ataque.forma = "suave"` usa r/(1+r);
+    - `ataque.intragrupo = false` anula los ataques dentro del propio grupo.
+- **Métricas de la revisión:**
+  - `frac_ataques_intragrupo`: canibalismo dentro del cuerpo;
+  - `parentesco_relativo`: desvío de la etiqueta neutra dentro de los grupos de 3 o más, sobre el de la población. Cerca de 0 significa cuerpos clonales;
+  - `corr_reg_rol_intra`: correlación entre estado y rol, con la media de cada grupo restada.
+- Detalle en `openspec/changes/fase-13-desarrollo/` y en las bitácoras del 2026-10-30.

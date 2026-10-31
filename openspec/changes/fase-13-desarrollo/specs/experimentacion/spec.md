@@ -13,3 +13,17 @@ Con `desarrollo.activo`, cada registro SHALL incluir:
 #### Scenario: Registro con la red
 - **WHEN** termina un intervalo de registro con la red activa
 - **THEN** el historial incluye las métricas de uso y de diferenciación
+
+### Requirement: Métricas del cuerpo
+Con `desarrollo.activo`, cada registro SHALL incluir el parentesco relativo dentro de los grupos de 3 o más y la correlación entre estado y rol con la media de cada grupo restada. Con `ataque.tamano`, MUST incluir la fracción de ataques dentro del propio grupo.
+
+#### Scenario: Registro con cuerpos
+- **WHEN** termina un intervalo de registro con grupos de 3 o más y ataque según tamaño
+- **THEN** el historial incluye `parentesco_relativo`, `corr_reg_rol_intra` y `frac_ataques_intragrupo`
+
+### Requirement: Experimentos en contenedor
+Los experimentos largos SHALL correr en el servicio `experimento` de Docker, sin red. Cada experimento MUST correr entero en una sola plataforma.
+
+#### Scenario: Lanzamiento de un piloto
+- **WHEN** se lanza un piloto de varias horas
+- **THEN** corre en un contenedor sin abrir ventanas en el escritorio del autor y guarda su avance en `runs/`

@@ -16,6 +16,8 @@ Escrito el 2026-10-27 y actualizado el 2026-10-29 para que una nueva sesión de 
 - **Instrucciones concretas y en español.** El autor no es programador: explicar en lenguaje simple, sin jerga, con analogías cuando ayuden. Le interesa entender el *porqué*.
 - **Sigue trabajando mientras conversa:** "no pares a menos que te lo indique". Responder sus preguntas y continuar.
 - **Su equipo:** Windows, carpeta `C:\Desarrollo\IDEv2`, Python 3.12 del sistema (también hay `.venv`), 12 núcleos lógicos. **El autor usa la PC mientras corre todo:** corridas con `--procesos 6` como máximo y bajarles la prioridad apenas arrancan (`Get-Process python | % { $_.PriorityClass = 'Idle' }`). Hasta ahora corría las corridas largas a mano y avisaba "resultados subidos". **Con Claude Desktop, Claude puede correrlas directamente en su equipo.**
+- **Los experimentos largos corren en Docker** (pedido del autor, 2026-10-30): `docker compose --profile experimentos run -d --name <nombre> experimento experiments/<fase>/<script>.py --procesos 4 ...`, con 4 CPU, sin red y sin abrir ventanas en su escritorio. Se espera el final con `docker wait <nombre>`. Cada experimento corre entero en una sola plataforma, porque Linux y Windows dan huellas distintas. Lanzarlos en Windows por WMI abría una consola, y cerrarla cortó un piloto.
+- **Libertad expresa** (2026-10-30): "ensayar, probar, validar, crear, destruir, plantear hipótesis... sin pedir permiso ante cada paso".
 - **Docker Desktop:** instalado. Contenedores `idev2-universo-1` e `idev2-clima-1`, con medio núcleo cada uno (`cpus: 0.5`) y `restart: unless-stopped`: tras un corte de luz retoman solos desde su último guardado (verificado el 2026-10-28).
 - **Ciudad:** Capitán Bermúdez, Santa Fe (Argentina).
 
@@ -23,6 +25,7 @@ Escrito el 2026-10-27 y actualizado el 2026-10-29 para que una nueva sesión de 
 - **Idioma:** documentación, specs, comentarios y nombres del dominio en español. SHALL y MUST de OpenSpec en inglés.
 - **La física (primitivas y costos) es fija e igual para todos; qué acciones tiene y usa cada organismo sale de su genoma.**
 - **El universo no se acomoda al organismo** (autor, 2026-10-30): solo se modifica para que sea más fiel a la realidad del autor, con la mayor conexión segura posible con el mundo real. Nunca para facilitar un resultado. Ver principio 7 de `docs/01-metodologia.md`. Esto reemplaza la vieja práctica de "verificar que la física premia el rasgo y, si no, cambiarla".
+- **Nada de fuerzas diseñadas** (autor, 2026-10-30): ni depredador externo, ni estaciones o toxicidad artificiales, ni premios para un rasgo. Las presiones surgen de la propia población (escasez, depredación que evoluciona con `atacar`) o del mundo real. Antes de diseñar, preguntarse por cada fuerza del universo si existiría sin que alguien la programe.
 - **Sin LLMs ni modelos preentrenados dentro de los organismos. Percepción solo local.**
 - **Toda afirmación se compara con un control y con varias semillas.** Los criterios son numéricos, se prerregistran en `docs/bitacora/` antes de correr y se verifican con un script en `experiments/<fase>/`.
 - **Determinismo:** misma configuración y semilla, mismo resultado. Toda la aleatoriedad pasa por los generadores de la simulación (en CPU).
@@ -30,7 +33,7 @@ Escrito el 2026-10-27 y actualizado el 2026-10-29 para que una nueva sesión de 
 - **Flujo por fase:**
   1. propuesta y diseño;
   2. implementación con tests;
-  3. verificación de que la física premia el rasgo (competencias o invasión) **antes** de pedir corridas largas;
+  3. verificación de viabilidad (que LUCA no se extinga, mirando solo la población) **antes** de pedir corridas largas. Desde el principio 7 ya no se verifica ni se ajusta que la física premie el rasgo buscado;
   4. prerregistro;
   5. corrida;
   6. evaluación;
@@ -171,7 +174,7 @@ Configuración de los pilotos del texto:
 - 500 000 pasos.
 
 **Cuidados del equipo** (el autor usa la PC mientras corre):
-- lanzar las corridas largas desligadas de la app de Claude (`Win32_Process.Create`, prioridad Idle), porque si la app se cierra o se actualiza las mata;
+- las corridas largas van en Docker (ver §2); antes se lanzaban desligadas en Windows (`Win32_Process.Create`, prioridad Idle);
 - como mucho 4 procesos de GPU, y solo si queda memoria disponible;
 - tener un vigilante que frene si la memoria disponible baja de 0,4 GB o la GPU pasa de 12 GB.
 
@@ -180,7 +183,15 @@ Configuración de los pilotos del texto:
 - **Nunca subirlas, copiarlas ni mostrar su contenido.** En la bitácora solo van su sha256 (`5a985d7c…` y `d6548766…`) y sus conteos (34 307 letras).
 - **Se usan solo en el experimento oficial prerregistrado,** cuando un piloto con el texto de calibración muestre que la predicción es alcanzable. Techos medidos: seguir la pista 0,242; base 0,545; invertir la pista 0,758, igual en los dos textos.
 
-**Plan acordado con el autor (en orden):**
+**Plan vigente (2026-10-30):** seguir la fase 13 en el universo natural.
+1. Evaluar los controles del cuerpo (`runs/fase13/controles.json`, contenedor `fase13-controles`).
+2. Si los cuerpos son robustos y clonales, siguiente peldaño: reproducción del cuerpo, sexo y tipos celulares.
+3. Universo continuo con `natural.toml` (corridas de semanas).
+4. Más realismo: cambio climático, El Niño y La Niña, acciones del autor, y espacio 3D con gravedad.
+
+Los puntos 2–4 del plan anterior (castigo, toxicidad, texto, archipiélago con selección divergente) usan fuerzas diseñadas: quedan **en suspenso por el principio 7**.
+
+**Plan anterior (histórico):**
 1. ~~Prerregistro con Asimov~~ hecho: inválido y nulo. Siguiente en el texto: física estable (castigo 0,35 o rampa larga) y poblaciones mayores (GPU) antes de otro prerregistro.
 2. Idea de Gemini: probar las poblaciones de la fase 11 con `castigo = 0,5` y rampa larga. ¿Se recluta la memoria cuando discriminar paga?
 3. Arrancar un **universo vivo nuevo** con la física que funcione (castigo y rampa), sin tocar el actual.
@@ -193,7 +204,7 @@ Configuración de los pilotos del texto:
    - a largo plazo, espacio continuo en 3D con gravedad, en lugar de la grilla. Es un motor nuevo y un cambio grande: diseñarlo como fase propia.
 
 ### 8.0 Al conectarse en el equipo del autor
-1. Ir a `C:\Desarrollo\IDEv2`, activar `.venv`, hacer `git pull --no-edit` y correr `python -m pytest -q`: tiene que dar 160 pasan y 3 omitidos.
+1. Ir a `C:\Desarrollo\IDEv2`, activar `.venv`, hacer `git pull --no-edit` y correr `python -m pytest -q`: tiene que dar 207 pasan y 1 omitido (al 2026-10-30).
 2. Regenerar las huellas locales: `python experiments/herramientas/huellas.py --guardar` (las del repo son de Linux).
 3. Ver si el autor ya arrancó el universo continuo. Buscar `runs/vivo/universo`, correr `python -m simbio mirar runs/vivo/universo` y revisar `docker ps`. Si no está corriendo, arrancarlo (§5) y dejarlo vivo.
 4. Preguntarle una sola vez, si no está anotado: si tiene Docker Desktop y **en qué ciudad vive** (para el clima real de la etapa 2; el correo es .com.ar, probablemente Argentina).
