@@ -46,3 +46,31 @@ Tests: 209 pasan, 1 omitido. Huellas iguales a la referencia.
 Por un comentario de Gemini sobre la potencia: con 6 semillas, una sola semilla ruidosa deja p en 0,078, como pasó con P2' en los controles. **Se amplía a 10 semillas (19–28).** Cuando terminan las 12 corridas de 19–24, el mismo script retoma y agrega 25–28, sin abrir el resultado parcial. Los criterios no cambian; se evalúan sobre las 10.
 
 También se agrega como exploratoria `eta_media`, la tasa de aprendizaje en vida (heredable). Pregunta: ¿el refuerzo individual en vida (premia la energía propia) se apaga en los cuerpos o frena la línea germinal? Si G1 da nulo, un control sin aprendizaje (`aprendizaje.activo=false`) es candidato.
+
+## Resultado (2026-10-31)
+10 semillas por condición, 300 000 pasos, sin extinciones. Salida: `runs/fase13/germinal.json`.
+
+| Criterio | Resultado | ¿Cumple? |
+|---|---|---|
+| **G1** `exceso_germinal` en red > 0 | 7 de 8 positivas (media 0,12), p = 0,008. En 2 semillas (19 y 21) ningún cuerpo llegó a 3 propágulos: sin dato | Formalmente sí, pero **no resiste el examen** (abajo) |
+| **G2** red − inerte > 0 | 5 de 8 positivas, p = 0,25 | **No** |
+
+**Por qué G1 no se toma como hallazgo:**
+- **La medida casi nunca tiene datos.** En 9 de las 10 semillas de red hubo un cuerpo medible en solo 0 a 18 de las 100 mediciones, con menos de un cuerpo por medición. Los valores positivos salen de un puñado de cuerpos, a veces el mismo cuerpo en mediciones seguidas.
+- **Donde sí hay datos, el exceso es cero.** Son las semillas con un cuerpo medible en la mitad o más de las mediciones: red 22 da −0,02; inerte 22, 24 y 28 dan +0,01, −0,01 y −0,02.
+- **El control da lo mismo.** En el inerte hay 7 de 10 positivas, con media 0,09 y p = 0,012. Si fuera división del trabajo hecha con la red, el inerte no debería mostrarla.
+- **Explicación probable de los positivos:** son pocos propágulos que llegan en ráfagas (una célula bien alimentada del borde suelta varios hijos seguidos). El azar del sorteo supone independencia y no reproduce esas ráfagas.
+
+**Lo que sí muestran los datos (descriptivo):**
+- **Los cuerpos casi no se reproducen como cuerpos.** En 9 de las 10 semillas, el 99,6–99,99 % de las células de un cuerpo nunca soltó un hijo. Los cuerpos crecen, pero no fundan cuerpos nuevos.
+- La excepción es la semilla 22 de red: tiene menos células enlazadas (43 %) y la mitad de las células del cuerpo sí soltó hijos.
+- `eta_media` (solo semillas 25–28) queda en 0,02–0,07 en ambas condiciones. No hay señal de que el aprendizaje individual se apague en los cuerpos.
+
+## Conclusión
+**No hay línea germinal.** El caso del prerregistro es "ninguno". El cuerpo sigue siendo una colonia clonal que crece pero no se reproduce como unidad. La evolución pasa por las células sueltas.
+
+**Siguiente, según el prerregistro:** buscar qué capacidad real le falta al genoma. Candidatos, sin fuerzas diseñadas:
+- **Puentes de energía regulados por el genoma**, como en *Volvox*.
+- **Medir la fragmentación**, antes de agregar nada. Un cuerpo ya puede partirse en pedazos de varias células si una célula se suelta en el lugar justo. Muchos organismos reales se reproducen así; puede que los nuestros también y no lo estemos viendo.
+
+**Para medir mejor la próxima vez:** pedir un mínimo de cuerpos medidos por semilla, o usar un azar por bloques que respete las ráfagas.
