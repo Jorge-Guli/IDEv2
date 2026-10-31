@@ -41,7 +41,9 @@ CLAVES = ["poblacion", "generacion_media", "genes_medios", "grupos_de_3_o_mas", 
           "exceso_germinal", "frac_sin_propagulos",
           "cuerpos_medidos_germinal", "frac_propagulos_de_cuerpo",
           # ¿el aprendizaje individual en vida se apaga en los cuerpos? (comentario de Gemini, 2026-10-31)
-          "eta_media"]
+          "eta_media",
+          # ¿se suprime el cáncer? (observación del autor, 2026-10-31)
+          "frac_frente_hermana", "supresion_cancer"]
 
 
 def correr(tarea):

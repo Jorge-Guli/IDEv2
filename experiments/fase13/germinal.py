@@ -21,7 +21,8 @@ from piloto import RAIZ, correr, final, permutacion_pareada
 
 MEDIDAS = ["exceso_germinal", "concentracion_propagulos", "concentracion_propagulos_azar",
            "concentracion_propagulos_lugar", "frac_sin_propagulos",
-           "frac_propagulos_de_cuerpo", "frac_enlazados", "poblacion", "frac_depredadores", "parentesco_relativo", "eta_media"]
+           "frac_propagulos_de_cuerpo", "frac_enlazados", "poblacion", "frac_depredadores", "parentesco_relativo", "eta_media",
+           "frac_ataques_intragrupo", "frac_frente_hermana", "supresion_cancer"]
 
 
 def evaluar(res, desde):

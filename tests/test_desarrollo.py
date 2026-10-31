@@ -189,3 +189,5 @@ def test_propagulos_se_cuentan():
     f = sim.historial[-1]
     assert {"exceso_germinal", "frac_sin_propagulos", "frac_propagulos_de_cuerpo"} <= set(f)
     assert int(sim.pob["n_propagulos"].sum()) > 0
+    assert 0.0 <= f["frac_frente_hermana"] <= 1.0
+    assert abs(f["supresion_cancer"] - (f["frac_frente_hermana"] - f["frac_ataques_intragrupo"])) < 1e-12

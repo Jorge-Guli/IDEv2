@@ -1256,6 +1256,19 @@ class Simulacion:
             fila["ataques"] = c["ataques"]
             if self.cfg.ataque.tamano:
                 fila["frac_ataques_intragrupo"] = c["ataques_intragrupo"] / max(c["ataques"], 1)
+                if n and self.cfg.desarrollo.activo:
+                    # ¿se suprime el "cáncer"? (observación del autor, 2026-10-31): fracción de los organismos con
+                    # alguien enfrente cuyo vecino de enfrente es de su mismo cuerpo. Es la fracción de ataques internos
+                    # que habría si se atacara a ciegas; supresion_cancer = esa − la observada (> 0: evitan a las hermanas)
+                    H, W = self.entorno.alto, self.entorno.ancho
+                    occ = self.ocupacion()
+                    d = p["dir"].astype(xp.int64)
+                    j = occ[(p["y"] + self.DY[d]) % H, (p["x"] + self.DX[d]) % W]
+                    hay = (j >= 0) & (j != xp.arange(n))
+                    labx = xp.asarray(dev.a_cpu(lab))
+                    hermana = hay & (labx[xp.where(hay, j, 0)] == labx) & (tam > 1)
+                    fila["frac_frente_hermana"] = float(hermana.sum() / max(int(hay.sum()), 1))
+                    fila["supresion_cancer"] = fila["frac_frente_hermana"] - fila["frac_ataques_intragrupo"]
             fila["robado_por_org_paso"] = c["robado"] / org_pasos
             fila["muertes_por_ataque"] = c["muertes_por_ataque"]
             if n:  # especialización: depredadores (atacan > 5 % del tiempo) y presas, y cuánto come cada grupo
