@@ -194,7 +194,11 @@ Configuración de los pilotos del texto:
    - Los cuerpos casi nunca sueltan hijos (99,6–99,99 % de sus células no lo hacen): crecen, pero no se reproducen como unidad.
    - Detalle en `docs/bitacora/2026-10-31-fase13-linea-germinal-prerregistro.md`.
    - Siguiente: medir la fragmentación (pedazos de varias células que se separan) y, si no hay, puentes de energía regulados por el genoma (*Volvox*).
-   - Pendiente también, por pregunta del autor: medir la respuesta del cuerpo a un ataque (señal por contacto, energía a la herida, relleno del hueco, soltar partes) contra cuerpos no atacados.
+4. **En cola: respuesta a un ataque y fragmentación.** Pregunta del autor: ¿la célula atacada avisa? ¿El cuerpo se defiende?
+   - Medidas `ayuda_herida`, `senal_vecinas` y `soltarse_herida` (atacadas contra no atacadas con los mismos enlaces), más la fragmentación (`fundador`).
+   - Red contra inerte, semillas 39–48.
+   - Arranca sola en Docker (`fase13-respuesta`) al terminar `fase13-cancer`.
+   - Prerregistro: `docs/bitacora/2026-10-31-fase13-respuesta-ataque-prerregistro.md`.
 3. **En curso: ¿la evolución suprime el "cáncer"?** Observación del autor: atacar a una hermana del propio cuerpo es como un cáncer. Medida `supresion_cancer` (ataques internos esperados a ciegas menos los observados), red contra sin_intra, semillas 29–38. Corre en Docker (`fase13-cancer`), arrancó al terminar `fase13-germinal10`. Prerregistro: `docs/bitacora/2026-10-31-fase13-cancer-prerregistro.md`.
 4. Después: sexo y tipos celulares.
 3. Universo continuo con `natural.toml` (corridas de semanas).
