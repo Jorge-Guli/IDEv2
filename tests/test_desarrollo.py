@@ -191,6 +191,7 @@ def test_propagulos_se_cuentan():
     assert int(sim.pob["n_propagulos"].sum()) > 0
     assert 0.0 <= f["frac_frente_hermana"] <= 1.0
     assert abs(f["supresion_cancer"] - (f["frac_frente_hermana"] - f["frac_ataques_intragrupo"])) < 1e-12
+    assert "supresion_cancer_atacantes" in f
 
 
 def test_fragmentacion():

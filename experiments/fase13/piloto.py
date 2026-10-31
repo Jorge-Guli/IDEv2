@@ -43,7 +43,7 @@ CLAVES = ["poblacion", "generacion_media", "genes_medios", "grupos_de_3_o_mas", 
           # ¿el aprendizaje individual en vida se apaga en los cuerpos? (comentario de Gemini, 2026-10-31)
           "eta_media",
           # ¿se suprime el cáncer? (observación del autor, 2026-10-31)
-          "frac_frente_hermana", "supresion_cancer",
+          "frac_frente_hermana", "supresion_cancer", "frac_frente_hermana_atacantes", "supresion_cancer_atacantes",
           # ¿los cuerpos se parten en pedazos de varias células? (peldaño 3.2)
           "frac_pedazos_fragmentados", "fundadores_partidos",
           # ¿el cuerpo responde cuando atacan a una de sus células? (pregunta del autor)

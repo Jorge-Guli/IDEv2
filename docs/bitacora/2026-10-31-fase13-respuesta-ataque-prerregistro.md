@@ -64,3 +64,6 @@ Tests: 211 pasan, 1 omitido. Huellas iguales a la referencia: las medidas no toc
 - **R2:** la célula atacada avisa a sus vecinas por contacto, y eso se sostiene por selección (en el inerte el aviso no sirve para nada).
 - **Ninguno:** el cuerpo no reacciona; cada célula enfrenta sola el ataque. Sería otra señal de que el cuerpo todavía es una colonia.
 - **Fragmentación alta:** los cuerpos podrían reproducirse partiéndose. Habría que separar la ruptura activa (soltarse) de la pasiva (una muerte en el medio).
+
+## Enmienda (2026-10-31, antes de ver ningún dato)
+El experimento se reinició a los pocos segundos de arrancar para sumar una exploratoria: `supresion_cancer_atacantes`, la supresión del cáncer con el azar ciego pesado por cuánto ataca cada célula. Corrige la reserva geométrica del [experimento del cáncer](2026-10-31-fase13-cancer-prerregistro.md). Los criterios R1 y R2 no cambian.

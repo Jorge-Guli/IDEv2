@@ -25,7 +25,7 @@ from piloto import RAIZ, correr, permutacion_pareada
 
 MEDIDAS = ["ayuda_herida", "senal_herida", "senal_vecinas", "soltarse_herida", "frac_heridas",
            "frac_pedazos_fragmentados", "fundadores_partidos", "frac_enlazados", "poblacion", "frac_depredadores",
-           "con_gen_regulado"]
+           "con_gen_regulado", "supresion_cancer", "supresion_cancer_atacantes", "frac_ataques_intragrupo"]
 MIN_FILAS = 30
 
 
@@ -57,7 +57,8 @@ def evaluar(res, desde):
             "exploratorias": {"senal_herida_red_menos_inerte": prueba(dif("senal_herida")),
                               "senal_vecinas_red": prueba(list(val["red"]["senal_vecinas"].values())),
                               "soltarse_herida_red": prueba(list(val["red"]["soltarse_herida"].values())),
-                              "ayuda_herida_red_menos_inerte": prueba(dif("ayuda_herida"))},
+                              "ayuda_herida_red_menos_inerte": prueba(dif("ayuda_herida")),
+                              "supresion_cancer_atacantes_red": prueba(list(val["red"]["supresion_cancer_atacantes"].values()))},
             "extinciones": {c: sum(r["extinta_en"] is not None for r in res if r["condicion"] == c)
                             for c in ("red", "inerte")}}
 

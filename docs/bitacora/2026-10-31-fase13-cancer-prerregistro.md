@@ -37,3 +37,36 @@ Tests: 209 pasan, 1 omitido. Huellas iguales.
 - **C1 y C2:** la evolución frena el cáncer porque daña al cuerpo. Es selección al nivel del cuerpo: el cuerpo empieza a ser un individuo.
 - **C1 sin C2:** las células evitan atacar a las hermanas, pero también sin daño. Puede ser solo que atacar a una hermana rinde poco (r = 1, la mitad del efecto).
 - **Ninguno:** las células atacan a ciegas; el cuerpo todavía es una colonia sin defensas contra sus tramposas.
+
+## Resultado (2026-10-31)
+10 semillas por condición, 300 000 pasos, sin extinciones. Salida: `runs/fase13/cancer.json`.
+
+| Criterio | Resultado | ¿Cumple? |
+|---|---|---|
+| **C1** `supresion_cancer` en red > 0 | 9 de 10 positivas, p = 0,002. La semilla 30 da 0, pero no tiene cuerpos (0,01 % de enlazados): no hay cáncer posible | **Sí, con una reserva** (abajo) |
+| **C2** red − sin_intra > 0 | 6 de 10 positivas, p = 0,11 | **No** |
+
+**Lo que se ve:**
+- **En red** hay dos grupos de semillas:
+  - 6 suprimen fuerte: 0,39–0,54. Por ejemplo, tienen una hermana enfrente el 92 % de las veces, pero solo el 38 % de sus ataques van a hermanas.
+  - 3 suprimen poco: 0,01–0,10.
+- **En sin_intra** también hay supresión, más pareja: 0,004–0,39, positiva en 10 de 10.
+
+**Por qué C2 sale nulo, y qué significa:**
+- El control `sin_intra` no es un universo "sin cáncer" neutral. Ahí atacar a una hermana **no rinde nada** al atacante, mientras que en red rinde la mitad.
+- Por lo tanto, en sin_intra la propia célula tiene más razones para no atacar hermanas, y aun así la supresión es en general menor que en red (6 de 10).
+- Es una pista a favor de una selección a nivel del cuerpo, pero no alcanza a ser significativa. El control mezcla dos cosas: el daño al cuerpo y la ganancia del atacante.
+
+**Reserva sobre C1 (geometría):** el azar ciego se calculó sobre todas las células con alguien enfrente. Las que atacan son sobre todo las del borde, que tienen menos hermanas enfrente que las del interior. Parte de la "supresión" puede ser solo eso: atacan las del borde y miran hacia afuera.
+
+## Conclusión
+- **Hay supresión del cáncer en sentido amplio:** las células atacan a sus hermanas mucho menos de lo que les tocaría a ciegas, en 9 de 9 semillas con cuerpos.
+- **No está demostrado que sea por el bien del cuerpo** (C2 nulo).
+- **Tampoco está descartado que sea geometría** del borde.
+
+## Correcciones para la próxima medición (hechas antes de ver nuevos datos)
+- **Medida nueva** `supresion_cancer_atacantes`: el azar ciego pesado por cuánto ataca cada célula (`uso_atacar`). Así compara a las atacantes contra sí mismas y saca la geometría del borde.
+  - Se agregó al experimento de respuesta al ataque (semillas 39–48, red contra inerte), reiniciado a los pocos segundos de arrancar, sin datos.
+- **Un control más limpio para C2** sería uno donde atacar a una hermana siga rindiendo al atacante, pero no le quite energía a la hermana. Eso crea energía de la nada y viola la física. Por eso no se hace.
+  - La alternativa honesta es comparar la supresión entre cuerpos más y menos emparentados: con más parentesco, más selección a nivel del cuerpo.
+  - Hoy el parentesco es casi siempre clonal (< 0,02), así que hoy no hay variación para comparar.

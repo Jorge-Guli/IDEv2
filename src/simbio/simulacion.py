@@ -1339,6 +1339,13 @@ class Simulacion:
                     hermana = hay & (labx[xp.where(hay, j, 0)] == labx) & (tam > 1)
                     fila["frac_frente_hermana"] = float(hermana.sum() / max(int(hay.sum()), 1))
                     fila["supresion_cancer"] = fila["frac_frente_hermana"] - fila["frac_ataques_intragrupo"]
+                    # revisión (2026-10-31): los que atacan son sobre todo células del borde, que tienen menos hermanas
+                    # enfrente que las del interior. El azar ciego se pesa entonces por cuánto ataca cada una (uso_atacar)
+                    w = p["uso_atacar"]
+                    den = float((w * hay).sum())
+                    fila["frac_frente_hermana_atacantes"] = float((w * hermana).sum()) / den if den > 0 else float("nan")
+                    fila["supresion_cancer_atacantes"] = (fila["frac_frente_hermana_atacantes"]
+                                                          - fila["frac_ataques_intragrupo"])
             fila["robado_por_org_paso"] = c["robado"] / org_pasos
             fila["muertes_por_ataque"] = c["muertes_por_ataque"]
             if n:  # especialización: depredadores (atacan > 5 % del tiempo) y presas, y cuánto come cada grupo
