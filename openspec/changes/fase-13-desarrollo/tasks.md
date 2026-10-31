@@ -13,7 +13,8 @@
 - [x] 2.3 Diagnóstico de los grupos y física del tamaño (`ataque.tamano`), con tests
 - [x] 2.4 Piloto del cuerpo (semillas 7–12): C1 se cumple, P2 no
 - [x] 2.5 Revisión con `revisor-cientifico`; medidas nuevas (parentesco, canibalismo interno, correlación dentro del cuerpo) y controles (`forma`, `intragrupo`)
-- [ ] 2.6 Controles del cuerpo (semillas 13–18): evaluar y registrar
+- [x] 2.6 Controles del cuerpo (semillas 13–18): S2 y K se cumplen; S1 (curva suave) y P2' no
+- [ ] 2.7 Fundamentar la forma de la curva del tamaño con datos reales de depredadores unicelulares
 
 ## 3. Peldaños siguientes (diseño pendiente, uno por vez)
 - [ ] 3.1 El cuerpo como unidad que se reproduce (línea germinal, cuello de botella unicelular)

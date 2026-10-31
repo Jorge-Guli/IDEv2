@@ -158,7 +158,11 @@ El diseño completo está en `docs/06-universo-vivo.md`. Resumen operativo:
   - aparecen cuerpos: 80–96 % enlazados, contra ~0 sin el tamaño (p = 1/64);
   - sin tipos celulares (P2 con p = 0,22).
   - La revisión escéptica pidió matizar: el tamaño protege por construcción física. Faltaban el parentesco y el canibalismo interno (16–37 % de los ataques), y una medida de diferenciación que no mezcle clones.
-- **En curso:** controles del cuerpo, con las semillas 13–18 y las condiciones red, inerte, suave y sin_intra (`docs/bitacora/2026-10-30-fase13-cuerpo-controles-prerregistro.md`, salida `runs/fase13/controles.json`).
+- **Controles del cuerpo (semillas 13–18, Docker):** ver `docs/bitacora/2026-10-30-fase13-cuerpo-controles-prerregistro.md`.
+  - **S1 no se cumple:** con la curva suave r/(1+r) no hay cuerpos en ninguna semilla. Los cuerpos dependen de que la ventaja del tamaño sea empinada.
+  - **S2 se cumple:** sin canibalismo interno los cuerpos siguen (0,91–0,93 enlazados). No son una colonia caníbal.
+  - **K se cumple:** son clonales (parentesco relativo < 0,02).
+  - **P2' no se cumple:** diferenciación dentro del cuerpo positiva en 5 de 6, p = 0,078.
 - **El autor dio libertad expresa** para ensayar, crear y destruir sin pedir permiso en cada paso.
 - **Siguientes, uno por vez:**
   - el cuerpo como unidad que se reproduce (línea germinal y cuello de botella unicelular);
@@ -183,9 +187,9 @@ Configuración de los pilotos del texto:
 - **Nunca subirlas, copiarlas ni mostrar su contenido.** En la bitácora solo van su sha256 (`5a985d7c…` y `d6548766…`) y sus conteos (34 307 letras).
 - **Se usan solo en el experimento oficial prerregistrado,** cuando un piloto con el texto de calibración muestre que la predicción es alcanzable. Techos medidos: seguir la pista 0,242; base 0,545; invertir la pista 0,758, igual en los dos textos.
 
-**Plan vigente (2026-10-30):** seguir la fase 13 en el universo natural.
-1. Evaluar los controles del cuerpo (`runs/fase13/controles.json`, contenedor `fase13-controles`).
-2. Si los cuerpos son robustos y clonales, siguiente peldaño: reproducción del cuerpo, sexo y tipos celulares.
+**Plan vigente (2026-10-31):** seguir la fase 13 en el universo natural.
+1. **Fundamentar la curva del tamaño con la realidad**, no con el resultado: buscar en la literatura cuánto más grande que su presa es un depredador unicelular (razones de tamaño depredador/presa en protistas). Escribir antes la regla de decisión (qué dato elige r² y cuál la suave). Hasta entonces, los cuerpos se reportan como condicionados a esa suposición.
+2. Con la curva fundamentada, siguiente peldaño: reproducción del cuerpo, sexo y tipos celulares.
 3. Universo continuo con `natural.toml` (corridas de semanas).
 4. Más realismo: cambio climático, El Niño y La Niña, acciones del autor, y espacio 3D con gravedad.
 
