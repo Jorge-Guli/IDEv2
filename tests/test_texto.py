@@ -35,7 +35,7 @@ def test_estacion_y_pista_siguen_al_texto(tmp_path):
 
 def test_sensor_coincide(tmp_path):
     sim = Simulacion(_cfg(tmp_path, "texto.sensor_coincide=true"))
-    assert sim.n_sens == gen.NUM_SENS
+    assert sim.n_sens == gen.NUM_SENS_TEXTO
     sim.t = 7  # letra vigente: "a"; anterior: "c" (−1)
     s = sim.sensar(sim.ocupacion(), sim.validar_enlaces(sim.ocupacion()))
     assert np.array_equal(s[:, gen.S_COINCIDE], s[:, gen.S_TIPO_AQUI] * -1.0)

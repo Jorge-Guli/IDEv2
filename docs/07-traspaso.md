@@ -199,7 +199,13 @@ Configuración de los pilotos del texto:
    - Los cuerpos se reproducen por **fragmentación pasiva**: casi todos descienden de un solo fundador y se multiplicaron partiéndose.
    - La supresión del cáncer, pesada por atacantes, es real (p = 0,003), pero aparece igual en el inerte.
    - Detalle: `docs/bitacora/2026-10-31-fase13-respuesta-ataque-prerregistro.md`.
-5. **Siguiente: fase 14, un cerebro antes que un cuerpo** (ver `docs/02-hoja-de-ruta.md`). La fase 13 queda como base, sin archivar hasta la revisión.
+5. **En curso: fase 14, un cerebro antes que un cuerpo** (ver `docs/02-hoja-de-ruta.md`). La fase 13 queda como base, sin archivar hasta la revisión.
+   - Física nueva (`vision.*`, apagada por defecto): un rasgo heredable `alcance` (0–5 celdas, LUCA = 0) que cuesta 0,02 por paso y celda.
+   - Tres sensores a distancia: comida, cercanía del otro y su tamaño relativo.
+   - Experimento `experiments/fase14/ojos.py`, condiciones vision, cegada y ciega, semillas 49–58.
+   - Prueba de lesión del cerebro y de los ojos al final.
+   - Corre en Docker (`fase14-ojos`), unas 12 horas.
+   - Prerregistro: `docs/bitacora/2026-11-01-fase14-ojos-prerregistro.md`.
 3. **Hecho: supresión del "cáncer".**
    - C1 se cumple: las células atacan a sus hermanas mucho menos que a ciegas, en 9 de 9 semillas con cuerpos (p = 0,002).
    - C2 no se cumple: red − sin_intra da 6 de 10 positivas, p = 0,11.

@@ -336,6 +336,23 @@ class DesarrolloCfg:
 
 
 @dataclass
+class VisionCfg:
+    # fase 14, un cerebro antes que un cuerpo: percepción a distancia, como los ojos y el olfato. En la Tierra los
+    # cerebros despegaron cuando se pudo percibir lejos (explosión del Cámbrico). El genoma decide el alcance (rasgo
+    # heredable, LUCA = 0) y la física cobra por él: un ojo cuesta mantenerlo (los fotorreceptores de una mosca
+    # gastan ~8 % de su metabolismo en reposo; Niven y Laughlin 2008). Con alcance a, el organismo ve las celdas
+    # 2..1+floor(a) en la dirección en que mira: la comida más rica, la cercanía del primer organismo y su tamaño
+    # relativo. Tope de pocas celdas: la percepción sigue siendo local
+    activa: bool = False
+    alcance_max: float = 5.0
+    costo_por_celda: float = 0.02  # energía por paso y celda de alcance (basal: 0,3)
+    sigma_alcance: float = 0.3  # desvío de la mutación del alcance
+    # control: el ojo existe, muta y cuesta igual, pero no informa (sus sensores valen 0). Separa el valor de la
+    # información del de pagar un rasgo; también sirve de lesión (cegar a una población que ya ve)
+    cegar: bool = False
+
+
+@dataclass
 class SimCfg:
     semilla: int = 0
     pasos: int = 5000
@@ -363,6 +380,7 @@ class Config:
     ataque: AtaqueCfg = field(default_factory=AtaqueCfg)
     texto: TextoCfg = field(default_factory=TextoCfg)
     desarrollo: DesarrolloCfg = field(default_factory=DesarrolloCfg)
+    vision: VisionCfg = field(default_factory=VisionCfg)
     sim: SimCfg = field(default_factory=SimCfg)
 
     def to_dict(self) -> dict[str, Any]:

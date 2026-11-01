@@ -69,7 +69,8 @@ class Simulacion:
         # mundo del texto: generador propio (solo baraja en el control), no consume de los demás
         self.texto = (Texto(cfg.texto, np.random.default_rng(np.random.SeedSequence([cfg.sim.semilla, 7])))
                       if cfg.texto.activo else None)
-        self.n_sens = (gen.NUM_SENS if cfg.texto.activo and cfg.texto.sensor_coincide else
+        self.n_sens = (gen.NUM_SENS if cfg.vision.activa else
+                       gen.NUM_SENS_TEXTO if cfg.texto.activo and cfg.texto.sensor_coincide else
                        gen.NUM_SENS_REALIDAD if cfg.realidad.activa or cfg.estimulos.activo else
                        gen.NUM_SENS_SIN_REALIDAD)
         if cfg.estimulos.activo:  # estímulos desde afuera (etapa 3): campo de luz y pulsos programados
@@ -248,7 +249,41 @@ class Simulacion:
             s[:, gen.S_PRESION] = self.clima.presion[self.clima.hora(self.t)]
         if self.luz is not None:
             s[:, gen.S_LUZ] = self.luz[y, x]
+        if self.cfg.vision.activa and not self.cfg.vision.cegar:
+            self._sensar_vision(s, occ, socios, R)
         return s
+
+    def _sensar_vision(self, s, occ, socios, R) -> None:
+        """Fase 14: vista a distancia en la dirección en que mira, hasta 1 + floor(alcance) celdas (la de enfrente ya
+        la ven los sensores de siempre). comida_lejos: el recurso más rico a la vista; otro_lejos: cercanía del primer
+        organismo a la vista (1: a dos celdas, baja hacia el borde del alcance; 0 si no hay); tamano_lejos: su tamaño
+        de grupo relativo al propio, t_otro / (t_otro + t_propio), como para saber si es presa o depredador."""
+        xp, p = self.xp, self.pob
+        H, W = self.entorno.alto, self.entorno.ancho
+        tope = int(self.cfg.vision.alcance_max)
+        if tope < 1 or p.n == 0:
+            return
+        a = xp.floor(p["alcance"]).astype(xp.int64)
+        y, x, d = p["y"], p["x"], p["dir"].astype(xp.int64)
+        comida = xp.zeros(p.n)
+        cerca = xp.zeros(p.n)
+        quien = xp.full(p.n, -1, dtype=xp.int64)
+        for k in range(tope, 0, -1):  # de lejos a cerca: el más cercano a la vista queda último
+            ve = a >= k
+            yk, xk = (y + (k + 1) * self.DY[d]) % H, (x + (k + 1) * self.DX[d]) % W
+            comida = xp.where(ve, xp.maximum(comida, R[yk, xk]), comida)
+            o = occ[yk, xk]
+            hay = ve & (o >= 0)
+            quien = xp.where(hay, o, quien)
+            cerca = xp.where(hay, 1.0 - (k - 1) / tope, cerca)
+        s[:, gen.S_COMIDA_LEJOS] = comida
+        s[:, gen.S_OTRO_LEJOS] = cerca
+        visto = quien >= 0
+        if bool(visto.any()):
+            lab = componentes(dev.a_cpu(socios))
+            tam = xp.asarray(np.bincount(lab, minlength=p.n)[lab].astype(np.float64))
+            t_otro = tam[xp.maximum(quien, 0)]
+            s[:, gen.S_TAMANO_LEJOS] = xp.where(visto, t_otro / (t_otro + tam), 0.0)
 
     def _sensar_coordinacion(self, s, socios, enlazado, n_enl) -> None:
         """Sensores de la fase 3, todos sobre los enlazados (percepción local por contacto): rumbo medio de
@@ -791,6 +826,8 @@ class Simulacion:
             p["E"] -= (basal + f.costo_por_gen * p["activo"].sum(axis=1) + self.costo_accion[act]
                        + cfg.asociacion.costo_enlace * (socios >= 0).sum(axis=1)
                        + cfg.coordinacion.costo_senal * p["senal"])
+            if cfg.vision.activa:  # fase 14: mantener un ojo cuesta, se use o no
+                p["E"] -= cfg.vision.costo_por_celda * p["alcance"]
 
             # depredación (tras los costos, para no alterar lo que perciben los vecinos en este paso)
             if cfg.depredacion.activa:
@@ -939,7 +976,8 @@ class Simulacion:
                     if h.estres_modo == "barajado":  # control: rompe el vínculo con la condición propia
                         estres = estres[xp.asarray(self.rng.permutation(p.n))]
                     m = gen.tasa_efectiva(hijos["mu"], hijos["sens"], estres[padres], h)
-                    gen.mutar(hijos, m, h, self.rng, self.permitidas, self.n_sens, cfg.desarrollo.activo)
+                    gen.mutar(hijos, m, h, self.rng, self.permitidas, self.n_sens, cfg.desarrollo.activo,
+                              (cfg.vision.sigma_alcance, cfg.vision.alcance_max) if cfg.vision.activa else None)
                     nuevos = self._nuevos(hijos, celdas // W, celdas % W, p["E"][padres],
                                           padre=p["id"][padres], generacion=p["generacion"][padres] + 1,
                                           cepa=p["cepa"][padres], estres=xp.zeros(padres.size))
@@ -1239,6 +1277,9 @@ class Simulacion:
                 "generacion_max": int(p["generacion"].max()),
                 "frac_cepa1": float((p["cepa"] == 1).mean()),
             })
+            if self.cfg.vision.activa:  # fase 14: ¿evolucionan los ojos?
+                fila["alcance_medio"] = float(p["alcance"].mean())
+                fila["frac_con_ojos"] = float((p["alcance"] >= 1.0).mean())
             perfil = xp.stack([((p["prim"] == k) & activo).sum(1) for k in range(self.n_prim)], axis=1)
             fila["perfiles_distintos"] = int(len(np.unique(dev.a_cpu(perfil), axis=0)))
             for k, nombre in enumerate(gen.PRIMITIVAS[:self.n_prim]):

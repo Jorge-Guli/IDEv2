@@ -40,12 +40,14 @@ PRIM_NO_ACCION = np.array([SENALAR, MEMORIA_A, MEMORIA_B])
  S_VECINOS, S_BLOQUEADO, S_DELTA_E, S_RUIDO,
  S_ENLACES, S_ENERGIA_SOCIOS, S_SOCIO_FRENTE, S_SIMILITUD_FRENTE, S_COMPLEJO_AQUI,
  S_RUMBO_SOCIOS_SIN, S_RUMBO_SOCIOS_COS, S_EMPUJE_SOCIOS, S_SENAL_SOCIOS, S_SENAL_PROPIA,
- S_MEMORIA_A, S_MEMORIA_B, S_TIPO_AQUI, S_PISTA, S_PRESION, S_LUZ, S_COINCIDE) = range(27)
+ S_MEMORIA_A, S_MEMORIA_B, S_TIPO_AQUI, S_PISTA, S_PRESION, S_LUZ, S_COINCIDE,
+ S_COMIDA_LEJOS, S_OTRO_LEJOS, S_TAMANO_LEJOS) = range(30)
 SENSORES = ["const", "recurso_aqui", "recurso_frente", "recurso_frente_izq", "recurso_frente_der",
             "energia", "vecinos", "bloqueado", "delta_e", "ruido",
             "enlaces", "energia_socios", "socio_frente", "similitud_frente", "complejo_aqui",
             "rumbo_socios_sin", "rumbo_socios_cos", "empuje_socios", "senal_socios", "senal_propia",
-            "memoria_a", "memoria_b", "tipo_aqui", "pista", "presion", "luz", "coincide"]
+            "memoria_a", "memoria_b", "tipo_aqui", "pista", "presion", "luz", "coincide",
+            "comida_lejos", "otro_lejos", "tamano_lejos"]
 SENS_MEMORIA = np.array([S_MEMORIA_A, S_MEMORIA_B])
 SENS_ESTACIONES = np.array([S_TIPO_AQUI, S_PISTA])
 SENS_RUMBO = np.array([S_RUMBO_SOCIOS_SIN, S_RUMBO_SOCIOS_COS, S_EMPUJE_SOCIOS])
@@ -56,6 +58,9 @@ NUM_SENS = len(SENSORES)
 NUM_SENS_SIN_REALIDAD = S_PRESION
 # con datos reales o estímulos (etapas 2 y 3) mutan también presión y luz, pero no los posteriores
 NUM_SENS_REALIDAD = S_COINCIDE
+# el mundo del texto (fase 12) suma el sensor "coincide"; la visión (fase 14), los tres de la vista a distancia
+NUM_SENS_TEXTO = S_COINCIDE + 1
+SENS_VISION = np.array([S_COMIDA_LEJOS, S_OTRO_LEJOS, S_TAMANO_LEJOS])
 
 # fase 13, red regulatoria: cada célula tiene NUM_REG reguladores (estado interno en [−1, 1]). Cada regulador lee
 # los reguladores propios, los NUM_MORF primeros de los socios enlazados (señal por contacto, como Notch–Delta) y
@@ -64,7 +69,7 @@ NUM_REG = 8
 NUM_MORF = 2
 ENTRADAS_REG = NUM_REG + NUM_MORF + NUM_SENS
 CAMPOS_REG = ("R", "rb", "v")
-CAMPOS = ("activo", "prim", "w", "b", "mu", "sens", "eta", "etiqueta", "cond") + CAMPOS_REG
+CAMPOS = ("activo", "prim", "w", "b", "mu", "sens", "eta", "etiqueta", "cond") + CAMPOS_REG + ("alcance",)
 # condición de expresión de cada gen (fase 9): 0 siempre; 1/2 solo si la memoria A está alta/baja (> 0,5 o ≤ 0,5);
 # 3/4 ídem con la memoria B. Solo actúa con la memoria activa
 NUM_COND = 5
@@ -108,6 +113,9 @@ def compatibilizar(g: dict[str, np.ndarray]) -> dict[str, np.ndarray]:
         vacios = vacio(n, G)
         for k in CAMPOS_REG:
             g.setdefault(k, vacios[k])
+    if "alcance" not in g:  # genomas anteriores a la fase 14: sin visión a distancia
+        g = dict(g)
+        g["alcance"] = np.zeros(g["activo"].shape[0])
     faltan = ENTRADAS_REG - g["R"].shape[-1]
     if faltan > 0:  # los sensores van al final de las entradas de R
         g = dict(g)
@@ -129,6 +137,7 @@ def vacio(n: int, genes_max: int, xp=np) -> dict[str, np.ndarray]:
         "R": xp.zeros((n, NUM_REG, ENTRADAS_REG)),
         "rb": xp.zeros((n, NUM_REG)),
         "v": xp.zeros((n, genes_max, NUM_REG)),
+        "alcance": xp.zeros(n),  # fase 14: cuántas celdas más allá de la de enfrente ve (0: LUCA no ve lejos)
     }
 
 
@@ -178,13 +187,16 @@ def tasa_efectiva(mu: np.ndarray, sens: np.ndarray, estres: np.ndarray, cfg: Her
 
 def mutar(g: dict[str, np.ndarray], m: np.ndarray, cfg: HerenciaCfg,
           rng: np.random.Generator, permitidas: np.ndarray | None = None,
-          n_sens: int = NUM_SENS_SIN_REALIDAD, regulacion: bool = False) -> dict[str, np.ndarray]:
+          n_sens: int = NUM_SENS_SIN_REALIDAD, regulacion: bool = False,
+          vision: tuple[float, float] | None = None) -> dict[str, np.ndarray]:
     """Aplica los operadores de mutación in situ con tasa efectiva m (n,) y devuelve g.
 
     `permitidas`: primitivas que pueden aparecer por mutación (por defecto, todas).
     `n_sens`: cuántos sensores (los primeros) tienen pesos que mutan; los demás quedan como están.
     `regulacion`: muta también la red regulatoria (fase 13). Apagada no consume azar: las corridas anteriores
     no cambian.
+    `vision`: (sigma, alcance_max) si la visión a distancia existe (fase 14): el alcance muta sumando un ruido
+    normal (desde 0, un factor multiplicativo no lo movería nunca). Apagada no consume azar.
     """
     n, G = g["activo"].shape
     if n == 0 or not cfg.mutacion:
@@ -280,4 +292,8 @@ def mutar(g: dict[str, np.ndarray], m: np.ndarray, cfg: HerenciaCfg,
         forma_v = (n, G, NUM_REG)
         mask_v = (A(rng.random(forma_v)) < m[:, None, None]) & activo[:, :, None]
         g["v"] += mask_v * A(rng.normal(0.0, cfg.sigma_peso, forma_v))
+    if vision is not None:
+        sigma, tope = vision
+        mask = A(rng.random(n)) < xp.minimum(1.0, cfg.k_rasgo * m)
+        g["alcance"] = xp.where(mask, xp.clip(g["alcance"] + A(rng.normal(0.0, sigma, n)), 0.0, tope), g["alcance"])
     return g
