@@ -194,11 +194,12 @@ Configuración de los pilotos del texto:
    - Los cuerpos casi nunca sueltan hijos (99,6–99,99 % de sus células no lo hacen): crecen, pero no se reproducen como unidad.
    - Detalle en `docs/bitacora/2026-10-31-fase13-linea-germinal-prerregistro.md`.
    - Siguiente: medir la fragmentación (pedazos de varias células que se separan) y, si no hay, puentes de energía regulados por el genoma (*Volvox*).
-4. **En curso: respuesta a un ataque y fragmentación.** Pregunta del autor: ¿la célula atacada avisa? ¿El cuerpo se defiende?
-   - Medidas `ayuda_herida`, `senal_vecinas` y `soltarse_herida` (atacadas contra no atacadas con los mismos enlaces), más la fragmentación (`fundador`).
-   - Red contra inerte, semillas 39–48.
-   - Corre en Docker (`fase13-respuesta`); incluye también `supresion_cancer_atacantes`.
-   - Prerregistro: `docs/bitacora/2026-10-31-fase13-respuesta-ataque-prerregistro.md`.
+4. **Hecho: respuesta a un ataque y fragmentación.**
+   - Sin defensa: R1 p = 0,63; R2 p = 0,12; nunca se usa `soltarse`.
+   - Los cuerpos se reproducen por **fragmentación pasiva**: casi todos descienden de un solo fundador y se multiplicaron partiéndose.
+   - La supresión del cáncer, pesada por atacantes, es real (p = 0,003), pero aparece igual en el inerte.
+   - Detalle: `docs/bitacora/2026-10-31-fase13-respuesta-ataque-prerregistro.md`.
+5. **Siguiente: fase 14, un cerebro antes que un cuerpo** (ver `docs/02-hoja-de-ruta.md`). La fase 13 queda como base, sin archivar hasta la revisión.
 3. **Hecho: supresión del "cáncer".**
    - C1 se cumple: las células atacan a sus hermanas mucho menos que a ciegas, en 9 de 9 semillas con cuerpos (p = 0,002).
    - C2 no se cumple: red − sin_intra da 6 de 10 positivas, p = 0,11.

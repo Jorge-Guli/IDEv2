@@ -18,8 +18,8 @@
 
 ## 3. Peldaños siguientes (diseño pendiente, uno por vez)
 - [x] 3.1 El cuerpo como unidad que se reproduce (línea germinal, cuello de botella unicelular): resultado nulo (10 semillas; los cuerpos casi no sueltan hijos); ver bitácora 2026-10-31
-- [ ] 3.2 (en Docker, `fase13-respuesta`) Fragmentación: ¿los cuerpos se parten en pedazos de varias células? (medir antes de agregar puentes regulados)
-- [ ] 3.3 (en Docker, `fase13-respuesta`) Respuesta del cuerpo a un ataque (pregunta del autor): señal por contacto, energía a la herida, relleno, soltar partes
+- [x] 3.2 Fragmentación: sí, pasiva; casi todos los cuerpos descienden de un fundador y se multiplicaron partiéndose
+- [x] 3.3 Respuesta del cuerpo a un ataque: nula (R1 p = 0,63, R2 p = 0,12; soltarse nunca se usa)
 - [x] 3.4 Supresión del cáncer: C1 sí (p = 0,002), C2 no (p = 0,11); medida corregida por atacantes en el experimento de respuesta
 - [ ] 3.2 Reproducción sexual
 - [ ] 3.3 Tipos celulares y células mensajeras

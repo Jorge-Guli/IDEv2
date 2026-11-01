@@ -67,3 +67,37 @@ Tests: 211 pasan, 1 omitido. Huellas iguales a la referencia: las medidas no toc
 
 ## Enmienda (2026-10-31, antes de ver ningún dato)
 El experimento se reinició a los pocos segundos de arrancar para sumar una exploratoria: `supresion_cancer_atacantes`, la supresión del cáncer con el azar ciego pesado por cuánto ataca cada célula. Corrige la reserva geométrica del [experimento del cáncer](2026-10-31-fase13-cancer-prerregistro.md). Los criterios R1 y R2 no cambian.
+
+## Resultado (2026-11-01)
+10 semillas por condición, 300 000 pasos, sin extinciones. Todas las semillas cumplen la regla de datos. Salida: `runs/fase13/respuesta.json`.
+
+| Criterio | Resultado | ¿Cumple? |
+|---|---|---|
+| **R1** `ayuda_herida` en red > 0 | 4 de 10 positivas, del orden de 0,0001 de energía, p = 0,63 | **No** |
+| **R2** `senal_vecinas` red − inerte > 0 | 6 de 10 positivas, p = 0,12 | **No** |
+
+**Exploratorias:**
+- **`soltarse_herida` = 0 en las 20 corridas.** Ninguna célula de un cuerpo usa nunca `soltarse`.
+- **`senal_herida`** red − inerte: p = 0,20. La célula atacada no cambia su estado más que en el control.
+- **Supresión del cáncer con el azar ciego pesado por atacantes** (corrige la geometría del borde):
+  - en red, 9 de 10 positivas (media 0,09), p = 0,003;
+  - en inerte, 10 de 10 positivas (media 0,13).
+  - **La supresión es real después de la corrección, pero no depende de la red regulatoria.** Alcanza con los sensores, por ejemplo `similitud_frente`.
+- **Fragmentación** (hallazgo principal):
+  - En 17 de 20 corridas, `frac_pedazos_fragmentados` ≈ 1 y `fundadores_partidos` ≈ 1.
+  - Eso significa que **casi todos los cuerpos vivos descienden, por divisiones unidas, de un mismo fundador, y se multiplicaron partiéndose**.
+  - Las otras 3 corridas (red 39, inerte 39 e inerte 48) tienen menos enlazados y muchos fundadores, varios partidos.
+
+## Conclusión
+- **El cuerpo no responde a un ataque.** No avisa, no ayuda a la herida y no suelta la parte.
+- **Pero los cuerpos sí se reproducen: por fragmentación pasiva.** Como no usan `soltarse`, los cortes vienen de células que mueren en el medio (por ataques o hambre) o de enlaces que se rompen al moverse.
+  - Explica por qué no hubo línea germinal: los cuerpos no fundan cuerpos con una célula, se parten.
+  - En la Tierra existe algo parecido: los filamentos de cianobacterias se parten donde muere una célula (necridios), y las esponjas y muchas algas se reproducen por fragmentos.
+- **Una sola estirpe de cuerpos se queda con el mundo** en casi todas las semillas.
+
+**Balance de la fase 13:**
+- **Sí hay:** cuerpos clonales, que se reproducen partiéndose, suprimen el canibalismo interno y resisten.
+- **No hay:** tipos celulares, línea germinal ni defensa coordinada.
+- **La red regulatoria no aporta** a nada de lo medido, contra el control inerte.
+
+Por la decisión del autor (2026-10-31, la naturaleza como inspiración), **la fase 14, un cerebro antes que un cuerpo, pasa al frente.**
