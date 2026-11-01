@@ -21,7 +21,7 @@ En la Tierra, los cerebros despegaron cuando apareció la percepción a distanci
   - `comida_lejos`: el recurso más rico a la vista;
   - `otro_lejos`: la cercanía del primer organismo a la vista;
   - `tamano_lejos`: el tamaño del grupo de ese organismo relativo al propio, para saber si es presa o depredador.
-- Con la visión apagada, el universo no cambia: tests 214 pasan, 1 omitido; huellas iguales a la referencia.
+- Con la visión apagada, el universo no cambia: tests 215 pasan, 1 omitido; huellas iguales a la referencia.
 
 ## Diseño
 - **Universo:** `natural.toml`, con la red regulatoria y desde LUCA.
