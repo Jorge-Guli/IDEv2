@@ -75,3 +75,13 @@ Corrida completa: 30 de 30, sin extinciones. Salida guardada en `runs/fase14/ojo
 - Se vuelven a correr vision y ciega con la lesión corregida: mismas semillas, mismos pasos, mismos criterios. Por el determinismo, las series son idénticas a la primera corrida; solo cambian las lesiones.
 - Las corridas de cegada se reutilizan sin su `lesion_cerebro`, que era inválido y es solo exploratorio.
 - Salida: `runs/fase14/ojos.json`.
+
+## Retiro (2026-11-01, 22:40)
+El autor objetó el diseño: los ojos "fuerzan cosas que se esperan que se den solas por necesidad". Tiene razón.
+- **Órgano armado de antemano.** El ojo no salía de la física: era un órgano entero diseñado, con su significado ya interpretado. "Comida más rica a la vista", "cercanía del primer organismo" y "tamaño relativo, para saber si es presa o depredador" son lecturas que un ser vivo tiene que *aprender* a extraer de lo que llega del mundo, no recibir resueltas.
+- **Sesgo de expectativa.** Se agregó porque se esperaba que los cerebros despegaran con él. Es acomodar el universo a un resultado buscado: el principio 7 aplicado a los órganos, no solo a las fuerzas.
+- **Experimento detenido.** Contenedor `fase14-ojos` detenido sin terminar la versión corregida. Queda como dato histórico:
+  - V1 nulo: aun regalado, el ojo no pagó en 9 de 10 poblaciones;
+  - V2 y V3 sin respuesta.
+- **El código de la visión queda en el repositorio**, apagado por defecto (`vision.activa = false`). Las corridas anteriores no cambian. No se usa en experimentos nuevos.
+- **Lección general.** Los sensores de siempre (`frente`, `vecinos`, `similitud_frente`…) son también lecturas ya interpretadas, heredadas de la fase 1. Una percepción fiel debe partir de lo que la física hace llegar al organismo (sustancias que difunden, luz, contacto) mediante receptores genéricos que el genoma arma desde cero. Ver la hoja de ruta.

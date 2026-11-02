@@ -205,6 +205,7 @@ Configuración de los pilotos del texto:
    - Experimento `experiments/fase14/ojos.py`, condiciones vision, cegada y ciega, semillas 49–58.
    - Prueba de lesión del cerebro y de los ojos al final.
    - Primera corrida (2026-11-01): V1 no se cumple (p = 0,42; ojos solo en la semilla 51). Un error en `lesion()` invalidó V2 y V3: deepcopy con memo compartido devolvía la misma copia. Corregido y con test (`tests/test_lesion.py`). Se relanzaron vision y ciega en Docker (`fase14-ojos`), unas 14 horas; cegada se reutiliza.
+   - **Retirado (2026-11-01)** a pedido del autor: el ojo era un órgano diseñado, con su significado ya interpretado ("presa o depredador"), puesto porque se esperaba que el cerebro despegara. Contradice el principio 7. Código apagado por defecto y sin uso. Próximo: percepción desde la física (sustancias que difunden y receptores genéricos que el genoma arma desde cero), sin órganos ni lecturas prediseñadas.
    - Prerregistro: `docs/bitacora/2026-11-01-fase14-ojos-prerregistro.md`.
 3. **Hecho: supresión del "cáncer".**
    - C1 se cumple: las células atacan a sus hermanas mucho menos que a ciegas, en 9 de 9 semillas con cuerpos (p = 0,002).

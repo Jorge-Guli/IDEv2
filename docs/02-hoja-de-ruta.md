@@ -35,6 +35,8 @@ Este documento es **el camino que sigue el proyecto, en orden**, con el porqué 
 "No quiero que sea el camino literal, quiero que lo uses como inspiración; si un paso puede saltearse, si encontrás otra forma de lograr la vida inteligente digital, adelante." El objetivo es la inteligencia, no repetir la historia de la Tierra. Los principios (sin fuerzas diseñadas, sin LLMs, percepción local, controles, determinismo) siguen firmes.
 
 ### Atajo en estudio: un cerebro antes que un cuerpo (fase 14, en diseño)
+> **Retirado (2026-11-01, objeción del autor):** los ojos de la primera versión eran un órgano diseñado, con lecturas ya interpretadas ("presa o depredador"). Forzaban lo que tiene que surgir por necesidad. La idea de un cerebro antes que un cuerpo sigue en pie, pero la percepción debe salir de la física: sustancias, luz o contacto que llegan al organismo, y receptores genéricos que el genoma arma desde cero y a los que nadie les dice qué significa lo que leen.
+
 **Diagnóstico de 13 fases:** el límite para la inteligencia no parece ser la falta de cuerpos. Es que **el mundo casi no premia procesar información más allá del reflejo**:
 - la memoria nunca evolucionó (fase 9): su primer peldaño no se premia;
 - la red regulatoria de 8 unidades, que ya es una pequeña red neuronal recurrente dentro de cada célula, no se usa (fase 13);
