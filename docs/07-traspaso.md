@@ -204,7 +204,7 @@ Configuración de los pilotos del texto:
    - Tres sensores a distancia: comida, cercanía del otro y su tamaño relativo.
    - Experimento `experiments/fase14/ojos.py`, condiciones vision, cegada y ciega, semillas 49–58.
    - Prueba de lesión del cerebro y de los ojos al final.
-   - Corre en Docker (`fase14-ojos`), unas 12 horas.
+   - Primera corrida (2026-11-01): V1 no se cumple (p = 0,42; ojos solo en la semilla 51). Un error en `lesion()` invalidó V2 y V3: deepcopy con memo compartido devolvía la misma copia. Corregido y con test (`tests/test_lesion.py`). Se relanzaron vision y ciega en Docker (`fase14-ojos`), unas 14 horas; cegada se reutiliza.
    - Prerregistro: `docs/bitacora/2026-11-01-fase14-ojos-prerregistro.md`.
 3. **Hecho: supresión del "cáncer".**
    - C1 se cumple: las células atacan a sus hermanas mucho menos que a ciegas, en 9 de 9 semillas con cuerpos (p = 0,002).

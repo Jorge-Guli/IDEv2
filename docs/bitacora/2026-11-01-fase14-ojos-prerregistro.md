@@ -55,3 +55,23 @@ En la Tierra, los cerebros despegaron cuando apareció la percepción a distanci
 - **V3:** el cerebro empieza a importar cuando hay información a distancia para procesar. Es el paso clave hacia la inteligencia, y abre la siguiente pregunta: ¿anticipa?
 - **V1 y V2 sin V3:** los ojos se usan como reflejo (ver comida lejos → avanzar) sin necesidad del cerebro. Habría que buscar qué situación real exige recordar o anticipar; por ejemplo, presas que se mueven, que ya existen porque la depredación evoluciona sola.
 - **Ninguno:** la visión no paga a ese costo en este mundo. Es un dato; no se baja el costo para que aparezca.
+
+## Resultado de la primera corrida (2026-11-01) y enmienda
+Corrida completa: 30 de 30, sin extinciones. Salida guardada en `runs/fase14/ojos_error_copia.json`.
+
+**V1, los ojos evolucionan por lo que informan: no se cumple.**
+- `alcance_medio` vision − cegada: 5 de 10 semillas positivas, p = 0,42.
+- Los ojos aparecieron de verdad en una sola semilla, la 51: el 60 % de la población tiene alcance ≥ 1 y el alcance medio es 0,73. En las otras nueve, menos del 0,1 % tiene ojos, igual que en cegada.
+- Esta medida sale de la serie de la corrida, no de la lesión, así que vale: **la visión no paga a ese costo en este mundo.** Es un dato; el costo no se toca.
+
+**V2 y V3 no valen: error en la prueba de lesión.**
+- `lesion()` armaba las dos copias con `copy.deepcopy(sim, memo)` y `copy.deepcopy(sim, dict(memo))`. La segunda copia del memo se hacía *después* de la primera copia, así que ya contenía `sim → intacta`, y deepcopy devolvía la misma copia dos veces.
+- La "intacta" era, entonces, la lesionada. El "costo" comparaba dos tramos sucesivos de 20 000 pasos de la misma simulación lesionada. Por eso todos los valores salieron negativos y parecidos (−3 % a −29 %): reflejaban el crecimiento de la población en el tiempo, no la lesión.
+- Corrección:
+  - cada copia lleva su propio memo, con una aserción de que son objetos distintos;
+  - `tests/test_lesion.py`: una lesión nula cuesta exactamente 0; una lesión real cambia la historia; la simulación original no se toca.
+
+**Enmienda:**
+- Se vuelven a correr vision y ciega con la lesión corregida: mismas semillas, mismos pasos, mismos criterios. Por el determinismo, las series son idénticas a la primera corrida; solo cambian las lesiones.
+- Las corridas de cegada se reutilizan sin su `lesion_cerebro`, que era inválido y es solo exploratorio.
+- Salida: `runs/fase14/ojos.json`.

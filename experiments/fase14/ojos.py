@@ -52,10 +52,11 @@ def seguir(sim, pasos):
 
 
 def lesion(sim, ajuste):
-    """Copia la simulación (mismo azar), aplica la lesión a una copia y sigue las dos en paralelo."""
-    memo = {id(sim.xp): sim.xp}
-    intacta, lesionada = copy.deepcopy(sim, memo), copy.deepcopy(sim, dict(memo))
-    lesionada.cfg = copy.deepcopy(sim.cfg)
+    """Copia la simulación (mismo azar), aplica la lesión a una copia y sigue las dos en paralelo.
+    Cada copia lleva su propio memo: con uno compartido, deepcopy devolvía la misma copia dos veces (error de la
+    primera corrida, 2026-11-01: la "intacta" era la lesionada y se comparaban dos tramos sucesivos)."""
+    intacta, lesionada = (copy.deepcopy(sim, {id(sim.xp): sim.xp}) for _ in range(2))
+    assert intacta is not lesionada and intacta.cfg is not lesionada.cfg
     ajuste(lesionada.cfg)
     a, b = seguir(intacta, PASOS_LESION), seguir(lesionada, PASOS_LESION)
     return round((a - b) / a, 5) if a > 0 else float("nan")
