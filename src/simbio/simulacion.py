@@ -802,6 +802,8 @@ class Simulacion:
             hora = self.clima.hora(self.t)
             ent.paso(self.t, cfg.mundo.regeneracion * self.clima.f_regeneracion[hora])
             basal = f.costo_basal * self.clima.f_basal[hora]
+        elif cfg.equipo.activa:  # el equipo donde corre: la comida recrece según la CPU libre
+            ent.paso(self.t, cfg.mundo.regeneracion * getattr(self, "cpu_libre", 1.0))
         else:
             ent.paso(self.t)
         if self.luz is not None:
@@ -1329,6 +1331,8 @@ class Simulacion:
                     mem = dev.a_cpu(p["memoria"])
                     al = [float(((2 * mem[:, k] - 1) * self.estacion()).mean()) for k in range(2)]
                     fila["memoria_alineada_a"], fila["memoria_alineada_b"] = al
+            if self.cfg.equipo.activa:
+                fila["cpu_libre"] = float(getattr(self, "cpu_libre", 1.0))
             if self.clima is not None:  # datos reales: la hora de la serie y el clima vigente
                 h = self.clima.hora(self.t)
                 fila["hora_clima"] = h

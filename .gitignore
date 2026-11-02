@@ -7,3 +7,5 @@ runs/
 runs_*.log
 # textos de entrada con derechos de autor: solo locales, nunca al repositorio
 datos/textos/
+# muestras del equipo del autor (lector_equipo.py): locales
+datos/equipo/

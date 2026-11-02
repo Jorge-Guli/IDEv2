@@ -9,6 +9,8 @@
 #   comerse a otro rinde.
 # - El genoma puede ganar todo lo que la física permite: asociarse (movimiento de grupo por fuerza, α = 0,5, el de la
 #   fase 3c), percibir el rumbo de los socios, atacar y la red regulatoria del desarrollo.
+# - Su mundo físico es el equipo donde corre (autor, 2026-11-01): la comida recrece según la CPU libre del equipo
+#   (EquipoCfg). Si el lector del equipo no anda, queda el último valor; todo lo aplicado se graba en equipo.jsonl.
 # - capacidad_max = 20: un mundo rico, elegido una vez. No se retoca según los resultados.
 [mundo]
 alto = 128
@@ -30,6 +32,9 @@ tamano = true
 
 [desarrollo]
 activo = true
+
+[equipo]
+activa = true
 
 [sim]
 poblacion_inicial = 200

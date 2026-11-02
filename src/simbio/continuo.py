@@ -114,6 +114,27 @@ def _volcar(sim: Simulacion, salida: Path) -> None:
         sim.linaje = []
 
 
+def leer_equipo(sim: Simulacion, salida: Path, ahora: float | None = None) -> dict:
+    """Lee la última muestra del equipo (la escribe afuera experiments/herramientas/lector_equipo.py) y la aplica.
+    Graba en equipo.jsonl el paso y el valor aplicado: es la única entrada del mundo que no sale de la semilla, así
+    que con ese registro cualquier tramo se puede volver a correr igual. Sin muestra, o vencida, queda la anterior."""
+    eq = sim.cfg.equipo
+    fila = {"t": sim.t}
+    try:
+        m = json.loads(Path(eq.archivo).read_text(encoding="utf-8"))
+        edad = (time.time() if ahora is None else ahora) - float(m["hora"])
+        if edad > eq.vencida:
+            fila["sin_dato"] = f"muestra vieja ({edad:.0f} s)"
+        else:
+            sim.cpu_libre = min(1.0, max(0.0, float(m["cpu_libre"])))
+            fila["hora_muestra"] = m["hora"]
+    except (OSError, ValueError, KeyError) as e:
+        fila["sin_dato"] = type(e).__name__
+    fila["cpu_libre"] = float(getattr(sim, "cpu_libre", 1.0))
+    _anotar(salida / "equipo.jsonl", [fila])
+    return fila
+
+
 def vivir(cfg: Config, salida: Path, guardar_cada: int = 10_000, pasos: int | None = None,
           resembrar: bool = True, verbose: bool = True) -> Simulacion:
     """Corre el universo de `salida` (lo crea si no existe) hasta `pasos` pasos totales, o sin plazo si es None.
@@ -141,6 +162,8 @@ def vivir(cfg: Config, salida: Path, guardar_cada: int = 10_000, pasos: int | No
     inicio, t0 = time.time(), sim.t
     try:
         while (pasos is None or sim.t < pasos) and not cortar["pedido"]:
+            if sim.cfg.equipo.activa and sim.t % sim.cfg.equipo.revisar_cada == 0:
+                leer_equipo(sim, salida)
             if sim.luz is not None and sim.t % sim.cfg.estimulos.revisar_cada == 0:
                 for fila in estimulos.recibir(sim, salida):  # estímulos desde afuera (etapa 3)
                     if verbose:

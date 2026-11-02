@@ -353,6 +353,19 @@ class VisionCfg:
 
 
 @dataclass
+class EquipoCfg:
+    # el mundo físico de LUCA es el equipo donde corre (autor, 2026-11-01): no el clima de una ciudad, sino la
+    # computadora que lo contiene. Una sola conexión, la más literal: la comida recrece en proporción a la fracción de
+    # CPU que el equipo tiene libre (regeneracion · cpu_libre). Si el equipo está ocupado, al mundo le llega menos.
+    # Lo mide afuera experiments/herramientas/lector_equipo.py; el universo continuo lee la última muestra cada
+    # `revisar_cada` pasos y graba lo aplicado en equipo.jsonl (con eso, cualquier tramo se puede reproducir)
+    activa: bool = False
+    archivo: str = "datos/equipo/actual.json"
+    revisar_cada: int = 1000
+    vencida: float = 600.0  # segundos: una muestra más vieja no se aplica (el lector no anda); queda la anterior
+
+
+@dataclass
 class SimCfg:
     semilla: int = 0
     pasos: int = 5000
@@ -381,6 +394,7 @@ class Config:
     texto: TextoCfg = field(default_factory=TextoCfg)
     desarrollo: DesarrolloCfg = field(default_factory=DesarrolloCfg)
     vision: VisionCfg = field(default_factory=VisionCfg)
+    equipo: EquipoCfg = field(default_factory=EquipoCfg)
     sim: SimCfg = field(default_factory=SimCfg)
 
     def to_dict(self) -> dict[str, Any]:

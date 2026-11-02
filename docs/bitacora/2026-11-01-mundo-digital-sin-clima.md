@@ -12,3 +12,22 @@
 **Siguiente, a partir de la propuesta del autor:** que el estado del propio equipo alimente al universo, como su verdadero entorno físico: carga, energía, temperatura y la actividad del autor, incluidas las sesiones de chat, con su permiso. Diseño en curso, con estas condiciones:
 - **Determinismo:** todo lo que entra se graba, para poder reproducir cualquier tramo.
 - **Privacidad:** de las sesiones se toman solo ritmos (cuándo y cuánto), nunca el contenido.
+
+## El equipo como mundo físico de LUCA (hecho el mismo día)
+El autor: "el universo de LUCA es un contenedor dentro de mi equipo físico; este equipo es un universo en sí mismo". Dio permiso para usar también la actividad de las sesiones de chat.
+
+**Una sola conexión, la más literal:** la comida recrece en proporción a la CPU libre del equipo (`regeneracion · cpu_libre`, `EquipoCfg`). Cuando la computadora está ocupada, al mundo de LUCA le llega menos energía; eso incluye nuestros propios experimentos. No hay otra elección de diseño: ni umbrales, ni premios.
+
+**Lector del equipo** (`experiments/herramientas/lector_equipo.py`):
+- corre afuera del contenedor, con prioridad mínima, y toma una muestra cada 10 segundos;
+- escribe en `datos/equipo/` (no se sube al repositorio) la CPU libre, la memoria libre y el ritmo de las sesiones de Claude Code;
+- de las sesiones mira solo cuántos bytes crecieron sus registros y cuántos cambiaron. **Nunca abre su contenido.** El ritmo queda registrado para estudiarlo, pero hoy no alimenta al universo.
+
+**Determinismo:**
+- el universo lee la última muestra cada 1 000 pasos y graba el valor aplicado en `runs/vivo/natural/equipo.jsonl`, así que con ese registro cualquier tramo se puede volver a correr;
+- si la muestra tiene más de 10 minutos, no se aplica y queda la anterior;
+- los experimentos con semilla no usan el equipo, porque su opción está apagada por defecto. Huellas iguales a la referencia; tests: 220 pasan, 1 omitido.
+
+**Universo reiniciado desde LUCA** con el equipo conectado. Primeras lecturas: CPU libre entre 0,81 y 0,88.
+
+**Pendiente:** que el lector arranque solo al encender el equipo. El permiso de la sesión no dejó instalarlo en el inicio de Windows, así que hoy hay que arrancarlo a mano tras cada reinicio.
