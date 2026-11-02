@@ -137,6 +137,7 @@ class Simulacion:
         d["digestion"][:] = 0.5  # neutro: digiere igual los dos tipos
         d["uso_comer"][:] = self.cfg.fisica.maquinaria_ref  # maquinaria de un generalista (fase 5)
         d["uso_avanzar"][:] = self.cfg.fisica.maquinaria_ref
+        d["actividad"][:] = 1.0  # nace con gasto pleno (fase 15)
         d["id"] = xp.arange(self.sig_id, self.sig_id + n)
         d["fundador"] = d["id"].copy()  # un hijo suelto funda un cuerpo nuevo; el unido hereda el del progenitor
         d["ultimo_ataque"][:] = -1_000_000  # nunca atacada
@@ -165,7 +166,7 @@ class Simulacion:
 
     def _reiniciar_contadores(self) -> None:
         xp = self.xp
-        self.cont = {"nacimientos": 0, "muertes": 0, "comido": 0.0, "org_pasos": 0,
+        self.cont = {"nacimientos": 0, "nacen_quietos": 0, "muertes": 0, "comido": 0.0, "org_pasos": 0,
                      "compartido": 0.0, "recibido": 0.0, "comido_libre": 0.0,
                      "comido_libre_sec": 0.0, "comido_libre_nosec": 0.0, "depredados": 0,
                      "depredados_en_refugio": 0, "enlaces_por_union": 0, "enlaces_por_division": 0,
@@ -825,6 +826,9 @@ class Simulacion:
                 p["E"] -= dosis
 
             # costos: basal + genoma + acción + enlaces
+            if cfg.metabolismo.activo:  # fase 15: el basal sigue a la actividad reciente
+                m = cfg.metabolismo
+                basal = basal * (m.piso + (1.0 - m.piso) * p["actividad"])
             p["E"] -= (basal + f.costo_por_gen * p["activo"].sum(axis=1) + self.costo_accion[act]
                        + cfg.asociacion.costo_enlace * (socios >= 0).sum(axis=1)
                        + cfg.coordinacion.costo_senal * p["senal"])
@@ -844,6 +848,8 @@ class Simulacion:
             r = f.maquinaria_memoria
             p["uso_comer"] += r * ((act == gen.COMER) - p["uso_comer"])
             p["uso_avanzar"] += r * ((act == gen.AVANZAR) - p["uso_avanzar"])
+            if cfg.metabolismo.activo:
+                p["actividad"] += cfg.metabolismo.inercia * ((act != gen.DESCANSAR) - p["actividad"])
             if cfg.ataque.activo:
                 p["uso_atacar"] += r * ((act == gen.ATACAR) - p["uso_atacar"])
             p["refractario"] = xp.maximum(p["refractario"] - 1, 0).astype(xp.int16)
@@ -1009,6 +1015,8 @@ class Simulacion:
                     nuevos["uso_comer"] = p["uso_comer"][padres].copy()  # el hijo hereda la maquinaria
                     nuevos["uso_avanzar"] = p["uso_avanzar"][padres].copy()
                     nuevos["uso_atacar"] = p["uso_atacar"][padres].copy()
+                    nuevos["actividad"] = p["actividad"][padres].copy()  # hijo de un quieto nace quieto (fase 15)
+                    self.cont["nacen_quietos"] += int((nuevos["actividad"] < 0.2).sum())
                     if cfg.desarrollo.activo:  # el hijo hereda el estado regulatorio, con ruido si es asimétrica
                         nuevos["reg"] = p["reg"][padres].copy()
                         if cfg.desarrollo.asimetria > 0:
@@ -1333,6 +1341,12 @@ class Simulacion:
                     fila["memoria_alineada_a"], fila["memoria_alineada_b"] = al
             if self.cfg.equipo.activa:
                 fila["cpu_libre"] = float(getattr(self, "cpu_libre", 1.0))
+            if self.cfg.metabolismo.activo:  # fase 15: letargo y crías que nacen quietas (semillas)
+                a = dev.a_cpu(p["actividad"])
+                fila["actividad_media"] = float(a.mean()) if a.size else float("nan")
+                fila["frac_letargo"] = float((a < 0.2).mean()) if a.size else float("nan")
+                fila["frac_nacen_quietos"] = (c["nacen_quietos"] / c["nacimientos"] if c["nacimientos"]
+                                              else float("nan"))
             if self.clima is not None:  # datos reales: la hora de la serie y el clima vigente
                 h = self.clima.hora(self.t)
                 fila["hora_clima"] = h

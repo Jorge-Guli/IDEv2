@@ -336,6 +336,17 @@ class DesarrolloCfg:
 
 
 @dataclass
+class MetabolismoCfg:
+    # fase 15: estar vivo cuesta según la actividad reciente, como un programa en pausa casi no usa CPU y el
+    # metabolismo de reposo es mucho menor que el activo. La actividad a sigue con inercia a "no descansó";
+    # basal = costo_basal · (piso + (1 − piso) · a). El costo por gen (la memoria que ocupa el programa) y el de las
+    # acciones no cambian. La cría hereda la actividad del progenitor. Nada dice cuándo aquietarse: lo decide el genoma
+    activo: bool = False
+    piso: float = 0.1  # fracción del basal en reposo pleno (torpor: 1–25 %)
+    inercia: float = 0.05  # ~20 pasos para bajar a la mitad: aquietarse rinde solo si se sostiene
+
+
+@dataclass
 class VisionCfg:
     # fase 14, un cerebro antes que un cuerpo: percepción a distancia, como los ojos y el olfato. En la Tierra los
     # cerebros despegaron cuando se pudo percibir lejos (explosión del Cámbrico). El genoma decide el alcance (rasgo
@@ -397,6 +408,7 @@ class Config:
     texto: TextoCfg = field(default_factory=TextoCfg)
     desarrollo: DesarrolloCfg = field(default_factory=DesarrolloCfg)
     vision: VisionCfg = field(default_factory=VisionCfg)
+    metabolismo: MetabolismoCfg = field(default_factory=MetabolismoCfg)
     equipo: EquipoCfg = field(default_factory=EquipoCfg)
     sim: SimCfg = field(default_factory=SimCfg)
 

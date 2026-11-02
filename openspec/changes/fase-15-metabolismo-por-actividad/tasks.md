@@ -1,10 +1,10 @@
 # Tasks
 
 ## 1. Física
-- [ ] 1.1 `MetabolismoCfg` (activo, piso = 0,1, inercia = 0,05) y campo `actividad` de la población (1 al nacer LUCA y al cargar lo viejo)
-- [ ] 1.2 Cobro basal según la actividad y actualización tras decidir; herencia en la división suelta y en la unida
-- [ ] 1.3 Métricas `actividad_media`, `frac_letargo` y `frac_nacen_quietos`
-- [ ] 1.4 Tests (reposo prolongado, apagado sin cambios, herencia, carga de lo viejo); suite completa y huellas iguales
+- [x] 1.1 `MetabolismoCfg` (activo, piso = 0,1, inercia = 0,05) y campo `actividad` de la población (1 al nacer LUCA y al cargar lo viejo)
+- [x] 1.2 Cobro basal según la actividad y actualización tras decidir; herencia en la división suelta y en la unida
+- [x] 1.3 Métricas `actividad_media`, `frac_letargo` y `frac_nacen_quietos`
+- [x] 1.4 Tests (reposo prolongado, apagado sin cambios, herencia, carga de lo viejo); suite completa y huellas iguales (226 pasan; prueba de 6 000 pasos: LUCA casi nunca descansa, actividad media 0,98)
 
 ## 2. Experimento
 - [ ] 2.1 `experiments/fase15/serie.py`: arma la serie (docker × pc) desde `datos/equipo/registro_*`, con las variantes real, quieta y barajada

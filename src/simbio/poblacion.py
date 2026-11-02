@@ -37,7 +37,8 @@ ESTADO = {
     "uso_atacar": (np.float64, ()),  # promedio móvil del uso de atacar (fase 12, etapa 4)
     "reg": (np.float64, (gen.NUM_REG,)),  # estado de la red regulatoria: el "tipo celular" (fase 13)
     "n_propagulos": (np.int32, ()),  # hijos que nacieron sueltos en la vida (fase 13, peldaño 3)
-    "n_lugar": (np.int32, ()),  # pasos con alguna celda vecina libre: oportunidad física de dividirse (peldaño 3)
+    "n_lugar": (np.int32, ()),
+    "actividad": (np.float64, ()),  # actividad reciente: fija el gasto de estar vivo (fase 15)  # pasos con alguna celda vecina libre: oportunidad física de dividirse (peldaño 3)
     "fundador": (np.int64, ()),  # id de la célula que fundó el cuerpo; los hijos unidos lo heredan (fragmentación)
     "ultimo_ataque": (np.int32, ()),  # paso en que la atacaron por última vez (respuesta del cuerpo a un ataque)
 }
@@ -71,6 +72,8 @@ class Poblacion:
                     self.d[k] = self.d["id"].copy()
                 if k == "ultimo_ataque":  # sin historia: nunca atacada
                     self.d[k][:] = -1_000_000
+                if k == "actividad":  # sin historia: gasto pleno, como antes de la fase 15
+                    self.d[k][:] = 1.0
         vacios = gen.vacio(self.n, self.genes_max, xp)
         for k in gen.CAMPOS:  # campos del genoma nuevos (red regulatoria, fase 13): en cero
             if k not in self.d:
