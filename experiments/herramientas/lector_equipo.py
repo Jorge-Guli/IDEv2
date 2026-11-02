@@ -1,6 +1,7 @@
 """Lector del equipo: el mundo físico de LUCA es la computadora donde corre (autor, 2026-11-01).
 
-Corre afuera del contenedor, con prioridad mínima, y cada `--cada` segundos escribe en datos/equipo/:
+Corre en su propio contenedor (servicio `lector` de docker-compose.yml: arranca solo con Docker, sin internet y con
+prioridad mínima), y cada `--cada` segundos escribe en datos/equipo/:
     actual.json            la última muestra (el universo continuo la lee; ver EquipoCfg y continuo.leer_equipo)
     registro_AAAA-MM.jsonl todas las muestras, para estudiar los ritmos del equipo
 Qué mide:
@@ -11,7 +12,9 @@ Qué mide:
 De las sesiones se toma solo el ritmo (cuánto y cuándo), nunca el contenido: no se abre ningún archivo, solo se mira
 su tamaño. Nada sale del equipo.
 
-Uso: pythonw experiments/herramientas/lector_equipo.py   (sin ventana; lo arranca solo el inicio de Windows)
+En Docker, la CPU y la memoria son las de la máquina donde corren los contenedores (en Windows, la de Docker
+Desktop): el barrio inmediato de LUCA, con los demás contenedores y nuestros experimentos, no los programas de Windows.
+Uso: docker compose up -d lector   (también anda afuera: python experiments/herramientas/lector_equipo.py)
 """
 
 from __future__ import annotations
@@ -23,14 +26,49 @@ import sys
 import time
 from pathlib import Path
 
-import psutil
+try:
+    import psutil
+except ImportError:  # en el contenedor: se lee /proc directamente
+    psutil = None
 
 RAIZ = Path(__file__).resolve().parents[2]
 
 
 def _bajar_prioridad() -> None:
-    p = psutil.Process()
-    p.nice(psutil.IDLE_PRIORITY_CLASS if sys.platform == "win32" else 19)
+    if sys.platform == "win32":
+        psutil.Process().nice(psutil.IDLE_PRIORITY_CLASS)
+    else:
+        os.nice(19)
+
+
+class _Cpu:
+    """Fracción de CPU libre desde la lectura anterior."""
+
+    def __init__(self):
+        self.prev = self._tiempos()
+
+    @staticmethod
+    def _tiempos():
+        if psutil is not None:
+            return None
+        v = [int(x) for x in Path("/proc/stat").read_text().splitlines()[0].split()[1:]]
+        return v[3] + v[4], sum(v)  # (inactivo + espera de disco, total)
+
+    def libre(self) -> float:
+        if psutil is not None:
+            return 1.0 - psutil.cpu_percent(interval=None) / 100.0
+        ahora = self._tiempos()
+        di, dt = ahora[0] - self.prev[0], ahora[1] - self.prev[1]
+        self.prev = ahora
+        return di / dt if dt > 0 else 1.0
+
+
+def _memoria_libre() -> float:
+    if psutil is not None:
+        m = psutil.virtual_memory()
+        return m.available / m.total
+    info = dict(x.split(":") for x in Path("/proc/meminfo").read_text().splitlines() if ":" in x)
+    return int(info["MemAvailable"].split()[0]) / int(info["MemTotal"].split()[0])
 
 
 def _tamanos(sesiones: Path) -> dict[str, int]:
@@ -43,12 +81,12 @@ def _tamanos(sesiones: Path) -> dict[str, int]:
     return tam
 
 
-def muestra(previos: dict[str, int], sesiones: Path) -> tuple[dict, dict[str, int]]:
+def muestra(previos: dict[str, int], sesiones: Path, cpu: _Cpu) -> tuple[dict, dict[str, int]]:
     tam = _tamanos(sesiones)
     crec = [tam[k] - previos.get(k, tam[k]) for k in tam]
     m = {"hora": time.time(),
-         "cpu_libre": round(1.0 - psutil.cpu_percent(interval=None) / 100.0, 4),
-         "memoria_libre": round(psutil.virtual_memory().available / psutil.virtual_memory().total, 4),
+         "cpu_libre": round(cpu.libre(), 4),
+         "memoria_libre": round(_memoria_libre(), 4),
          "chat_bytes": int(sum(c for c in crec if c > 0)),
          "chat_archivos": int(sum(c > 0 for c in crec))}
     return m, tam
@@ -64,12 +102,14 @@ def main() -> None:
     _bajar_prioridad()
     salida, sesiones = Path(args.salida), Path(args.sesiones)
     salida.mkdir(parents=True, exist_ok=True)
-    psutil.cpu_percent(interval=None)  # la primera lectura no tiene intervalo
+    cpu = _Cpu()
+    if psutil is not None:
+        psutil.cpu_percent(interval=None)  # la primera lectura no tiene intervalo
     previos = _tamanos(sesiones)
     n = 0
     while args.veces == 0 or n < args.veces:
         time.sleep(args.cada)
-        m, previos = muestra(previos, sesiones)
+        m, previos = muestra(previos, sesiones, cpu)
         linea = json.dumps(m)
         tmp = salida / "actual.json.tmp"
         tmp.write_text(linea, encoding="utf-8")

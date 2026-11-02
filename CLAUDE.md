@@ -28,7 +28,7 @@ Documentación, specs, comentarios y nombres del dominio en **español**. Los en
 - Evaluación de la fase 1: `python experiments/fase1/evaluar.py --salida runs/fase1`
 - Validar specs: `openspec validate --all --strict`
 - Dispositivo: `python -m simbio dispositivo`
-- Universo continuo (natural, principio 7): `docker compose up -d --build` (servicio `natural`, datos en `runs/vivo/natural`) y `python -m simbio mirar runs/vivo/natural`. Los universos de la fase 12 (`universo`, `clima`) quedaron retirados por tener fuerzas diseñadas (perfil `historico`)
-- Lector del equipo (mundo físico de LUCA, debe estar corriendo para el universo natural): `pythonw experiments/herramientas/lector_equipo.py` (prioridad mínima; muestras en `datos/equipo/`, solo ritmos, nunca contenido)
+- Universo continuo (natural, principio 7): `docker compose up -d --build` (servicios `natural` y `lector`, datos en `runs/vivo/natural`) y `python -m simbio mirar runs/vivo/natural`. Los universos de la fase 12 (`universo`, `clima`) quedaron retirados por tener fuerzas diseñadas (perfil `historico`)
+- Lector del equipo (mundo físico de LUCA, alimenta al universo natural): servicio `lector` de Docker, arranca con `docker compose up -d` (muestras en `datos/equipo/`; de las sesiones, solo ritmos, nunca contenido)
 - Experimentos largos (siempre en Docker, sin ventanas en el escritorio del autor): `docker compose --profile experimentos run -d --name <nombre> experimento experiments/<fase>/<script>.py --procesos 4 ...`; esperar con `docker wait <nombre>`
 - Huellas de determinismo: `python experiments/herramientas/huellas.py --comparar`

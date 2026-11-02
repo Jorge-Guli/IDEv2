@@ -30,4 +30,6 @@ El autor: "el universo de LUCA es un contenedor dentro de mi equipo físico; est
 
 **Universo reiniciado desde LUCA** con el equipo conectado. Primeras lecturas: CPU libre entre 0,81 y 0,88.
 
-**Pendiente:** que el lector arranque solo al encender el equipo. El permiso de la sesión no dejó instalarlo en el inicio de Windows, así que hoy hay que arrancarlo a mano tras cada reinicio.
+**El lector corre en Docker** (servicio `lector`), a pregunta del autor. Arranca solo con Docker, sin tocar el inicio de Windows, sin internet y con 0,1 CPU. Lee las sesiones montadas en solo lectura, y únicamente sus tamaños.
+- **Consecuencia:** la CPU y la memoria que ve son las de la máquina de Docker Desktop, no las de todo Windows. Es el barrio inmediato de LUCA: los otros contenedores y nuestros experimentos.
+- Primeras lecturas: CPU libre 0,95; memoria libre 0,92.

@@ -20,6 +20,21 @@ services:
     stop_grace_period: 60s
     cpus: 0.5
 
+  # Lector del equipo: el mundo físico de LUCA (autor, 2026-11-01). Cada 10 s anota la CPU y la memoria libres de la
+  # máquina de Docker y el ritmo de las sesiones de Claude Code (solo tamaños de sus registros, nunca el contenido)
+  # en ./datos/equipo, que el universo natural lee. Arranca solo con Docker; sin internet y casi sin CPU
+  lector:
+    image: simbio-vivo
+    working_dir: /repo
+    entrypoint: ["python", "experiments/herramientas/lector_equipo.py", "--salida", "/salida", "--sesiones", "/sesiones"]
+    volumes:
+      - ./experiments:/repo/experiments:ro
+      - ./datos/equipo:/salida
+      - ${USERPROFILE}/.claude/projects:/sesiones:ro
+    network_mode: none
+    restart: unless-stopped
+    cpus: 0.1
+
   # Universos de la fase 12, retirados el 2026-10-31: tenían fuerzas diseñadas (depredador externo, estaciones y
   # la lluvia decidiendo qué comida nutre). Sus datos quedan en ./runs/vivo/universo y ./runs/vivo/clima. Solo
   # arrancan a pedido: docker compose --profile historico up -d universo clima
