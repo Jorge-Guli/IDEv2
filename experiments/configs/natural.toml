@@ -1,15 +1,15 @@
-# Universo natural (fase 13, principio 7 de la metodología): nada de fuerzas diseñadas.
+# Universo natural (principio 7 de la metodología): nada de fuerzas diseñadas y nada traído de la Tierra.
 # - Física base: comer da energía, moverse y vivir cuestan, dividirse reparte. Todos empiezan como LUCA y comen lo mismo.
-# - Mundo real: el clima horario de Capitán Bermúdez (2000-2025). La radiación hace crecer la comida y la temperatura
-#   cambia el costo de vivir. La presión se percibe como sensor local. La lluvia NO decide qué comida nutre: eso era
-#   una regla inventada.
+# - Mundo digital con física propia (autor, 2026-11-01): el clima real de Capitán Bermúdez se quitó. Es del mundo
+#   físico del autor, no del mundo donde habita LUCA. La comida recrece a ritmo constante; la variación y las presiones
+#   salen de la propia población (escasez, competencia, depredación que evoluciona). La versión con clima
+#   (2026-10-31 a 2026-11-01, ~4 millones de pasos) quedó en runs/vivo/natural_clima como dato histórico.
 # - Sin depredador externo ni estaciones artificiales: la depredación solo existe si evoluciona. La primitiva atacar
 #   está disponible para el genoma, pero LUCA no la tiene; aparece por mutación cuando, al escasear la comida,
 #   comerse a otro rinde.
 # - El genoma puede ganar todo lo que la física permite: asociarse (movimiento de grupo por fuerza, α = 0,5, el de la
 #   fase 3c), percibir el rumbo de los socios, atacar y la red regulatoria del desarrollo.
-# - capacidad_max = 20: un mundo rico, elegido una vez (con 10, el invierno real extinguía; ver clima.toml). No se
-#   retoca según los resultados.
+# - capacidad_max = 20: un mundo rico, elegido una vez. No se retoca según los resultados.
 [mundo]
 alto = 128
 ancho = 128
@@ -27,10 +27,6 @@ activo = true
 # comerse a otro depende del tamaño (más fiel a la realidad, aprobado por el autor el 2026-10-30, tras el piloto
 # de la red): una célula sola apenas puede con un grupo grande. Antes: el daño solo se dividía por 1 + enlaces
 tamano = true
-
-[realidad]
-activa = true
-lluvia = false
 
 [desarrollo]
 activo = true
