@@ -35,6 +35,9 @@ activo = true
 
 [equipo]
 activa = true
+# cada 100 pasos (~2 s a 50 pasos/s): así cada muestra (una cada 10 s) dura en el universo lo que duró en el equipo.
+# Con 1000 pasos (~20 s) una muestra pesaba el doble de lo real y la mitad de las muestras no llegaba a sentirse
+revisar_cada = 100
 
 [sim]
 poblacion_inicial = 200

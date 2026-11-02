@@ -150,6 +150,10 @@ def vivir(cfg: Config, salida: Path, guardar_cada: int = 10_000, pasos: int | No
     eventos = salida / "eventos.jsonl"
     if estado.exists():
         sim = cargar_estado(estado)
+        if sim.pob.n == 0 and not resembrar:  # universo extinto: queda como está (sin esto, cada reinicio de
+            if verbose:                       # Docker anotaba otra retoma y otra extinción, un paso por vez)
+                print(f"universo extinto en t={sim.t}: no hay nada que retomar", flush=True)
+            return sim
         _anotar(eventos, [{"evento": "retoma", "t": sim.t, "hora": time.time(), "poblacion": sim.pob.n}])
     else:
         sim = Simulacion(cfg)

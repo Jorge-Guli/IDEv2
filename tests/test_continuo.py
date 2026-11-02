@@ -37,3 +37,13 @@ def test_eventos_y_archivos(tmp_path):
     assert '"inicio"' in eventos[0] and '"fin"' in eventos[-1]
     for nombre in ("estado.pkl", "config.toml", "poblacion.npz", "metricas.jsonl"):
         assert (tmp_path / "u" / nombre).exists()
+
+
+def test_universo_extinto_no_se_retoma(tmp_path):
+    cfg = _cfg()
+    cfg.fisica.costo_basal = 60.0  # mueren en el primer paso
+    muerto = continuo.vivir(cfg, tmp_path / "u", guardar_cada=50, pasos=100, resembrar=False, verbose=False)
+    assert muerto.pob.n == 0
+    eventos = (tmp_path / "u" / "eventos.jsonl").read_text()
+    otra = continuo.vivir(cfg, tmp_path / "u", guardar_cada=50, pasos=100, resembrar=False, verbose=False)
+    assert otra.t == muerto.t and (tmp_path / "u" / "eventos.jsonl").read_text() == eventos
