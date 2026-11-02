@@ -119,18 +119,22 @@ def leer_equipo(sim: Simulacion, salida: Path, ahora: float | None = None) -> di
     Graba en equipo.jsonl el paso y el valor aplicado: es la única entrada del mundo que no sale de la semilla, así
     que con ese registro cualquier tramo se puede volver a correr igual. Sin muestra, o vencida, queda la anterior."""
     eq = sim.cfg.equipo
+    niveles = getattr(sim, "niveles_equipo", {})
     fila = {"t": sim.t}
-    try:
-        m = json.loads(Path(eq.archivo).read_text(encoding="utf-8"))
-        edad = (time.time() if ahora is None else ahora) - float(m["hora"])
-        if edad > eq.vencida:
-            fila["sin_dato"] = f"muestra vieja ({edad:.0f} s)"
-        else:
-            sim.cpu_libre = min(1.0, max(0.0, float(m["cpu_libre"])))
-            fila["hora_muestra"] = m["hora"]
-    except (OSError, ValueError, KeyError) as e:
-        fila["sin_dato"] = type(e).__name__
-    fila["cpu_libre"] = float(getattr(sim, "cpu_libre", 1.0))
+    for nivel in eq.niveles:
+        try:
+            m = json.loads((Path(eq.carpeta) / f"{nivel}.json").read_text(encoding="utf-8"))
+            edad = (time.time() if ahora is None else ahora) - float(m["hora"])
+            if edad > eq.vencida:
+                fila[f"sin_dato_{nivel}"] = f"muestra vieja ({edad:.0f} s)"
+            else:
+                niveles[nivel] = min(1.0, max(0.0, float(m["cpu_libre"])))
+        except (OSError, ValueError, KeyError) as e:
+            fila[f"sin_dato_{nivel}"] = type(e).__name__
+        fila[nivel] = niveles.get(nivel, 1.0)
+    sim.niveles_equipo = niveles
+    sim.cpu_libre = float(np.prod([niveles.get(n, 1.0) for n in eq.niveles]))
+    fila["cpu_libre"] = sim.cpu_libre
     _anotar(salida / "equipo.jsonl", [fila])
     return fila
 

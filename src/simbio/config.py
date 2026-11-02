@@ -356,11 +356,14 @@ class VisionCfg:
 class EquipoCfg:
     # el mundo físico de LUCA es el equipo donde corre (autor, 2026-11-01): no el clima de una ciudad, sino la
     # computadora que lo contiene. Una sola conexión, la más literal: la comida recrece en proporción a la fracción de
-    # CPU que el equipo tiene libre (regeneracion · cpu_libre). Si el equipo está ocupado, al mundo le llega menos.
-    # Lo mide afuera experiments/herramientas/lector_equipo.py; el universo continuo lee la última muestra cada
+    # CPU libre (regeneracion · cpu_libre). Siente varios niveles a la vez, como una persona siente su ciudad, su país
+    # y el mundo: la máquina de Docker (su barrio) y la PC entera. La energía que le llega atraviesa cada nivel y cada
+    # uno se queda con su parte: cpu_libre es el producto de la CPU libre de todos los niveles.
+    # Lo mide experiments/herramientas/lector_equipo.py; el universo continuo lee la última muestra cada
     # `revisar_cada` pasos y graba lo aplicado en equipo.jsonl (con eso, cualquier tramo se puede reproducir)
     activa: bool = False
-    archivo: str = "datos/equipo/actual.json"
+    carpeta: str = "datos/equipo"
+    niveles: list[str] = field(default_factory=lambda: ["docker", "pc"])
     revisar_cada: int = 1000
     vencida: float = 600.0  # segundos: una muestra más vieja no se aplica (el lector no anda); queda la anterior
 

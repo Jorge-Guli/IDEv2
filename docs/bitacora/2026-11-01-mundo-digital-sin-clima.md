@@ -33,3 +33,18 @@ El autor: "el universo de LUCA es un contenedor dentro de mi equipo físico; est
 **El lector corre en Docker** (servicio `lector`), a pregunta del autor. Arranca solo con Docker, sin tocar el inicio de Windows, sin internet y con 0,1 CPU. Lee las sesiones montadas en solo lectura, y únicamente sus tamaños.
 - **Consecuencia:** la CPU y la memoria que ve son las de la máquina de Docker Desktop, no las de todo Windows. Es el barrio inmediato de LUCA: los otros contenedores y nuestros experimentos.
 - Primeras lecturas: CPU libre 0,95; memoria libre 0,92.
+
+## Varios niveles a la vez (mismo día)
+El autor: "que sienta ambas cosas, como yo siento lo que pasa en mi ciudad, país, continente, mundo… son distintos niveles".
+
+**Dos niveles:**
+- **docker:** la máquina de Docker, el barrio de LUCA. La lee el servicio `lector`.
+- **pc:** la computadora entera, con los programas del autor. La lee `lector_equipo.py --nivel pc` en Windows.
+
+**Cómo se combinan:** la energía que llega a LUCA atraviesa cada nivel, y cada uno se queda con su parte. Por eso `cpu_libre` es el producto de la CPU libre de los dos niveles. Es la única elección, y se fija acá.
+- Cada nivel se graba por separado en `equipo.jsonl`.
+- Un nivel sin muestra fresca conserva su último valor; uno que nunca dio dato no resta.
+
+**Universo reiniciado desde LUCA.** Primeras lecturas: docker 0,95, pc 0,75–0,81, producto 0,72–0,77.
+
+**Pendiente:** el lector de la PC corre en Windows y no puede vivir en Docker, porque desde ahí no se ve Windows. Para que arranque solo con la PC hay que agregarlo al inicio de Windows, y eso lo decide el autor. Mientras no corra, el nivel pc queda con su último valor.

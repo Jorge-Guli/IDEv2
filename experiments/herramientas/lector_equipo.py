@@ -2,8 +2,11 @@
 
 Corre en su propio contenedor (servicio `lector` de docker-compose.yml: arranca solo con Docker, sin internet y con
 prioridad mínima), y cada `--cada` segundos escribe en datos/equipo/:
-    actual.json            la última muestra (el universo continuo la lee; ver EquipoCfg y continuo.leer_equipo)
-    registro_AAAA-MM.jsonl todas las muestras, para estudiar los ritmos del equipo
+    <nivel>.json                   la última muestra (el universo continuo la lee; ver EquipoCfg y continuo.leer_equipo)
+    registro_<nivel>_AAAA-MM.jsonl todas las muestras, para estudiar los ritmos del equipo
+Niveles (autor: "que sienta ambas cosas, como yo siento mi ciudad, mi país, el mundo"):
+    docker  la máquina donde corren los contenedores: el barrio inmediato de LUCA (lector en Docker)
+    pc      la computadora entera, con los programas del autor (lector en Windows, afuera de Docker)
 Qué mide:
     cpu_libre      fracción de CPU sin usar en el intervalo (la única que hoy alimenta al universo)
     memoria_libre  fracción de memoria disponible
@@ -12,9 +15,8 @@ Qué mide:
 De las sesiones se toma solo el ritmo (cuánto y cuándo), nunca el contenido: no se abre ningún archivo, solo se mira
 su tamaño. Nada sale del equipo.
 
-En Docker, la CPU y la memoria son las de la máquina donde corren los contenedores (en Windows, la de Docker
-Desktop): el barrio inmediato de LUCA, con los demás contenedores y nuestros experimentos, no los programas de Windows.
-Uso: docker compose up -d lector   (también anda afuera: python experiments/herramientas/lector_equipo.py)
+Uso: docker compose up -d lector                                                    (nivel docker)
+     pythonw experiments/herramientas/lector_equipo.py --nivel pc --sin-sesiones   (nivel pc, en Windows)
 """
 
 from __future__ import annotations
@@ -94,6 +96,8 @@ def muestra(previos: dict[str, int], sesiones: Path, cpu: _Cpu) -> tuple[dict, d
 
 def main() -> None:
     ap = argparse.ArgumentParser()
+    ap.add_argument("--nivel", default="docker")
+    ap.add_argument("--sin-sesiones", action="store_true", help="no mira las sesiones (las mira otro nivel)")
     ap.add_argument("--cada", type=float, default=10.0)
     ap.add_argument("--salida", default=str(RAIZ / "datos/equipo"))
     ap.add_argument("--sesiones", default=str(Path.home() / ".claude/projects"))
@@ -105,16 +109,18 @@ def main() -> None:
     cpu = _Cpu()
     if psutil is not None:
         psutil.cpu_percent(interval=None)  # la primera lectura no tiene intervalo
+    if args.sin_sesiones:
+        sesiones = salida / "sin_sesiones"  # no existe: chat_bytes = 0
     previos = _tamanos(sesiones)
     n = 0
     while args.veces == 0 or n < args.veces:
         time.sleep(args.cada)
         m, previos = muestra(previos, sesiones, cpu)
         linea = json.dumps(m)
-        tmp = salida / "actual.json.tmp"
+        tmp = salida / f"{args.nivel}.json.tmp"
         tmp.write_text(linea, encoding="utf-8")
-        os.replace(tmp, salida / "actual.json")  # el universo nunca lee una muestra a medio escribir
-        with open(salida / f"registro_{time.strftime('%Y-%m')}.jsonl", "a", encoding="utf-8") as f:
+        os.replace(tmp, salida / f"{args.nivel}.json")  # el universo nunca lee una muestra a medio escribir
+        with open(salida / f"registro_{args.nivel}_{time.strftime('%Y-%m')}.jsonl", "a", encoding="utf-8") as f:
             f.write(linea + "\n")
         n += 1
 
