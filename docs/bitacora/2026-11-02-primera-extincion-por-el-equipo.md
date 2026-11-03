@@ -21,7 +21,7 @@ La física no se tocó: el recrecimiento sigue siendo `regeneracion · cpu_libre
 - Para la validación pendiente (equipo real contra promedio quieto y contra serie barajada), la tasa de extinción es una medida más: el promedio quieto nunca habría tenido este corte.
 
 ## Segunda extinción (mismo día, 20:57)
-El universo nuevo vivió ~9 h 20 min y 1,99 millones de pasos, con 1 200–1 500 organismos. A las 20:56:41 la PC quedó casi sin CPU libre durante más de 2 min: valores entre 0,0 y 0,1 hasta las 20:58:53, con la memoria libre por debajo del 10 %. Docker seguía al 94 %. La población cayó de 1 304 a 97 en ~1 000 pasos y se extinguió en t = 1 986 332. Ya con la lectura cada 100 pasos, el universo sintió el corte con su duración real.
+El universo nuevo vivió ~9 h 20 min y 1,99 millones de pasos, con 1 200–1 500 organismos. A las 20:56:41 la PC quedó casi sin CPU libre durante más de 2 min: valores entre 0,0 y 0,1 hasta las 20:58:53, con la memoria libre por debajo del 10 %. Causa, según el autor: otra sesión de Claude Code compilando y corriendo tests en el mismo equipo. Docker seguía al 94 %. La población cayó de 1 304 a 97 en ~1 000 pasos y se extinguió en t = 1 986 332. Ya con la lectura cada 100 pasos, el universo sintió el corte con su duración real.
 
 - Dos episodios de CPU casi agotada en 21 h de registro: los dos fueron fatales y no hubo ninguno parcial que dejara sobrevivientes. Sin física nueva no hay salida (ver la fase 15).
 - El mundo extinto queda en `runs/vivo/natural_extinto_2026-11-02b`; arranca otro desde LUCA con la misma física. Cada extinción es un dato para el grupo A del experimento de la fase 15 (física actual con el equipo real).
