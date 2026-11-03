@@ -26,3 +26,6 @@ El universo nuevo vivió ~9 h 20 min y 1,99 millones de pasos, con 1 200–1 500
 - Dos episodios de CPU casi agotada en 21 h de registro: los dos fueron fatales y no hubo ninguno parcial que dejara sobrevivientes. Sin física nueva no hay salida (ver la fase 15).
 - El mundo extinto queda en `runs/vivo/natural_extinto_2026-11-02b`; arranca otro desde LUCA con la misma física. Cada extinción es un dato para el grupo A del experimento de la fase 15 (física actual con el equipo real).
 - Docker seguía relanzando el contenedor extinto cada minuto. Desde el arreglo, eso ya no anota eventos ni da pasos.
+
+## Gemelo en vivo con la física de la fase 15 (21:07)
+El autor recordó que tras cada catástrofe de la Tierra algo sobrevivió, por ejemplo los tardígrados, que sobreviven en criptobiosis con el metabolismo casi detenido. Desde las 21:07 corre el servicio `letargo` (`runs/vivo/letargo`): el mismo `natural.toml`, la misma semilla 0 y `metabolismo.activo = true`. Siente los mismos golpes del equipo en el mismo instante que `natural`. Es una comparación en vivo, con una sola pareja, que no reemplaza al experimento prerregistrado con 6 semillas.

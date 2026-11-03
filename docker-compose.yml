@@ -20,6 +20,21 @@ services:
     stop_grace_period: 60s
     cpus: 0.5
 
+  # Gemelo del natural con la física de la fase 15 (estar quieto cuesta menos, como el letargo de los tardígrados).
+  # Siente los mismos golpes del equipo en el mismo momento: comparación en vivo, a la par del experimento con la
+  # serie grabada. Misma semilla que el natural
+  letargo:
+    image: simbio-vivo
+    volumes:
+      - ./runs/vivo:/datos
+      - ./datos:/simbio/datos:ro
+    command: ["experiments/configs/natural.toml", "--salida", "/datos/letargo", "--guardar-cada", "10000",
+              "--sin-resembrar", "--set", "metabolismo.activo=true"]
+    network_mode: none
+    restart: unless-stopped
+    stop_grace_period: 60s
+    cpus: 0.5
+
   # Lector del equipo: el mundo físico de LUCA (autor, 2026-11-01). Cada 10 s anota la CPU y la memoria libres de la
   # máquina de Docker y el ritmo de las sesiones de Claude Code (solo tamaños de sus registros, nunca el contenido)
   # en ./datos/equipo, que el universo natural lee. Arranca solo con Docker; sin internet y casi sin CPU
